@@ -921,10 +921,10 @@
           if (token.startsWith("$$") && token.endsWith("$$")) {
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("\\\\[") && token.endsWith("\\\\]")) {
+          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("\\\\(") && token.endsWith("\\\\)")) {
+          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
             expression = token.slice(2, -2);
           } else {
             expression = token.slice(1, -1);
@@ -991,10 +991,10 @@
           if (token.startsWith("$$") && token.endsWith("$$")) {
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("\\\\[") && token.endsWith("\\\\]")) {
+          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("\\\\(") && token.endsWith("\\\\)")) {
+          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
             expression = token.slice(2, -2);
           } else {
             expression = token.slice(1, -1);
