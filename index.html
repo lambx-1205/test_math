@@ -286,6 +286,72 @@
       white-space: pre-wrap;
     }
 
+    #preview,
+    .saved-note-rendered {
+      overflow-wrap: anywhere;
+      line-height: 1.8;
+    }
+
+    #preview h1, #preview h2, #preview h3, #preview h4,
+    .saved-note-rendered h1, .saved-note-rendered h2,
+    .saved-note-rendered h3, .saved-note-rendered h4 {
+      margin: 1.15em 0 0.55em;
+      line-height: 1.35;
+    }
+
+    #preview h1, .saved-note-rendered h1 { font-size: 1.65em; }
+    #preview h2, .saved-note-rendered h2 { font-size: 1.4em; }
+    #preview h3, .saved-note-rendered h3 { font-size: 1.2em; }
+    #preview p, .saved-note-rendered p { margin: 0.65em 0; }
+    #preview ul, #preview ol,
+    .saved-note-rendered ul, .saved-note-rendered ol { padding-left: 1.7em; }
+    #preview blockquote, .saved-note-rendered blockquote {
+      margin: 0.9em 0;
+      padding: 0.15em 1em;
+      border-left: 3px solid var(--line);
+      color: var(--muted);
+    }
+    #preview pre, .saved-note-rendered pre {
+      overflow-x: auto;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #f5f7fb;
+      white-space: pre;
+    }
+    #preview code, .saved-note-rendered code {
+      padding: 0.12em 0.32em;
+      border-radius: 4px;
+      background: #f0f2f7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+    #preview pre code, .saved-note-rendered pre code {
+      padding: 0;
+      background: transparent;
+    }
+    #preview table, .saved-note-rendered table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      display: block;
+      overflow-x: auto;
+    }
+    #preview th, #preview td,
+    .saved-note-rendered th, .saved-note-rendered td {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      text-align: left;
+    }
+    #preview th, .saved-note-rendered th { background: #f5f7fb; }
+    #preview hr, .saved-note-rendered hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 1.3em 0;
+    }
+    #preview img, .saved-note-rendered img { max-width: 100%; height: auto; }
+    #preview a, .saved-note-rendered a { color: var(--accent); }
+
     #preview .katex,
     .saved-note-rendered .katex {
       margin-inline: 0.16em;
@@ -595,6 +661,41 @@
       });
     }
 
+    function loadScriptWithFallback(urls, check) {
+      return new Promise(function (resolve, reject) {
+        let index = 0;
+        function next() {
+          if (index >= urls.length) {
+            reject(new Error("Could not load a required rendering library."));
+            return;
+          }
+          const script = document.createElement("script");
+          script.src = urls[index++];
+          script.async = true;
+          script.onload = function () {
+            if (check()) resolve();
+            else { script.remove(); next(); }
+          };
+          script.onerror = function () { script.remove(); next(); };
+          document.head.appendChild(script);
+        }
+        next();
+      });
+    }
+
+    function loadMarkdownLibraries() {
+      return loadScriptWithFallback([
+        "https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js",
+        "https://unpkg.com/marked@15.0.7/marked.min.js"
+      ], function () { return Boolean(window.marked && typeof window.marked.parse === "function"); })
+      .then(function () {
+        return loadScriptWithFallback([
+          "https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js",
+          "https://unpkg.com/dompurify@3.2.6/dist/purify.min.js"
+        ], function () { return Boolean(window.DOMPurify && typeof window.DOMPurify.sanitize === "function"); });
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       const source = document.getElementById("source");
       const preview = document.getElementById("preview");
@@ -787,7 +888,6 @@
       function appendFormula(target, expression, displayMode) {
         const container = document.createElement("span");
         target.appendChild(container);
-
         try {
           window.katex.render(expression, container, {
             displayMode: displayMode,
@@ -801,11 +901,68 @@
         }
       }
 
-      // Render source into any target: the live preview and saved cards use
-      // exactly the same parsing and KaTeX options.
+      function looksLikeMarkdown(text) {
+        return /(^|\n)\s{0,3}(#{1,6}\s|>\s|[-*+]\s|\d+[.)]\s|([-*_]){3,}\s*$|\|.*\|\s*$|\x60{3})|\*\*[^*]+\*\*|__[^_]+__|~~[^~]+~~|\[[^\]]+\]\([^)]+\)|(^|[^\\])\x60[^\x60]+\x60/m.test(text);
+      }
+
+      function renderMathInTextNode(node) {
+        const text = node.nodeValue;
+        const pattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
+        const matches = Array.from(text.matchAll(pattern));
+        if (!matches.length) return;
+
+        const fragment = document.createDocumentFragment();
+        let cursor = 0;
+        matches.forEach(function (match) {
+          appendText(fragment, text.slice(cursor, match.index));
+          const token = match[0];
+          let expression = token;
+          let displayMode = false;
+          if (token.startsWith("$$") && token.endsWith("$$")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\\\[") && token.endsWith("\\\\]")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\\\(") && token.endsWith("\\\\)")) {
+            expression = token.slice(2, -2);
+          } else {
+            expression = token.slice(1, -1);
+          }
+          appendFormula(fragment, expression, displayMode);
+          cursor = match.index + token.length;
+        });
+        appendText(fragment, text.slice(cursor));
+        node.parentNode.replaceChild(fragment, node);
+      }
+
+      function renderMathWithinMarkdown(target) {
+        const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.parentElement && !node.parentElement.closest("code, pre, .katex, script, style")) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach(renderMathInTextNode);
+      }
+
+      function renderMarkdownContent(target, text) {
+        if (!window.marked || !window.DOMPurify) {
+          target.textContent = text;
+          return false;
+        }
+        const html = window.marked.parse(text, { gfm: true, breaks: false });
+        target.innerHTML = window.DOMPurify.sanitize(html, {
+          USE_PROFILES: { html: true }
+        });
+        renderMathWithinMarkdown(target);
+        return true;
+      }
+
       function renderMathContent(target, text) {
         target.replaceChildren();
-
         if (!text.trim()) return;
 
         if (!window.katex || typeof window.katex.render !== "function") {
@@ -813,44 +970,38 @@
           return;
         }
 
-        // If the source has no recognized delimiters, render it directly as a
-        // display formula. Use a fresh global regex so earlier input cannot affect
-        // match positions on later keystrokes.
-        const matches = Array.from(text.matchAll(new RegExp(delimiterPattern.source, "g")));
+        if (looksLikeMarkdown(text)) {
+          renderMarkdownContent(target, text);
+          return;
+        }
 
-        if (matches.length === 0) {
-          const formula = text.trim();
-          if (formula) appendFormula(target, formula, true);
+        const pattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
+        const matches = Array.from(text.matchAll(pattern));
+        if (!matches.length) {
+          appendFormula(target, text.trim(), true);
           return;
         }
 
         let cursor = 0;
-        for (const match of matches) {
-          const token = match[0];
+        matches.forEach(function (match) {
           appendText(target, text.slice(cursor, match.index));
-
-          let expression;
+          const token = match[0];
+          let expression = token;
           let displayMode = false;
-
           if (token.startsWith("$$") && token.endsWith("$$")) {
-            // Display math: remove the two-dollar delimiters on both sides.
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("$") && token.endsWith("$")) {
-            // Inline math: remove exactly one dollar sign on each side.
-            expression = token.slice(1, -1);
-          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
+          } else if (token.startsWith("\\\\[") && token.endsWith("\\\\]")) {
             expression = token.slice(2, -2);
             displayMode = true;
-          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
+          } else if (token.startsWith("\\\\(") && token.endsWith("\\\\)")) {
             expression = token.slice(2, -2);
           } else {
             expression = token.slice(1, -1);
           }
-
           appendFormula(target, expression, displayMode);
           cursor = match.index + token.length;
-        }
+        });
         appendText(target, text.slice(cursor));
       }
 
@@ -871,7 +1022,7 @@
 
         const hasFormulaError = Boolean(preview.querySelector(".katex-error"));
         setStatus(
-          hasFormulaError ? "式の記法を確認してください" : "プレビュー更新済み",
+          hasFormulaError ? "式の記法を確認してください" : "Markdown・数式を描画済み",
           hasFormulaError
         );
       }
@@ -894,14 +1045,14 @@
       renderSavedNotes();
       setStatus("KaTeXを読み込み中…", false);
 
-      loadKatex()
+      Promise.all([loadKatex(), loadMarkdownLibraries()])
         .then(function () {
           renderPreview();
           renderSavedNotes();
         })
         .catch(function (error) {
           preview.textContent = source.value;
-          setStatus("KaTeXを読み込めません。CDNへの接続を確認してください", true);
+          setStatus("描画ライブラリを読み込めません。通信を確認してください", true);
           console.error(error);
         });
     });
