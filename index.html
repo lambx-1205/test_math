@@ -832,7 +832,7 @@
           let expression;
           let displayMode = false;
 
-          if (token.startsWith("$") && token.endsWith("$")) {
+          if (token.startsWith("$$") && token.endsWith("$")) {
             // Display math: remove the two-dollar delimiters on both sides.
             expression = token.slice(2, -2);
             displayMode = true;
