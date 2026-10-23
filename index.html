@@ -286,6 +286,16 @@
       white-space: pre-wrap;
     }
 
+    #preview .katex,
+    .saved-note-rendered .katex {
+      margin-inline: 0.16em;
+    }
+
+    #preview .katex-display .katex,
+    .saved-note-rendered .katex-display .katex {
+      margin-inline: 0;
+    }
+
     #preview .katex-display {
       max-width: 100%;
       margin: 1.15em 0;
@@ -620,7 +630,7 @@
 
       // Math can be wrapped in $...$, $$...$$, \\(...\\), or \\[...\\].
       // When no delimiters are present, treat the whole input as a display formula.
-      const delimiterPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
+      const delimiterPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/;
 
       function readSavedNotes() {
         try {
@@ -803,36 +813,41 @@
           return;
         }
 
-        const matches = Array.from(text.matchAll(delimiterPattern));
+        // If the source has no recognized delimiters, render it directly as a
+        // display formula. Use a fresh global regex so earlier input cannot affect
+        // match positions on later keystrokes.
+        const matches = Array.from(text.matchAll(new RegExp(delimiterPattern.source, "g")));
 
         if (matches.length === 0) {
-          appendFormula(target, text, true);
-        } else {
-          let cursor = 0;
-          for (const match of matches) {
-            const token = match[0];
-            appendText(target, text.slice(cursor, match.index));
-
-            let expression;
-            let displayMode = false;
-
-            if (token.startsWith("$$") && token.endsWith("$$")) {
-              expression = token.slice(2, -2);
-              displayMode = true;
-            } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
-              expression = token.slice(2, -2);
-              displayMode = true;
-            } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
-              expression = token.slice(2, -2);
-            } else {
-              expression = token.slice(1, -1);
-            }
-
-            appendFormula(target, expression, displayMode);
-            cursor = match.index + token.length;
-          }
-          appendText(target, text.slice(cursor));
+          const formula = text.trim();
+          if (formula) appendFormula(target, formula, true);
+          return;
         }
+
+        let cursor = 0;
+        for (const match of matches) {
+          const token = match[0];
+          appendText(target, text.slice(cursor, match.index));
+
+          let expression;
+          let displayMode = false;
+
+          if (token.startsWith("$") && token.endsWith("$")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
+            expression = token.slice(2, -2);
+          } else {
+            expression = token.slice(1, -1);
+          }
+
+          appendFormula(target, expression, displayMode);
+          cursor = match.index + token.length;
+        }
+        appendText(target, text.slice(cursor));
       }
 
       function renderPreview() {
