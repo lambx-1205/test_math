@@ -878,6 +878,7 @@
       loadKatex()
         .then(function () {
           renderPreview();
+          renderSavedNotes();
         })
         .catch(function (error) {
           preview.textContent = source.value;
