@@ -7,14 +7,9 @@
   <title>test_math | 数式プレビュー</title>
   <meta name="description" content="KaTeXを使ってLaTeX数式をリアルタイムにプレビューするシンプルなエディタです。">
 
-  <link rel="stylesheet"
+  <link id="katex-css" rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css"
-    integrity="sha384-3rdsX6e5mueWyoweR9NIVmtEsUkokpBT/0ALqKKIBMr9j4qhHkaIkAcGgsE6uVlp"
-    crossorigin="anonymous">
-  <script defer
-    src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"
-    integrity="sha384-QFFtAGzvvj+bfgCGxXJlNZZ1R1nXEZgvG8tDLCCY1F19xl20WlfTYgguB4VcNdxYk"
-    crossorigin="anonymous"></script>
+    onerror="this.onerror=null;this.href='https://unpkg.com/katex@0.19.0/dist/katex.min.css';">
 
   <style>
     :root {
@@ -406,6 +401,43 @@
   </main>
 
   <script>
+    function loadKatex() {
+      const sources = [
+        "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js",
+        "https://unpkg.com/katex@0.19.0/dist/katex.min.js"
+      ];
+
+      return new Promise(function (resolve, reject) {
+        let index = 0;
+
+        function tryNextSource() {
+          if (index >= sources.length) {
+            reject(new Error("KaTeX could not be loaded from either CDN."));
+            return;
+          }
+
+          const script = document.createElement("script");
+          script.src = sources[index++];
+          script.async = true;
+          script.onload = function () {
+            if (window.katex && typeof window.katex.render === "function") {
+              resolve();
+            } else {
+              script.remove();
+              tryNextSource();
+            }
+          };
+          script.onerror = function () {
+            script.remove();
+            tryNextSource();
+          };
+          document.head.appendChild(script);
+        }
+
+        tryNextSource();
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       const source = document.getElementById("source");
       const preview = document.getElementById("preview");
@@ -532,7 +564,18 @@
       });
 
       source.value = sample;
-      renderPreview();
+      preview.textContent = sample;
+      setStatus("KaTeXを読み込み中…", false);
+
+      loadKatex()
+        .then(function () {
+          renderPreview();
+        })
+        .catch(function (error) {
+          preview.textContent = source.value;
+          setStatus("KaTeXを読み込めません。CDNへの接続を確認してください", true);
+          console.error(error);
+        });
     });
   </script>
 </body>
