@@ -433,7 +433,7 @@
         "\\[",
         "A\\cap B = \\{x\\mid x\\in A,\\ x\\in B\\}",
         "\\]"
-      ].join("\\n");
+      ].join("\n");
 
       function renderPreview() {
         const text = source.value;
@@ -450,8 +450,8 @@
           window.renderMathInElement(preview, {
             delimiters: [
               { left: "$$", right: "$$", display: true },
-              { left: "\\\\[", right: "\\\\]", display: true },
-              { left: "\\\\(", right: "\\\\)", display: false },
+              { left: "\\[", right: "\\]", display: true },
+              { left: "\\(", right: "\\)", display: false },
               { left: "$", right: "$", display: false }
             ],
             throwOnError: false,
