@@ -405,10 +405,27 @@
 
     .saved-note-content {
       margin: 0;
+      min-width: 0;
       overflow-wrap: anywhere;
-      white-space: pre-wrap;
       color: #273347;
-      font: 13px/1.85 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.85;
+    }
+
+    .saved-note-rendered {
+      white-space: pre-wrap;
+    }
+
+    .saved-note-rendered .katex-display {
+      max-width: 100%;
+      margin: 0.9em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 3px 0;
+    }
+
+    .saved-note-rendered .katex-error {
+      color: #b42318;
     }
 
     .footer {
@@ -714,9 +731,9 @@
           actions.append(editButton, deleteButton);
           header.append(date, actions);
 
-          const body = document.createElement("pre");
-          body.className = "saved-note-content";
-          body.textContent = note.content;
+          const body = document.createElement("div");
+          body.className = "saved-note-content saved-note-rendered";
+          renderMathContent(body, note.content);
 
           article.append(header, body);
           savedNotesContainer.appendChild(article);
@@ -753,13 +770,13 @@
         statusText.textContent = message;
       }
 
-      function appendText(text) {
-        if (text) preview.appendChild(document.createTextNode(text));
+      function appendText(target, text) {
+        if (text) target.appendChild(document.createTextNode(text));
       }
 
-      function appendFormula(expression, displayMode) {
+      function appendFormula(target, expression, displayMode) {
         const container = document.createElement("span");
-        preview.appendChild(container);
+        target.appendChild(container);
 
         try {
           window.katex.render(expression, container, {
@@ -770,36 +787,31 @@
           });
         } catch (error) {
           container.textContent = expression;
-          setStatus("数式を描画できません", true);
           console.error("KaTeX render error:", error);
         }
       }
 
-      function renderPreview() {
-        const text = source.value;
-        charCount.textContent = text.length.toLocaleString("ja-JP") + " 文字";
-        preview.replaceChildren();
+      // Render source into any target: the live preview and saved cards use
+      // exactly the same parsing and KaTeX options.
+      function renderMathContent(target, text) {
+        target.replaceChildren();
 
-        if (!text.trim()) {
-          setStatus("入力待ち", false);
-          return;
-        }
+        if (!text.trim()) return;
 
         if (!window.katex || typeof window.katex.render !== "function") {
-          appendText(text);
-          setStatus("KaTeXを読み込めません。通信を確認してください", true);
+          target.textContent = text;
           return;
         }
 
         const matches = Array.from(text.matchAll(delimiterPattern));
 
         if (matches.length === 0) {
-          appendFormula(text, true);
+          appendFormula(target, text, true);
         } else {
           let cursor = 0;
           for (const match of matches) {
             const token = match[0];
-            appendText(text.slice(cursor, match.index));
+            appendText(target, text.slice(cursor, match.index));
 
             let expression;
             let displayMode = false;
@@ -816,10 +828,26 @@
               expression = token.slice(1, -1);
             }
 
-            appendFormula(expression, displayMode);
+            appendFormula(target, expression, displayMode);
             cursor = match.index + token.length;
           }
-          appendText(text.slice(cursor));
+          appendText(target, text.slice(cursor));
+        }
+      }
+
+      function renderPreview() {
+        const text = source.value;
+        charCount.textContent = text.length.toLocaleString("ja-JP") + " 文字";
+        renderMathContent(preview, text);
+
+        if (!text.trim()) {
+          setStatus("入力待ち", false);
+          return;
+        }
+
+        if (!window.katex || typeof window.katex.render !== "function") {
+          setStatus("KaTeXを読み込めません。通信を確認してください", true);
+          return;
         }
 
         const hasFormulaError = Boolean(preview.querySelector(".katex-error"));
