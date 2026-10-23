@@ -289,7 +289,51 @@
     #preview,
     .saved-note-rendered {
       overflow-wrap: anywhere;
-      line-height: 1.8;
+      line-height: 1.55;
+    }
+
+    #preview.markdown-rendered,
+    .saved-note-rendered.markdown-rendered {
+      white-space: normal;
+      line-height: 1.5;
+    }
+
+    #preview.markdown-rendered p,
+    .saved-note-rendered.markdown-rendered p {
+      margin: 0.3em 0;
+    }
+
+    #preview.markdown-rendered h1,
+    #preview.markdown-rendered h2,
+    #preview.markdown-rendered h3,
+    #preview.markdown-rendered h4,
+    .saved-note-rendered.markdown-rendered h1,
+    .saved-note-rendered.markdown-rendered h2,
+    .saved-note-rendered.markdown-rendered h3,
+    .saved-note-rendered.markdown-rendered h4 {
+      margin: 0.75em 0 0.3em;
+    }
+
+    #preview.markdown-rendered ul,
+    #preview.markdown-rendered ol,
+    .saved-note-rendered.markdown-rendered ul,
+    .saved-note-rendered.markdown-rendered ol {
+      margin: 0.25em 0;
+    }
+
+    #preview.markdown-rendered li,
+    .saved-note-rendered.markdown-rendered li {
+      margin: 0.08em 0;
+    }
+
+    #preview.markdown-rendered blockquote,
+    .saved-note-rendered.markdown-rendered blockquote {
+      margin: 0.45em 0;
+    }
+
+    #preview.markdown-rendered .katex-display,
+    .saved-note-rendered.markdown-rendered .katex-display {
+      margin: 0.35em 0;
     }
 
     #preview h1, #preview h2, #preview h3, #preview h4,
@@ -936,28 +980,68 @@
         node.parentNode.replaceChild(fragment, node);
       }
 
-      function renderMathWithinMarkdown(target) {
-        const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
-        const nodes = [];
-        let node;
-        while ((node = walker.nextNode())) {
-          if (node.parentElement && !node.parentElement.closest("code, pre, .katex, script, style")) {
-            nodes.push(node);
-          }
-        }
-        nodes.forEach(renderMathInTextNode);
-      }
-
       function renderMarkdownContent(target, text) {
         if (!window.marked || !window.DOMPurify) {
           target.textContent = text;
           return false;
         }
-        const html = window.marked.parse(text, { gfm: true, breaks: false });
+
+        // Protect math before Markdown parsing so multiline display math isn't split across HTML nodes.
+        const mathTokens = [];
+        const mathPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
+        const protectedText = text.replace(mathPattern, function (token) {
+          const placeholder = "MATHPLACEHOLDER" + mathTokens.length + "ENDTOKEN";
+          let expression = token;
+          let displayMode = false;
+          if (token.startsWith("$") && token.endsWith("$")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
+            expression = token.slice(2, -2);
+            displayMode = true;
+          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
+            expression = token.slice(2, -2);
+          } else {
+            expression = token.slice(1, -1);
+          }
+          mathTokens.push({ placeholder, expression, displayMode });
+          return placeholder;
+        });
+
+        const html = window.marked.parse(protectedText, { gfm: true, breaks: false });
         target.innerHTML = window.DOMPurify.sanitize(html, {
           USE_PROFILES: { html: true }
         });
-        renderMathWithinMarkdown(target);
+
+        if (mathTokens.length) {
+          const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          let node;
+          while ((node = walker.nextNode())) {
+            if (node.parentElement && !node.parentElement.closest("code, pre, script, style")) {
+              nodes.push(node);
+            }
+          }
+          nodes.forEach(function (textNode) {
+            const value = textNode.nodeValue;
+            const fragment = document.createDocumentFragment();
+            let cursor = 0;
+            let found = false;
+            mathTokens.forEach(function (item) {
+              const index = value.indexOf(item.placeholder, cursor);
+              if (index < 0) return;
+              found = true;
+              appendText(fragment, value.slice(cursor, index));
+              appendFormula(fragment, item.expression, item.displayMode);
+              cursor = index + item.placeholder.length;
+            });
+            if (found) {
+              appendText(fragment, value.slice(cursor));
+              textNode.parentNode.replaceChild(fragment, textNode);
+            }
+          });
+        }
+        target.classList.add("markdown-rendered");
         return true;
       }
 
@@ -974,6 +1058,7 @@
           renderMarkdownContent(target, text);
           return;
         }
+        target.classList.remove("markdown-rendered");
 
         const pattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
         const matches = Array.from(text.matchAll(pattern));
