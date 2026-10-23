@@ -300,6 +300,117 @@
       font-size: 0.92em;
     }
 
+    .primary-button {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .primary-button:hover {
+      border-color: #3645bd;
+      background: #3645bd;
+      color: #fff;
+    }
+
+    .saved-section {
+      margin-top: 22px;
+      padding: 21px 22px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .saved-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .saved-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .saved-count {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .saved-description {
+      margin: 9px 0 13px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .saved-feedback {
+      margin: 0 0 12px;
+      color: #3d8067;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .saved-feedback.error { color: #b45309; }
+
+    .saved-notes {
+      display: grid;
+      gap: 12px;
+    }
+
+    .saved-empty {
+      padding: 27px 18px;
+      border: 1px dashed #dbe1eb;
+      border-radius: 12px;
+      color: #8a94a6;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .saved-note {
+      min-width: 0;
+      padding: 15px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fcfdff;
+    }
+
+    .saved-note-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .saved-note-date {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .saved-note-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 7px;
+    }
+
+    .saved-note-content {
+      margin: 0;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      color: #273347;
+      font: 13px/1.85 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
     .footer {
       display: flex;
       justify-content: space-between;
@@ -324,6 +435,8 @@
       .version-pill { margin-top: 5px; }
       .panel-heading { align-items: flex-start; padding: 13px; }
       .panel-actions { flex-direction: column; }
+      .saved-section { padding: 17px 14px; }
+      .saved-note-actions { flex-direction: column; }
       .editor-area { padding: 10px; }
       textarea { padding: 12px; font-size: 12px; }
       .preview-wrap { padding: 19px 15px; }
@@ -360,6 +473,7 @@
             </div>
           </div>
           <div class="panel-actions">
+            <button id="save-button" class="primary-button" type="button">保存</button>
             <button id="sample-button" type="button">サンプル</button>
             <button id="clear-button" type="button">クリア</button>
           </div>
@@ -392,6 +506,22 @@
           <div id="preview" aria-label="数式のプレビュー"></div>
         </div>
       </section>
+    </section>
+
+    <section class="saved-section" aria-labelledby="saved-title">
+      <div class="saved-section-header">
+        <div class="saved-heading">
+          <div class="panel-icon" aria-hidden="true">▤</div>
+          <div>
+            <h2 id="saved-title">保存したメモ</h2>
+            <p class="panel-subtitle">保存した内容はここに追加されます</p>
+          </div>
+        </div>
+        <span id="saved-count" class="saved-count">0 件</span>
+      </div>
+      <p class="saved-description">「保存」を押すと、左の入力欄の内容が下の一覧に追加されます。このブラウザに保存されるため、同じブラウザで次回開いたときも残ります。</p>
+      <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">まだメモはありません。内容を入力して「保存」を押してください。</p>
+      <div id="saved-notes" class="saved-notes"></div>
     </section>
 
     <footer class="footer">
@@ -446,6 +576,11 @@
       const charCount = document.getElementById("char-count");
       const sampleButton = document.getElementById("sample-button");
       const clearButton = document.getElementById("clear-button");
+      const saveButton = document.getElementById("save-button");
+      const savedNotesContainer = document.getElementById("saved-notes");
+      const savedCount = document.getElementById("saved-count");
+      const savedFeedback = document.getElementById("saved-feedback");
+      const storageKey = "test_math_saved_notes_v1";
 
       const sample = [
         "インライン数式は $a^2+b^2=c^2$ のように文章中に置けます。",
@@ -469,6 +604,149 @@
       // Math can be wrapped in $...$, $$...$$, \\(...\\), or \\[...\\].
       // When no delimiters are present, treat the whole input as a display formula.
       const delimiterPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
+
+      function readSavedNotes() {
+        try {
+          const stored = localStorage.getItem(storageKey);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) return [];
+          return parsed.filter(function (note) {
+            return note && typeof note.id === "string" &&
+              typeof note.content === "string" &&
+              typeof note.savedAt === "string";
+          });
+        } catch (error) {
+          console.warn("Saved notes could not be read:", error);
+          savedFeedback.textContent = "保存データを読み込めませんでした。ブラウザの保存設定を確認してください。";
+          savedFeedback.classList.add("error");
+          return [];
+        }
+      }
+
+      let savedNotes = readSavedNotes();
+
+      function persistSavedNotes() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(savedNotes));
+          return true;
+        } catch (error) {
+          console.error("Saved notes could not be stored:", error);
+          savedFeedback.textContent = "ブラウザへの保存に失敗しました。プライベートブラウズや保存容量の設定を確認してください。";
+          savedFeedback.classList.add("error");
+          return false;
+        }
+      }
+
+      function updateSavedFeedback(message, isError) {
+        savedFeedback.textContent = message;
+        savedFeedback.classList.toggle("error", Boolean(isError));
+      }
+
+      function formatSavedDate(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "保存日時不明";
+        return date.toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+
+      function renderSavedNotes() {
+        savedNotesContainer.replaceChildren();
+        savedCount.textContent = savedNotes.length.toLocaleString("ja-JP") + " 件";
+
+        if (savedNotes.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "saved-empty";
+          empty.textContent = "保存したメモはまだありません。入力欄に内容を書き、「保存」を押してください。";
+          savedNotesContainer.appendChild(empty);
+          return;
+        }
+
+        savedNotes.forEach(function (note) {
+          const article = document.createElement("article");
+          article.className = "saved-note";
+
+          const header = document.createElement("div");
+          header.className = "saved-note-header";
+
+          const date = document.createElement("time");
+          date.className = "saved-note-date";
+          date.dateTime = note.savedAt;
+          date.textContent = "保存日時： " + formatSavedDate(note.savedAt);
+
+          const actions = document.createElement("div");
+          actions.className = "saved-note-actions";
+
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.textContent = "編集欄に戻す";
+          editButton.addEventListener("click", function () {
+            source.value = note.content;
+            renderPreview();
+            source.focus();
+            document.querySelector(".editor-panel").scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+            updateSavedFeedback("保存したメモを入力欄に戻しました。元のメモは保存されたままです。", false);
+          });
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.textContent = "削除";
+          deleteButton.addEventListener("click", function () {
+            savedNotes = savedNotes.filter(function (item) {
+              return item.id !== note.id;
+            });
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored ? "メモを削除しました。" : "メモはこの画面から削除しましたが、ブラウザへの保存更新に失敗しました。",
+              !stored
+            );
+          });
+
+          actions.append(editButton, deleteButton);
+          header.append(date, actions);
+
+          const body = document.createElement("pre");
+          body.className = "saved-note-content";
+          body.textContent = note.content;
+
+          article.append(header, body);
+          savedNotesContainer.appendChild(article);
+        });
+      }
+
+      function saveCurrentNote() {
+        const text = source.value;
+        if (!text.trim()) {
+          updateSavedFeedback("空の内容は保存できません。先に入力欄へ内容を書いてください。", true);
+          source.focus();
+          return;
+        }
+
+        const note = {
+          id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
+          content: text,
+          savedAt: new Date().toISOString()
+        };
+
+        savedNotes.unshift(note);
+        const stored = persistSavedNotes();
+        renderSavedNotes();
+
+        if (stored) {
+          updateSavedFeedback("保存しました。ページを再読み込みしても、このブラウザ内にメモが残ります。", false);
+        } else {
+          updateSavedFeedback("一覧には追加しましたが、ブラウザに永続保存できませんでした。", true);
+        }
+      }
 
       function setStatus(message, isError) {
         status.classList.toggle("error", Boolean(isError));
@@ -552,6 +830,7 @@
       }
 
       source.addEventListener("input", renderPreview);
+      saveButton.addEventListener("click", saveCurrentNote);
       sampleButton.addEventListener("click", function () {
         source.value = sample;
         renderPreview();
@@ -565,6 +844,7 @@
 
       source.value = sample;
       preview.textContent = sample;
+      renderSavedNotes();
       setStatus("KaTeXを読み込み中…", false);
 
       loadKatex()
