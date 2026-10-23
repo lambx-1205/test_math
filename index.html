@@ -833,8 +833,12 @@
           let displayMode = false;
 
           if (token.startsWith("$") && token.endsWith("$")) {
+            // Display math: remove the two-dollar delimiters on both sides.
             expression = token.slice(2, -2);
             displayMode = true;
+          } else if (token.startsWith("$") && token.endsWith("$")) {
+            // Inline math: remove exactly one dollar sign on each side.
+            expression = token.slice(1, -1);
           } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
             expression = token.slice(2, -2);
             displayMode = true;
