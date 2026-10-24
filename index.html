@@ -1107,7 +1107,7 @@
           const placeholder = "MATHPLACEHOLDER" + mathTokens.length + "ENDTOKEN";
           let expression = token;
           let displayMode = false;
-          if (token.startsWith("$") && token.endsWith("$")) {
+          if (token.startsWith("$$") && token.endsWith("$$")) {
             expression = token.slice(2, -2);
             displayMode = true;
           } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
