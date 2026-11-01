@@ -514,7 +514,18 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 10px;
+      min-width: 0;
+    }
+
+    .saved-note-title {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      color: #273347;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
     .saved-note-date {
@@ -527,6 +538,31 @@
       display: flex;
       flex: 0 0 auto;
       gap: 7px;
+    }
+
+    .saved-note-expanded {
+      margin-top: 13px;
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .saved-note-expanded[hidden] {
+      display: none;
+    }
+
+    .saved-note-detail-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .saved-note-date {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
     }
 
     .saved-note-content {
@@ -650,6 +686,8 @@
           </div>
           <div class="panel-actions">
             <button id="save-button" class="primary-button" type="button">保存</button>
+            <button id="overwrite-save-button" type="button" hidden>上書き保存</button>
+            <button id="rename-save-button" type="button" hidden>保存名変更</button>
             <button id="sample-button" type="button">サンプル</button>
             <button id="clear-button" type="button">クリア</button>
           </div>
@@ -695,7 +733,7 @@
         </div>
         <span id="saved-count" class="saved-count">0 件</span>
       </div>
-      <p class="saved-description">「保存」を押すと、左の入力欄の内容が下の一覧に追加されます。このブラウザに保存されるため、同じブラウザで次回開いたときも残ります。</p>
+      <p class="saved-description">「保存」を押すとタイトル入力ダイアログが開き、タイトル付きで一覧に追加されます。保存内容はこのブラウザに保存されます。</p>
       <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">まだメモはありません。内容を入力して「保存」を押してください。</p>
       <div id="saved-notes" class="saved-notes"></div>
     </section>
@@ -864,6 +902,8 @@
       const sampleButton = document.getElementById("sample-button");
       const clearButton = document.getElementById("clear-button");
       const saveButton = document.getElementById("save-button");
+      const overwriteSaveButton = document.getElementById("overwrite-save-button");
+      const renameSaveButton = document.getElementById("rename-save-button");
       const savedNotesContainer = document.getElementById("saved-notes");
       const savedCount = document.getElementById("saved-count");
       const savedFeedback = document.getElementById("saved-feedback");
@@ -896,11 +936,21 @@
           if (!stored) return [];
           const parsed = JSON.parse(stored);
           if (!Array.isArray(parsed)) return [];
-          return parsed.filter(function (note) {
-            return note && typeof note.id === "string" &&
-              typeof note.content === "string" &&
-              typeof note.savedAt === "string";
-          });
+          return parsed
+            .filter(function (note) {
+              return note && typeof note.id === "string" &&
+                typeof note.content === "string" &&
+                typeof note.savedAt === "string";
+            })
+            .map(function (note) {
+              // Keep notes created by older versions readable.
+              return {
+                ...note,
+                title: typeof note.title === "string" && note.title.trim()
+                  ? note.title
+                  : "無題のメモ"
+              };
+            });
         } catch (error) {
           console.warn("Saved notes could not be read:", error);
           savedFeedback.textContent = "保存データを読み込めませんでした。ブラウザの保存設定を確認してください。";
@@ -910,6 +960,20 @@
       }
 
       let savedNotes = readSavedNotes();
+      let editingNoteId = null;
+
+      function setEditingNote(note) {
+        editingNoteId = note ? note.id : null;
+        overwriteSaveButton.hidden = !note;
+        renameSaveButton.hidden = !note;
+        if (note) {
+          overwriteSaveButton.title = "「" + note.title + "」の内容を上書き保存";
+          renameSaveButton.title = "「" + note.title + "」の保存名を変更";
+        } else {
+          overwriteSaveButton.removeAttribute("title");
+          renameSaveButton.removeAttribute("title");
+        }
+      }
 
       function persistSavedNotes() {
         try {
@@ -959,53 +1023,129 @@
           const header = document.createElement("div");
           header.className = "saved-note-header";
 
-          const date = document.createElement("time");
-          date.className = "saved-note-date";
-          date.dateTime = note.savedAt;
-          date.textContent = "保存日時： " + formatSavedDate(note.savedAt);
+          const title = document.createElement("h3");
+          title.className = "saved-note-title";
+          title.textContent = note.title || "無題のメモ";
 
           const actions = document.createElement("div");
           actions.className = "saved-note-actions";
+
+          const body = document.createElement("div");
+          body.className = "saved-note-expanded";
+          body.hidden = true;
+
+          const openButton = document.createElement("button");
+          openButton.type = "button";
+          openButton.textContent = "開く";
+          openButton.setAttribute("aria-expanded", "false");
+          openButton.addEventListener("click", function () {
+            body.hidden = !body.hidden;
+            openButton.textContent = body.hidden ? "開く" : "閉じる";
+            openButton.setAttribute("aria-expanded", String(!body.hidden));
+          });
+
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.textContent = "コピー";
+          copyButton.addEventListener("click", function () {
+            copyTextToClipboard(note.content)
+              .then(function () {
+                updateSavedFeedback("「" + (note.title || "無題のメモ") + "」の内容をコピーしました。", false);
+              })
+              .catch(function (error) {
+                console.error("Clipboard copy failed:", error);
+                updateSavedFeedback("コピーできませんでした。ブラウザのクリップボード利用設定を確認してください。", true);
+              });
+          });
 
           const editButton = document.createElement("button");
           editButton.type = "button";
           editButton.textContent = "編集欄に戻す";
           editButton.addEventListener("click", function () {
             source.value = note.content;
+            setEditingNote(note);
             renderPreview();
             source.focus();
             document.querySelector(".editor-panel").scrollIntoView({
               behavior: "smooth",
               block: "start"
             });
-            updateSavedFeedback("保存したメモを入力欄に戻しました。元のメモは保存されたままです。", false);
+            updateSavedFeedback("「" + (note.title || "無題のメモ") + "」を編集中です。編集後は「上書き保存」を押してください。", false);
           });
+
+          actions.append(openButton, copyButton, editButton);
+          header.append(title, actions);
+
+          const renderedContent = document.createElement("div");
+          renderedContent.className = "saved-note-content saved-note-rendered";
+          renderMathContent(renderedContent, note.content);
+
+          const detailFooter = document.createElement("div");
+          detailFooter.className = "saved-note-detail-footer";
+
+          const date = document.createElement("time");
+          date.className = "saved-note-date";
+          date.dateTime = note.updatedAt || note.savedAt;
+          date.textContent = (note.updatedAt && note.updatedAt !== note.savedAt)
+            ? "最終更新： " + formatSavedDate(note.updatedAt)
+            : "保存日時： " + formatSavedDate(note.savedAt);
 
           const deleteButton = document.createElement("button");
           deleteButton.type = "button";
           deleteButton.textContent = "削除";
           deleteButton.addEventListener("click", function () {
+            const deletingActiveNote = editingNoteId === note.id;
             savedNotes = savedNotes.filter(function (item) {
               return item.id !== note.id;
             });
             const stored = persistSavedNotes();
+            if (deletingActiveNote) setEditingNote(null);
             renderSavedNotes();
             updateSavedFeedback(
-              stored ? "メモを削除しました。" : "メモはこの画面から削除しましたが、ブラウザへの保存更新に失敗しました。",
+              stored ? "「" + (note.title || "無題のメモ") + "」を削除しました。" : "一覧から削除しましたが、ブラウザへの保存更新に失敗しました。",
               !stored
             );
           });
 
-          actions.append(editButton, deleteButton);
-          header.append(date, actions);
-
-          const body = document.createElement("div");
-          body.className = "saved-note-content saved-note-rendered";
-          renderMathContent(body, note.content);
-
+          detailFooter.append(date, deleteButton);
+          body.append(renderedContent, detailFooter);
           article.append(header, body);
           savedNotesContainer.appendChild(article);
         });
+      }
+
+      function fallbackCopyText(text) {
+        return new Promise(function (resolve, reject) {
+          const temporary = document.createElement("textarea");
+          temporary.value = text;
+          temporary.setAttribute("readonly", "");
+          temporary.style.position = "fixed";
+          temporary.style.opacity = "0";
+          temporary.style.pointerEvents = "none";
+          document.body.appendChild(temporary);
+          temporary.focus();
+          temporary.select();
+
+          let copied = false;
+          try {
+            copied = document.execCommand("copy");
+          } catch (error) {
+            copied = false;
+          }
+          temporary.remove();
+
+          if (copied) resolve();
+          else reject(new Error("Clipboard copy is unavailable."));
+        });
+      }
+
+      function copyTextToClipboard(text) {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+          return navigator.clipboard.writeText(text).catch(function () {
+            return fallbackCopyText(text);
+          });
+        }
+        return fallbackCopyText(text);
       }
 
       function saveCurrentNote() {
@@ -1016,21 +1156,94 @@
           return;
         }
 
+        const enteredTitle = window.prompt("保存するメモのタイトルを入力してください。", "");
+        if (enteredTitle === null) return;
+        const title = enteredTitle.trim();
+        if (!title) {
+          updateSavedFeedback("タイトルが空欄のため、保存しませんでした。", true);
+          return;
+        }
+
+        const now = new Date().toISOString();
         const note = {
           id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
+          title: title,
           content: text,
-          savedAt: new Date().toISOString()
+          savedAt: now,
+          updatedAt: now
         };
 
         savedNotes.unshift(note);
+        setEditingNote(null);
         const stored = persistSavedNotes();
         renderSavedNotes();
 
         if (stored) {
-          updateSavedFeedback("保存しました。ページを再読み込みしても、このブラウザ内にメモが残ります。", false);
+          updateSavedFeedback("「" + title + "」を保存しました。", false);
         } else {
           updateSavedFeedback("一覧には追加しましたが、ブラウザに永続保存できませんでした。", true);
         }
+      }
+
+      function overwriteCurrentNote() {
+        if (!editingNoteId) {
+          updateSavedFeedback("上書きするメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
+          return;
+        }
+        const text = source.value;
+        if (!text.trim()) {
+          updateSavedFeedback("空の内容では上書き保存できません。", true);
+          source.focus();
+          return;
+        }
+
+        const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
+        if (!note) {
+          setEditingNote(null);
+          updateSavedFeedback("編集対象のメモが見つかりません。保存一覧を確認してください。", true);
+          return;
+        }
+
+        note.content = text;
+        note.updatedAt = new Date().toISOString();
+        const stored = persistSavedNotes();
+        renderSavedNotes();
+        updateSavedFeedback(
+          stored ? "「" + note.title + "」を上書き保存しました。" : "画面上では更新しましたが、ブラウザへの保存に失敗しました。",
+          !stored
+        );
+      }
+
+      function renameCurrentNote() {
+        if (!editingNoteId) {
+          updateSavedFeedback("名前を変更するメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
+          return;
+        }
+
+        const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
+        if (!note) {
+          setEditingNote(null);
+          updateSavedFeedback("編集対象のメモが見つかりません。保存一覧を確認してください。", true);
+          return;
+        }
+
+        const enteredTitle = window.prompt("新しい保存名を入力してください。", note.title || "");
+        if (enteredTitle === null) return;
+        const title = enteredTitle.trim();
+        if (!title) {
+          updateSavedFeedback("保存名が空欄のため、変更しませんでした。", true);
+          return;
+        }
+
+        note.title = title;
+        note.updatedAt = new Date().toISOString();
+        const stored = persistSavedNotes();
+        setEditingNote(note);
+        renderSavedNotes();
+        updateSavedFeedback(
+          stored ? "保存名を「" + title + "」に変更しました。" : "画面上では名前を変更しましたが、ブラウザへの保存に失敗しました。",
+          !stored
+        );
       }
 
       function setStatus(message, isError) {
@@ -1242,6 +1455,8 @@
 
       source.addEventListener("input", renderPreview);
       saveButton.addEventListener("click", saveCurrentNote);
+      overwriteSaveButton.addEventListener("click", overwriteCurrentNote);
+      renameSaveButton.addEventListener("click", renameCurrentNote);
       sampleButton.addEventListener("click", function () {
         source.value = sample;
         renderPreview();
@@ -1255,6 +1470,7 @@
 
       source.value = sample;
       preview.textContent = sample;
+      setEditingNote(null);
       renderSavedNotes();
       setStatus("KaTeXを読み込み中…", false);
 
