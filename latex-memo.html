@@ -803,18 +803,14 @@
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">∑</div>
         <div>
-          <p class="eyebrow">UTILITY HUB / EDITOR</p>
+          
           <h1>LaTeX メモ帳</h1>
         </div>
       </div>
       <a class="version-pill home-link" href="index.html">← トップページへ戻る</a>
     </header>
 
-    <p class="intro">
-      左側に Markdown と LaTeX を入力すると、右側にリアルタイムで表示されます。数式は必ず区切り記号で囲んでください。
-      表示数式は <code>$ ... $</code> または <code>\[ ... \]</code>、
-      文中の数式は <code>$ ... $</code> または <code>\( ... \)</code> を使います。区切りのない LaTeX は数式として描画されません。
-    </p>
+    <p class="intro">表示数式は <code>\[ ... \]</code>、文中数式は <code>\( ... \)</code> で囲みます。Markdownにも対応しています。</p>
 
     <section class="workbench" aria-label="数式エディタ">
       <section class="panel editor-panel" aria-labelledby="editor-title">
@@ -835,7 +831,7 @@
           </div>
         </div>
         <div class="editor-area">
-          <label for="source-editor" class="eyebrow">SOURCE EDITOR</label>
+          
           <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
           <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
@@ -851,7 +847,7 @@
             <div class="panel-icon" aria-hidden="true">∑</div>
             <div>
               <h2 id="preview-title">出力</h2>
-              <p class="panel-subtitle">レンダリング結果</p>
+              
             </div>
           </div>
           <div id="status" class="status" role="status" aria-live="polite">
@@ -868,7 +864,7 @@
     <section class="character-count-panel" aria-label="現在の文字数" aria-live="polite">
       <div>
         <p class="character-count-label">現在の文字数</p>
-        <p class="character-count-hint">入力欄の内容をリアルタイムで集計（空白・改行を含む）</p>
+        
       </div>
       <output id="current-character-count" class="character-count-value" aria-label="現在の文字数">0 文字</output>
     </section>
@@ -879,29 +875,17 @@
           <div class="panel-icon" aria-hidden="true">▤</div>
           <div>
             <h2 id="saved-title">保存したメモ</h2>
-            <p class="panel-subtitle">保存した内容はここに追加されます</p>
+            
           </div>
         </div>
         <span id="saved-count" class="saved-count">0 件</span>
       </div>
-      <p class="saved-description">「保存」を押すとタイトル入力ダイアログが開き、タイトル付きで一覧に追加されます。保存内容はこのブラウザに保存されます。</p>
-      <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">まだメモはありません。内容を入力して「保存」を押してください。</p>
+      <p class="saved-description">保存したメモはこのブラウザに保存されます。</p>
+      <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">保存したメモはありません。</p>
       <div id="saved-notes" class="saved-notes"></div>
     </section>
 
-    <footer class="footer">
-      <span>Powered by KaTeX · 入力内容はこのページ内で処理されます。</span>
-      <span>GitHub Pages 用の静的ページ</span>
-      <div class="footer-meta" aria-live="polite">
-        <div><strong>最終更新日時：</strong><time id="last-updated">GitHubから取得中…</time></div>
-        <div>
-          <strong>更新履歴：</strong>
-          <ul id="update-history">
-            <li><a href="https://github.com/lambx-1205/test_math/commits/main/latex-memo.html" target="_blank" rel="noopener noreferrer">GitHubで更新履歴を確認</a></li>
-          </ul>
-        </div>
-      </div>
-    </footer>
+
   </main>
 
   <script>
@@ -977,74 +961,7 @@
       });
     }
 
-    function formatJstDateTime(isoString) {
-      return new Intl.DateTimeFormat("ja-JP", {
-        timeZone: "Asia/Tokyo",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-      }).format(new Date(isoString)) + " JST";
-    }
-
-    function loadFooterHistory() {
-      const updatedAt = document.getElementById("last-updated");
-      const history = document.getElementById("update-history");
-      const historyUrl = "https://github.com/lambx-1205/test_math/commits/main/index.html";
-      fetch("https://api.github.com/repos/lambx-1205/test_math/commits?path=latex-memo.html&per_page=5", {
-        headers: { Accept: "application/vnd.github+json" }
-      })
-        .then(function (response) {
-          if (!response.ok) throw new Error("GitHub commit history unavailable");
-          return response.json();
-        })
-        .then(function (commits) {
-          if (!Array.isArray(commits) || commits.length === 0) {
-            throw new Error("No commits returned");
-          }
-
-          const latest = commits[0];
-          const latestDate = latest.commit.committer.date || latest.commit.author.date;
-          updatedAt.dateTime = latestDate;
-          updatedAt.textContent = formatJstDateTime(latestDate);
-          history.replaceChildren();
-
-          commits.forEach(function (item) {
-            const li = document.createElement("li");
-            const time = document.createElement("time");
-            const commitDate = item.commit.committer.date || item.commit.author.date;
-            time.dateTime = commitDate;
-            time.textContent = formatJstDateTime(commitDate);
-            const link = document.createElement("a");
-            link.href = item.html_url;
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            link.textContent = item.commit.message.split("\n")[0];
-            li.appendChild(time);
-            li.appendChild(document.createTextNode(" · "));
-            li.appendChild(link);
-            history.appendChild(li);
-          });
-        })
-        .catch(function (error) {
-          updatedAt.textContent = "取得できません";
-          history.replaceChildren();
-          const li = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = historyUrl;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = "GitHubで更新履歴を確認";
-          li.appendChild(link);
-          history.appendChild(li);
-          console.warn(error);
-        });
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
-      loadFooterHistory();
       const source = document.getElementById("source");
       const sourceEditorHost = document.getElementById("source-editor");
       const preview = document.getElementById("preview");
