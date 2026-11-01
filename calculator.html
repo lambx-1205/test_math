@@ -36,45 +36,7 @@
     .home-link { padding:8px 11px; border:1px solid #dfe3ff; border-radius:999px; background:#f0f2ff; color:#3e4dc0; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; }
     .home-link:hover { background:#e7eaff; }
     .intro { margin:0 0 19px; color:var(--muted); font-size:13px; line-height:1.8; }
-    .workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:17px; align-items:start; }
-    .tool-tabs { display:flex; gap:7px; margin:0 0 17px; padding:5px; overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:#f0f2f7; }
-    .tool-tab { min-width:76px; padding:9px 15px; border:0; border-radius:8px; background:transparent; color:var(--muted); font-size:12px; font-weight:750; white-space:nowrap; }
-    .tool-tab:hover { background:rgba(255,255,255,.65); }
-    .tool-tab.active { background:#fff; color:var(--accent); box-shadow:0 1px 5px rgba(25,35,60,.10); }
-    .tab-panel { display:none; }
-    .tab-panel.active { display:block; }
-    .operations-intro { margin:2px 0 16px; }
-    .operations-intro h2 { margin:0 0 5px; font-size:17px; }
-    .operations-intro p { margin:0; color:var(--muted); font-size:12px; line-height:1.7; }
-    .operation-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; align-items:start; }
-    .operation-card { height:100%; }
-    .operation-card:first-child { grid-row:span 2; }
-    .operation-form { display:grid; gap:12px; }
-    .matrix-input { width:100%; min-height:92px; resize:vertical; padding:10px 11px; border:1px solid #dfe5ef; border-radius:9px; outline:none; background:#fbfcff; color:#243047; font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
-    .matrix-input:focus, .operation-form input:focus { border-color:#aeb8f3; box-shadow:0 0 0 3px rgba(70,88,216,.08); }
-    .operation-form input { width:100%; min-height:38px; padding:8px 10px; border:1px solid #dfe5ef; border-radius:8px; outline:none; background:#fff; color:var(--ink); font:12px ui-monospace,SFMono-Regular,Menlo,monospace; }
-    .operation-button { min-height:38px; padding:9px 13px; border:1px solid var(--accent); border-radius:9px; background:var(--accent); color:#fff; font-size:12px; font-weight:750; }
-    .operation-button:hover { border-color:#3645bd; background:#3645bd; }
-    .secondary-operation { width:100%; margin-top:8px; background:#f0f2ff; color:#3e4dc0; border-color:#dfe3ff; }
-    .secondary-operation:hover { background:#e6e9ff; color:#2938a8; }
-    .operation-result-wrap { display:grid; gap:7px; padding:11px; border:1px solid #e1e5f5; border-radius:10px; background:#fafbff; }
-    .operation-result { min-height:40px; max-height:260px; margin:0; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:#26346b; font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
-    .operation-result.error { color:#b42318; }
-    .operation-note { margin:0; color:var(--muted); font-size:10px; line-height:1.65; }
-    .operation-actions { display:grid; }
-    .interval-row { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; }
-    .interval-row span { color:var(--muted); font-size:12px; }
-    .advanced-keys { margin-top:12px; border:1px solid var(--line); border-radius:10px; background:#fafbfe; }
-    .advanced-keys summary { padding:10px 12px; color:#536078; font-size:11px; font-weight:750; cursor:pointer; }
-    .advanced-keypad { margin:0; padding:0 10px 10px; grid-template-columns:repeat(5,minmax(0,1fr)); }
-    .basic-keypad { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:14px; }
-    .basic-keypad .equals { grid-column:span 4; }
-    .tab-panel[hidden] { display:none !important; }
-    #tab-calculator .workspace > .panel { max-width:900px; }
-    #tab-calculator .guide { max-width:900px; }
-    .operation-result-wrap .small-button { justify-self:start; }
-    @media(max-width:900px) { .operation-grid { grid-template-columns:minmax(0,1fr); } .operation-card:first-child { grid-row:auto; } }
-
+    .workspace { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(310px,.85fr); gap:17px; align-items:start; }
     .panel { min-width:0; border:1px solid var(--line); border-radius:17px; background:var(--panel); box-shadow:var(--shadow); overflow:hidden; }
     .panel-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); }
     .panel-heading h2 { margin:0; font-size:14px; font-weight:800; }
@@ -130,9 +92,10 @@
     .guide p { margin:0; color:var(--muted); font-size:10px; line-height:1.75; }
     .guide code { padding:1px 4px; border-radius:4px; background:#f0f2f7; color:#46536b; font:10px ui-monospace,monospace; }
     footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 15px; margin-top:18px; color:#8a94a6; font-size:10px; line-height:1.6; }
-    @media(max-width:900px) { .operation-grid { grid-template-columns:minmax(0,1fr); } }
+    @media(max-width:900px) { .workspace { grid-template-columns:minmax(0,1fr); } .side-stack { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; } }
     @media(max-width:620px) {
       .shell { padding:20px 13px; }
+      .side-stack { grid-template-columns:minmax(0,1fr); }
       .panel-body { padding:13px; }
       .panel-heading { padding:14px; }
       .key { min-height:41px; }
@@ -158,16 +121,8 @@
 
     <p class="intro">四則演算から三角関数、対数、複素数、行列まで。式をそのまま入力することも、キーを使って組み立てることもできます。計算履歴と単位変換もこのページ内で利用できます。</p>
 
-    <nav class="tool-tabs" role="tablist" aria-label="電卓の機能">
-      <button class="tool-tab active" id="tab-button-calculator" type="button" role="tab" aria-selected="true" aria-controls="tab-calculator" data-tab-target="calculator">電卓</button>
-      <button class="tool-tab" id="tab-button-operations" type="button" role="tab" aria-selected="false" aria-controls="tab-operations" data-tab-target="operations">演算</button>
-      <button class="tool-tab" id="tab-button-units" type="button" role="tab" aria-selected="false" aria-controls="tab-units" data-tab-target="units">単位変換</button>
-      <button class="tool-tab" id="tab-button-history" type="button" role="tab" aria-selected="false" aria-controls="tab-history" data-tab-target="history">履歴</button>
-    </nav>
-
-    <section class="tab-panel active" id="tab-calculator" role="tabpanel" aria-labelledby="tab-button-calculator">
-      <div class="workspace">
-        <section class="panel" aria-labelledby="calc-heading">
+    <div class="workspace">
+      <section class="panel" aria-labelledby="calc-heading">
         <div class="panel-heading">
           <div>
             <h2 id="calc-heading">計算</h2>
@@ -191,61 +146,61 @@
             <button id="copy-result" class="small-button" type="button">結果をコピー</button>
           </div>
 
-          <div class="keypad basic-keypad" aria-label="基本電卓キー">
-            <button class="key danger" data-action="clear" type="button">AC</button>
+          <div class="keypad" aria-label="電卓キー">
+            <button class="key function" data-insert="sin(" type="button">sin</button>
+            <button class="key function" data-insert="cos(" type="button">cos</button>
+            <button class="key function" data-insert="tan(" type="button">tan</button>
+            <button class="key function" data-insert="log10(" type="button">log</button>
+            <button class="key function" data-insert="log(" type="button">ln / log</button>
+
+            <button class="key function" data-insert="asin(" type="button">sin⁻¹</button>
+            <button class="key function" data-insert="acos(" type="button">cos⁻¹</button>
+            <button class="key function" data-insert="atan(" type="button">tan⁻¹</button>
+            <button class="key function" data-insert="sqrt(" type="button">√</button>
+            <button class="key function" data-insert="abs(" type="button">abs</button>
+
+            <button class="key function" data-insert="pi" type="button">π</button>
+            <button class="key function" data-insert="e" type="button">e</button>
+            <button class="key function" data-insert="ans" type="button">Ans</button>
             <button class="key function" data-insert="(" type="button">(</button>
             <button class="key function" data-insert=")" type="button">)</button>
-            <button class="key danger" data-action="backspace" type="button">DEL</button>
 
             <button class="key" data-insert="7" type="button">7</button>
             <button class="key" data-insert="8" type="button">8</button>
             <button class="key" data-insert="9" type="button">9</button>
             <button class="key operator" data-insert="/" type="button">÷</button>
+            <button class="key operator" data-insert="^" type="button">xʸ</button>
 
             <button class="key" data-insert="4" type="button">4</button>
             <button class="key" data-insert="5" type="button">5</button>
             <button class="key" data-insert="6" type="button">6</button>
             <button class="key operator" data-insert="*" type="button">×</button>
+            <button class="key operator" data-insert="!" type="button">n!</button>
 
             <button class="key" data-insert="1" type="button">1</button>
             <button class="key" data-insert="2" type="button">2</button>
             <button class="key" data-insert="3" type="button">3</button>
             <button class="key operator" data-insert="-" type="button">−</button>
+            <button class="key operator" data-insert="%" type="button">mod</button>
 
+            <button class="key danger" data-action="clear" type="button">AC</button>
             <button class="key" data-insert="0" type="button">0</button>
             <button class="key" data-insert="." type="button">.</button>
-            <button class="key operator" data-insert="^" type="button">xʸ</button>
             <button class="key operator" data-insert="+" type="button">+</button>
+            <button class="key danger" data-action="backspace" type="button">DEL</button>
 
+            <button class="key function" data-insert="gcd(" type="button">gcd</button>
+            <button class="key function" data-insert="lcm(" type="button">lcm</button>
+            <button class="key function" data-insert="min(" type="button">min</button>
+            <button class="key function" data-insert="max(" type="button">max</button>
+            <button class="key function" data-insert="mean(" type="button">mean</button>
+
+            <button class="key function" data-insert="[[1, 2], [3, 4]]" type="button">行列例</button>
+            <button class="key function" data-insert="i" type="button">虚数 i</button>
+            <button class="key function" data-insert="/100" type="button">÷100</button>
             <button class="key equals" data-action="calculate" type="button">= 計算</button>
           </div>
 
-          <details class="advanced-keys">
-            <summary>関数・特殊キーを表示</summary>
-            <div class="keypad advanced-keypad">
-              <button class="key function" data-insert="sin(" type="button">sin</button>
-              <button class="key function" data-insert="cos(" type="button">cos</button>
-              <button class="key function" data-insert="tan(" type="button">tan</button>
-              <button class="key function" data-insert="asin(" type="button">sin⁻¹</button>
-              <button class="key function" data-insert="acos(" type="button">cos⁻¹</button>
-              <button class="key function" data-insert="atan(" type="button">tan⁻¹</button>
-              <button class="key function" data-insert="sqrt(" type="button">√</button>
-              <button class="key function" data-insert="abs(" type="button">abs</button>
-              <button class="key function" data-insert="log10(" type="button">log₁₀</button>
-              <button class="key function" data-insert="log(" type="button">ln</button>
-              <button class="key function" data-insert="pi" type="button">π</button>
-              <button class="key function" data-insert="e" type="button">e</button>
-              <button class="key function" data-insert="ans" type="button">Ans</button>
-              <button class="key operator" data-insert="!" type="button">n!</button>
-              <button class="key operator" data-insert="%" type="button">mod</button>
-              <button class="key function" data-insert="gcd(" type="button">gcd</button>
-              <button class="key function" data-insert="lcm(" type="button">lcm</button>
-              <button class="key function" data-insert="min(" type="button">min</button>
-              <button class="key function" data-insert="max(" type="button">max</button>
-              <button class="key function" data-insert="mean(" type="button">mean</button>
-              <button class="key function" data-insert="i" type="button">i</button>
-            </div>
-          </details>
           <div style="margin-top:15px">
             <div class="expression-label"><span>式の例</span><span>クリックで入力</span></div>
             <div class="examples">
@@ -260,143 +215,9 @@
           </div>
         </div>
       </section>
-      </div>
-          <section class="guide" aria-labelledby="guide-heading">
-      <h2 id="guide-heading">電卓で入力できる式・関数</h2>
-      <div class="guide-grid">
-        <p><strong>基本演算：</strong> <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>^</code> <code>%</code>。括弧で順序を指定できます。</p>
-        <p><strong>関数：</strong> <code>sqrt</code> <code>abs</code> <code>sin</code> <code>cos</code> <code>tan</code> <code>log</code> <code>exp</code> など。</p>
-        <p><strong>定数：</strong> <code>pi</code>（π）、<code>e</code>、<code>i</code>（虚数単位）、<code>ans</code>（前回の答え）。</p>
-        <p><strong>整数：</strong> <code>gcd</code>（最大公約数）、<code>lcm</code>（最小公倍数）、<code>factorial</code>。</p>
-        <p><strong>行列：</strong> <code>det</code> <code>inv</code> <code>transpose</code> <code>trace</code> など。例 <code>det([[1,2],[3,4]])</code>。</p>
-        <p><strong>制限：</strong> 変数定義・代入・任意コード実行は無効です。式は安全確認後に計算します。</p>
-      </div>
-    </section>
-    </section>
 
-        <section class="tab-panel" id="tab-operations" role="tabpanel" aria-labelledby="tab-button-operations" hidden>
-      <div class="operations-intro">
-        <h2>演算ツール</h2>
-        <p>行列・ベクトル・微積分など、数学や物理で頻繁に使う演算を入力欄とボタンから実行できます。</p>
-      </div>
-
-      <div class="operation-grid">
-        <section class="panel operation-card" aria-labelledby="matrix-operation-title">
-          <div class="panel-heading">
-            <div><h2 id="matrix-operation-title">線形代数・行列</h2><p class="panel-subtitle">行列式、逆行列、固有値、連立一次方程式など</p></div>
-          </div>
-          <div class="panel-body operation-form">
-            <div class="field">
-              <label for="matrix-a">行列 A（JSON形式）</label>
-              <textarea id="matrix-a" class="matrix-input" spellcheck="false">[[1, 2], [3, 4]]</textarea>
-            </div>
-            <div class="field" id="matrix-b-wrap" hidden>
-              <label id="matrix-b-label" for="matrix-b">行列 B / 右辺ベクトル b</label>
-              <textarea id="matrix-b" class="matrix-input" spellcheck="false">[[5, 6], [7, 8]]</textarea>
-            </div>
-            <div class="field">
-              <label for="matrix-operation">演算</label>
-              <select id="matrix-operation">
-                <option value="det">行列式 det(A)</option>
-                <option value="inv">逆行列 A⁻¹</option>
-                <option value="transpose">転置行列 tA</option>
-                <option value="trace">トレース tr(A)</option>
-                <option value="rank">階数 rank(A)</option>
-                <option value="eigs">固有値・固有ベクトル</option>
-                <option value="pinv">擬似逆行列 A⁺</option>
-                <option value="multiply">行列積 AB</option>
-                <option value="solve">連立一次方程式 Ax=b</option>
-              </select>
-            </div>
-            <button id="matrix-run" class="operation-button" type="button">演算する</button>
-            <div class="operation-result-wrap">
-              <div class="result-label">RESULT</div>
-              <pre id="matrix-result" class="operation-result" aria-live="polite">-2</pre>
-              <button class="small-button" data-copy-target="matrix-result" type="button">結果をコピー</button>
-            </div>
-            <div class="examples">
-              <button class="example" data-matrix-example="det">2×2 行列式</button>
-              <button class="example" data-matrix-example="eigs">固有値</button>
-              <button class="example" data-matrix-example="solve">連立方程式</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel operation-card" aria-labelledby="vector-operation-title">
-          <div class="panel-heading">
-            <div><h2 id="vector-operation-title">ベクトル演算</h2><p class="panel-subtitle">内積・外積・ノルム・なす角</p></div>
-          </div>
-          <div class="panel-body operation-form">
-            <div class="field">
-              <label for="vector-a">ベクトル a（例：[1, 2, 3]）</label>
-              <input id="vector-a" type="text" value="[1, 2, 3]" spellcheck="false">
-            </div>
-            <div class="field">
-              <label for="vector-b">ベクトル b</label>
-              <input id="vector-b" type="text" value="[4, 5, 6]" spellcheck="false">
-            </div>
-            <div class="field">
-              <label for="vector-operation">演算</label>
-              <select id="vector-operation">
-                <option value="dot">内積 a・b</option>
-                <option value="cross">外積 a×b（3次元）</option>
-                <option value="normA">ノルム ||a||₂</option>
-                <option value="normB">ノルム ||b||₂</option>
-                <option value="angle">なす角（度）</option>
-                <option value="projection">b方向への a の正射影</option>
-              </select>
-            </div>
-            <button id="vector-run" class="operation-button" type="button">演算する</button>
-            <div class="operation-result-wrap">
-              <div class="result-label">RESULT</div>
-              <pre id="vector-result" class="operation-result" aria-live="polite">32</pre>
-              <button class="small-button" data-copy-target="vector-result" type="button">結果をコピー</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel operation-card" aria-labelledby="calculus-operation-title">
-          <div class="panel-heading">
-            <div><h2 id="calculus-operation-title">微分・積分</h2><p class="panel-subtitle">数式の記号微分と定積分の数値計算</p></div>
-          </div>
-          <div class="panel-body operation-form">
-            <div class="field">
-              <label for="calculus-expression">関数 f(x)</label>
-              <input id="calculus-expression" type="text" value="x^3 + 2*x^2 - sin(x)" spellcheck="false">
-            </div>
-            <div class="field">
-              <label for="calculus-variable">変数</label>
-              <input id="calculus-variable" type="text" value="x" maxlength="1">
-            </div>
-            <div class="field">
-              <label for="derivative-point">微分係数を評価する点（任意）</label>
-              <input id="derivative-point" type="number" step="any" value="2">
-            </div>
-            <div class="operation-actions">
-              <button id="differentiate-button" class="operation-button" type="button">導関数を求める</button>
-            </div>
-            <div class="field interval-fields">
-              <label>定積分の区間</label>
-              <div class="interval-row">
-                <input id="integral-a" type="number" step="any" value="0" aria-label="積分区間の下端">
-                <span>〜</span>
-                <input id="integral-b" type="number" step="any" value="1" aria-label="積分区間の上端">
-              </div>
-              <button id="integrate-button" class="operation-button secondary-operation" type="button">定積分を数値計算</button>
-            </div>
-            <div class="operation-result-wrap">
-              <div class="result-label">RESULT</div>
-              <pre id="calculus-result" class="operation-result" aria-live="polite">f'(x) = 3*x^2 + 4*x - cos(x)</pre>
-              <button class="small-button" data-copy-target="calculus-result" type="button">結果をコピー</button>
-            </div>
-            <p class="operation-note">三角関数はラジアンとして扱います。定積分は複合Simpson法による数値近似です（固定分割数 2000）。</p>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" id="tab-units" role="tabpanel" aria-labelledby="tab-button-units" hidden>
-      <div class="workspace"><section class="panel" aria-labelledby="converter-heading">
+      <div class="side-stack">
+        <section class="panel" aria-labelledby="converter-heading">
           <div class="panel-heading">
             <div>
               <h2 id="converter-heading">単位変換</h2>
@@ -437,11 +258,9 @@
             <button id="convert-button" class="small-button" type="button">変換する</button>
             <output id="convert-result" class="convert-result" aria-live="polite">1 m</output>
           </div>
-        </section></div>
-    </section>
+        </section>
 
-    <section class="tab-panel" id="tab-history" role="tabpanel" aria-labelledby="tab-button-history" hidden>
-      <div class="workspace"><section class="panel" aria-labelledby="history-heading">
+        <section class="panel" aria-labelledby="history-heading">
           <div class="panel-heading">
             <div>
               <h2 id="history-heading">計算履歴</h2>
@@ -454,8 +273,22 @@
               <div class="history-empty">まだ計算履歴はありません。</div>
             </div>
           </div>
-        </section></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="guide" aria-labelledby="guide-heading">
+      <h2 id="guide-heading">入力できる式・関数</h2>
+      <div class="guide-grid">
+        <p><strong>基本演算：</strong> <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>^</code> <code>%</code>。括弧で順序を指定できます。</p>
+        <p><strong>関数：</strong> <code>sqrt</code> <code>abs</code> <code>sin</code> <code>cos</code> <code>tan</code> <code>log</code> <code>exp</code> など。</p>
+        <p><strong>定数：</strong> <code>pi</code>（π）、<code>e</code>、<code>i</code>（虚数単位）、<code>ans</code>（前回の答え）。</p>
+        <p><strong>整数：</strong> <code>gcd</code>（最大公約数）、<code>lcm</code>（最小公倍数）、<code>factorial</code>。</p>
+        <p><strong>行列：</strong> <code>det</code> <code>inv</code> <code>transpose</code> <code>trace</code> など。例 <code>det([[1,2],[3,4]])</code>。</p>
+        <p><strong>制限：</strong> 変数定義・代入・任意コード実行は無効です。式は安全確認後に計算します。</p>
+      </div>
     </section>
+
     <footer>
       <span>UTILITY HUB · 万能電卓</span>
       <span>計算処理はこのブラウザ内で実行されます。履歴は端末内に保存されます。</span>
@@ -517,9 +350,8 @@
         "acos", "atan", "atan2", "sinh", "cosh", "tanh", "asinh", "acosh",
         "atanh", "factorial", "gamma", "gcd", "lcm", "mod", "min", "max",
         "mean", "median", "mode", "std", "variance", "sum", "prod", "det",
-        "inv", "pinv", "eigs", "lusolve", "multiply", "transpose", "trace",
-        "diag", "norm", "dot", "cross", "re", "im", "conj", "arg", "complex",
-        "combinations", "permutations"
+        "inv", "transpose", "trace", "diag", "norm", "dot", "cross",
+        "re", "im", "conj", "arg", "complex", "combinations", "permutations"
       ]);
       const allowedSymbols = new Set([
         "pi", "e", "i", "tau", "Infinity", "NaN", "ans",
@@ -826,355 +658,6 @@
         }
       }
 
-      // Simple tab navigation keeps the calculator, operations, converter, and history separate.
-      document.querySelectorAll("[data-tab-target]").forEach(function (button) {
-        button.addEventListener("click", function () {
-          const target = button.dataset.tabTarget;
-          document.querySelectorAll("[data-tab-target]").forEach(function (item) {
-            const active = item === button;
-            item.classList.toggle("active", active);
-            item.setAttribute("aria-selected", String(active));
-          });
-          document.querySelectorAll(".tab-panel").forEach(function (panel) {
-            const active = panel.id === "tab-" + target;
-            panel.classList.toggle("active", active);
-            panel.hidden = !active;
-          });
-        });
-      });
-
-      function formatOperationValue(value) {
-        if (Array.isArray(value)) {
-          return "[\n" + value.map(function (row) {
-            return "  " + (Array.isArray(row)
-              ? "[" + row.map(function (cell) { return formatOperationScalar(cell); }).join(", ") + "]"
-              : formatOperationScalar(row));
-          }).join(",\n") + "\n]";
-        }
-        return formatOperationScalar(value);
-      }
-
-      function formatOperationScalar(value) {
-        if (typeof value === "number" && Number.isFinite(value)) {
-          return mathEngine.format(value, { precision: 12, lowerExp: -8, upperExp: 12 });
-        }
-        try { return mathEngine.format(value, { precision: 12 }); }
-        catch (error) { return String(value); }
-      }
-
-      function showOperationResult(id, text, isError) {
-        const output = document.getElementById(id);
-        output.textContent = text;
-        output.classList.toggle("error", Boolean(isError));
-      }
-
-      function parseNumericMatrix(text, label) {
-        let value;
-        try { value = JSON.parse(text); }
-        catch (error) { throw new Error(label + " は [[1, 2], [3, 4]] の形式で入力してください。"); }
-        if (!Array.isArray(value) || value.length === 0 || value.length > 10 ||
-            !value.every(function (row) {
-              return Array.isArray(row) && row.length > 0 && row.length <= 10 &&
-                row.every(function (cell) { return typeof cell === "number" && Number.isFinite(cell); });
-            })) {
-          throw new Error(label + " は10×10以内の有限実数からなる行列で入力してください。");
-        }
-        const width = value[0].length;
-        if (!value.every(function (row) { return row.length === width; })) {
-          throw new Error(label + " の各行の列数が一致していません。");
-        }
-        return value;
-      }
-
-      function requireSquare(matrix, name) {
-        if (matrix.length !== matrix[0].length) throw new Error(name + " は正方行列である必要があります。");
-      }
-
-      function calculateRank(matrix) {
-        const a = matrix.map(function (row) { return row.slice(); });
-        const rows = a.length, cols = a[0].length;
-        const scale = Math.max(1, ...a.flat().map(Math.abs));
-        const tolerance = scale * 1e-10;
-        let pivotRow = 0;
-        for (let col = 0; col < cols && pivotRow < rows; col += 1) {
-          let best = pivotRow;
-          for (let row = pivotRow + 1; row < rows; row += 1) {
-            if (Math.abs(a[row][col]) > Math.abs(a[best][col])) best = row;
-          }
-          if (Math.abs(a[best][col]) <= tolerance) continue;
-          [a[pivotRow], a[best]] = [a[best], a[pivotRow]];
-          const pivot = a[pivotRow][col];
-          for (let j = col; j < cols; j += 1) a[pivotRow][j] /= pivot;
-          for (let row = 0; row < rows; row += 1) {
-            if (row === pivotRow) continue;
-            const factor = a[row][col];
-            for (let j = col; j < cols; j += 1) a[row][j] -= factor * a[pivotRow][j];
-          }
-          pivotRow += 1;
-        }
-        return pivotRow;
-      }
-
-      function calculateMatrixOperation() {
-        if (!mathEngine) {
-          showOperationResult("matrix-result", "計算エンジンを読み込み中です。", true);
-          return;
-        }
-        try {
-          const A = parseNumericMatrix(document.getElementById("matrix-a").value, "行列 A");
-          const operation = document.getElementById("matrix-operation").value;
-          let result;
-          if (["det", "inv", "trace", "eigs"].includes(operation)) requireSquare(A, "行列 A");
-          switch (operation) {
-            case "det": result = mathEngine.det(A); break;
-            case "inv": result = mathEngine.inv(A); break;
-            case "transpose": result = mathEngine.transpose(A); break;
-            case "trace": result = mathEngine.trace(A); break;
-            case "rank": result = calculateRank(A); break;
-            case "pinv": result = mathEngine.pinv(A); break;
-            case "eigs": {
-              if (A.length > 6) throw new Error("固有値計算は6次以下の行列に制限しています。");
-              const eigen = mathEngine.eigs(A);
-              const values = eigen.values.toArray ? eigen.values.toArray() : eigen.values;
-              const vectors = (eigen.eigenvectors || []).map(function (item) {
-                const vector = item.vector.toArray ? item.vector.toArray() : item.vector;
-                return "λ = " + formatOperationScalar(item.value) + "\nv = " + formatOperationValue(vector);
-              });
-              result = "固有値：\n" + formatOperationValue(values) +
-                (vectors.length ? "\n\n固有ベクトル：\n" + vectors.join("\n\n") : "");
-              break;
-            }
-            case "multiply": {
-              const B = parseNumericMatrix(document.getElementById("matrix-b").value, "行列 B");
-              if (A[0].length !== B.length) throw new Error("行列積 AB では A の列数と B の行数を一致させてください。");
-              result = mathEngine.multiply(A, B);
-              break;
-            }
-            case "solve": {
-              requireSquare(A, "係数行列 A");
-              let b;
-              try { b = JSON.parse(document.getElementById("matrix-b").value); }
-              catch (error) { throw new Error("右辺ベクトル b は [5, 6] の形式で入力してください。"); }
-              if (!Array.isArray(b) || b.length !== A.length ||
-                  !b.every(function (v) { return typeof v === "number" && Number.isFinite(v); })) {
-                throw new Error("右辺ベクトル b の長さは A の行数と一致する有限実数ベクトルにしてください。");
-              }
-              result = mathEngine.lusolve(A, b);
-              break;
-            }
-            default: throw new Error("この演算は未対応です。");
-          }
-          const formatted = typeof result === "string" ? result : formatOperationValue(result);
-          showOperationResult("matrix-result", formatted, false);
-        } catch (error) {
-          showOperationResult("matrix-result", error.message || "演算できませんでした。", true);
-        }
-      }
-
-      function parseNumericVector(text, label) {
-        let value;
-        try { value = JSON.parse(text); }
-        catch (error) { throw new Error(label + " は [1, 2, 3] の形式で入力してください。"); }
-        if (!Array.isArray(value) || value.length < 2 || value.length > 3 ||
-            !value.every(function (v) { return typeof v === "number" && Number.isFinite(v); })) {
-          throw new Error(label + " は2次元または3次元の有限実数ベクトルにしてください。");
-        }
-        return value;
-      }
-
-      function calculateVectorOperation() {
-        if (!mathEngine) {
-          showOperationResult("vector-result", "計算エンジンを読み込み中です。", true);
-          return;
-        }
-        try {
-          const a = parseNumericVector(document.getElementById("vector-a").value, "ベクトル a");
-          const b = parseNumericVector(document.getElementById("vector-b").value, "ベクトル b");
-          const operation = document.getElementById("vector-operation").value;
-          if (a.length !== b.length && ["dot", "angle", "projection", "cross"].includes(operation)) {
-            throw new Error("ベクトル a と b の次元を一致させてください。");
-          }
-          let result;
-          switch (operation) {
-            case "dot": result = mathEngine.dot(a, b); break;
-            case "cross":
-              if (a.length !== 3) throw new Error("外積は3次元ベクトルで計算してください。");
-              result = mathEngine.cross(a, b);
-              break;
-            case "normA": result = mathEngine.norm(a); break;
-            case "normB": result = mathEngine.norm(b); break;
-            case "angle": {
-              const na = mathEngine.norm(a), nb = mathEngine.norm(b);
-              if (na === 0 || nb === 0) throw new Error("零ベクトルとのなす角は定義されません。");
-              const cosine = Math.max(-1, Math.min(1, mathEngine.dot(a,b) / (na * nb)));
-              result = Math.acos(cosine) * 180 / Math.PI;
-              result = formatOperationScalar(result) + " °";
-              break;
-            }
-            case "projection": {
-              const denominator = mathEngine.dot(b,b);
-              if (denominator === 0) throw new Error("零ベクトル b への射影は定義されません。");
-              result = mathEngine.multiply(mathEngine.dot(a,b) / denominator, b);
-              break;
-            }
-          }
-          showOperationResult("vector-result", typeof result === "string" ? result : formatOperationValue(result), false);
-        } catch (error) {
-          showOperationResult("vector-result", error.message || "演算できませんでした。", true);
-        }
-      }
-
-      const calculusFunctions = new Set([
-        "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh",
-        "exp", "log", "log10", "log2", "sqrt", "abs", "floor", "ceil"
-      ]);
-      function validateCalculusNode(root, variable) {
-        let count = 0;
-        function visit(node, depth) {
-          count += 1;
-          if (count > 160 || depth > 20) throw new Error("式が複雑すぎます。");
-          switch (node.type) {
-            case "ConstantNode":
-              if (typeof node.value !== "number") throw new Error("数値以外の定数は使用できません。");
-              break;
-            case "SymbolNode":
-              if (![variable, "pi", "e"].includes(node.name)) {
-                throw new Error("使用できる変数は " + variable + " のみです。");
-              }
-              break;
-            case "ParenthesisNode":
-              break;
-            case "OperatorNode":
-              if (!["+","-","*","/","^"].includes(node.op)) throw new Error("この演算子には対応していません。");
-              break;
-            case "FunctionNode":
-              if (!node.fn || node.fn.type !== "SymbolNode" || !calculusFunctions.has(node.fn.name)) {
-                throw new Error("使用できない関数です。");
-              }
-              break;
-            default:
-              throw new Error("変数定義や配列などは使用できません。");
-          }
-          if (typeof node.forEach === "function") node.forEach(function (child) { visit(child, depth + 1); });
-        }
-        visit(root,0);
-      }
-
-      function calculateDerivative() {
-        if (!mathEngine) {
-          showOperationResult("calculus-result", "計算エンジンを読み込み中です。", true);
-          return;
-        }
-        try {
-          const expression = document.getElementById("calculus-expression").value.trim();
-          const variable = document.getElementById("calculus-variable").value.trim();
-          if (!/^[a-zA-Z]$/.test(variable)) throw new Error("変数は英字1文字で指定してください。");
-          const node = mathEngine.parse(expression);
-          validateCalculusNode(node, variable);
-          const derivative = mathEngine.derivative(node, variable);
-          let result = "d/d" + variable + " f = " + derivative.toString();
-          const pointText = document.getElementById("derivative-point").value;
-          if (pointText !== "") {
-            const point = Number(pointText);
-            if (!Number.isFinite(point)) throw new Error("評価点は有限の数値にしてください。");
-            const value = derivative.evaluate({ [variable]: point });
-            result += "\n\nf'(" + variable + " = " + point + ") = " + formatOperationScalar(value);
-          }
-          showOperationResult("calculus-result", result, false);
-        } catch (error) {
-          showOperationResult("calculus-result", error.message || "微分できませんでした。", true);
-        }
-      }
-
-      function calculateDefiniteIntegral() {
-        if (!mathEngine) {
-          showOperationResult("calculus-result", "計算エンジンを読み込み中です。", true);
-          return;
-        }
-        try {
-          const expression = document.getElementById("calculus-expression").value.trim();
-          const variable = document.getElementById("calculus-variable").value.trim();
-          if (!/^[a-zA-Z]$/.test(variable)) throw new Error("変数は英字1文字で指定してください。");
-          const node = mathEngine.parse(expression);
-          validateCalculusNode(node,variable);
-          const a = Number(document.getElementById("integral-a").value);
-          const b = Number(document.getElementById("integral-b").value);
-          if (!Number.isFinite(a) || !Number.isFinite(b)) throw new Error("積分区間は有限の数値で指定してください。");
-          if (a === b) {
-            showOperationResult("calculus-result","∫ = 0",false);
-            return;
-          }
-          const compiled = node.compile();
-          const n = 2000;
-          const h = (b-a)/n;
-          function f(x) {
-            const value = compiled.evaluate({ [variable]: x });
-            if (typeof value !== "number" || !Number.isFinite(value)) {
-              throw new Error("積分区間内で実数値をとる関数を指定してください。");
-            }
-            return value;
-          }
-          let sum = f(a) + f(b);
-          for (let i=1;i<n;i+=1) sum += (i%2===0 ? 2 : 4) * f(a+i*h);
-          const integral = sum*h/3;
-          showOperationResult("calculus-result",
-            "∫[" + a + ", " + b + "] " + expression + " d" + variable +
-            " ≈ " + formatOperationScalar(integral) + "\nSimpson法 · n = " + n, false);
-        } catch (error) {
-          showOperationResult("calculus-result",error.message || "積分できませんでした。",true);
-        }
-      }
-
-      document.getElementById("matrix-run").addEventListener("click",calculateMatrixOperation);
-      document.getElementById("vector-run").addEventListener("click",calculateVectorOperation);
-      document.getElementById("differentiate-button").addEventListener("click",calculateDerivative);
-      document.getElementById("integrate-button").addEventListener("click",calculateDefiniteIntegral);
-
-      document.getElementById("matrix-operation").addEventListener("change",function () {
-        const operation = this.value;
-        const needsB = ["multiply","solve"].includes(operation);
-        document.getElementById("matrix-b-wrap").hidden = !needsB;
-        document.getElementById("matrix-b-label").textContent = operation === "solve"
-          ? "右辺ベクトル b（例：[5, 6]）"
-          : "行列 B（JSON形式）";
-      });
-
-      document.querySelectorAll("[data-matrix-example]").forEach(function (button) {
-        button.addEventListener("click",function () {
-          const type = button.dataset.matrixExample;
-          const A = document.getElementById("matrix-a");
-          const op = document.getElementById("matrix-operation");
-          const Bwrap = document.getElementById("matrix-b-wrap");
-          if (type === "det") {
-            A.value = "[[1, 2], [3, 4]]";
-            op.value = "det";
-          } else if (type === "eigs") {
-            A.value = "[[2, 1], [1, 2]]";
-            op.value = "eigs";
-          } else if (type === "solve") {
-            A.value = "[[2, 1], [1, 3]]";
-            document.getElementById("matrix-b").value = "[5, 7]";
-            op.value = "solve";
-          }
-          op.dispatchEvent(new Event("change"));
-          Bwrap.hidden = !["multiply","solve"].includes(op.value);
-          calculateMatrixOperation();
-        });
-      });
-
-      document.querySelectorAll("[data-copy-target]").forEach(function (button) {
-        button.addEventListener("click",function () {
-          const text = document.getElementById(button.dataset.copyTarget).textContent;
-          copyText(text).then(function () {
-            button.textContent = "コピー済み";
-            window.setTimeout(function () { button.textContent = "結果をコピー"; }, 1200);
-          }).catch(function () {
-            button.textContent = "コピー不可";
-          });
-        });
-      });
-
-      // Results are computed on demand, so changing tabs never erases inputs or outputs.
       document.querySelectorAll("[data-insert]").forEach(function (button) {
         button.addEventListener("click", function () {
           insertAtCursor(button.dataset.insert);
