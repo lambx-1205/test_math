@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f7fb">
+<title>ファイル / PDF編集 | UTILITY HUB</title>
+<style>
+:root{color-scheme:light;--ink:#182230;--muted:#657187;--line:#e1e7f0;--panel:#fff;--canvas:#f5f7fb;--accent:#4658d8;--soft:#eef0ff;--shadow:0 12px 34px rgba(28,43,77,.06)}
+*{box-sizing:border-box}body{margin:0;min-width:320px;background:radial-gradient(ellipse at 8% 0%,rgba(70,88,216,.08),transparent 34rem),var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;padding:25px 25px 42px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:34px}.brand{display:flex;align-items:center;gap:11px}.mark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:var(--accent);color:#fff;font-weight:900;font-size:20px}.eyebrow{font-size:10px;letter-spacing:.15em;color:var(--muted);font-weight:800;margin:0 0 3px}.brand-name{font-size:16px;font-weight:850;margin:0}.back{font-size:12px;color:var(--muted);font-weight:700}.back:hover{color:var(--accent)}
+.hero{margin:0 0 22px}.kicker{display:inline-flex;background:var(--soft);color:#3e4dc0;border:1px solid #dfe3ff;border-radius:99px;padding:5px 10px;font-size:10px;font-weight:800}h1{font-size:clamp(29px,5vw,42px);letter-spacing:-.05em;margin:12px 0 6px}.hero p{color:var(--muted);font-size:13px;line-height:1.8;margin:0}
+.tabs{display:flex;gap:7px;margin:19px 0 15px;border-bottom:1px solid var(--line)}.tab{border:0;border-bottom:2px solid transparent;background:none;padding:10px 14px;color:var(--muted);font-size:12px;font-weight:800;cursor:pointer}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}.tab-panel[hidden]{display:none}
+.layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:15px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:17px;min-width:0}.panel+.panel{margin-top:14px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.panel h2{font-size:14px;margin:0}.sub{color:var(--muted);font-size:10px}
+.btn{appearance:none;border:1px solid #dfe4ee;border-radius:9px;background:#fff;color:#334155;padding:9px 12px;font-size:11px;font-weight:750;cursor:pointer;transition:.12s}.btn:hover{border-color:#b7c1ec;background:#f7f8ff}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:#3848c4}.btn.danger{color:#b42332}.btn:disabled{opacity:.42;cursor:not-allowed}.actions{display:flex;gap:7px;flex-wrap:wrap}.file-input{display:none}.drop{border:1.5px dashed #c7cee0;border-radius:12px;padding:19px;text-align:center;background:#fafbff}.drop strong{display:block;font-size:12px;margin-bottom:5px}.drop p{font-size:10px;color:var(--muted);margin:0 0 11px}.file-list{display:grid;gap:7px;margin-top:12px}.file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #edf0f5;border-radius:9px;padding:9px 10px;font-size:10px}.file-row strong{display:block;overflow-wrap:anywhere;font-size:11px}.file-row span{color:var(--muted)}.empty{padding:23px;text-align:center;color:#929bad;background:#fafbfc;border:1px solid #edf0f5;border-radius:10px;font-size:11px;line-height:1.7}
+.group{padding:13px 0;border-top:1px solid #edf0f5}.group:first-of-type{border-top:0;padding-top:0}.group-title{font-size:11px;font-weight:850;margin-bottom:9px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field label{font-size:10px;color:var(--muted);font-weight:700}.field input,.field select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:var(--ink);background:#fff;font-size:11px}.notice{margin-top:12px;padding:10px 11px;border-radius:9px;background:#f6f7fb;color:#667085;font-size:10px;line-height:1.7}.status{min-height:18px;color:var(--muted);font-size:10px;margin-top:9px}
+.viewer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}.viewer-tools{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.page-counter{font-size:11px;font-weight:800;color:#465267;min-width:70px;text-align:center}.zoom-label{font-size:10px;color:var(--muted);min-width:40px;text-align:center}.viewer-stage{min-height:360px;max-height:72vh;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:14px;background:#eef1f6;border-radius:11px}.viewer-stage canvas{display:block;background:white;box-shadow:0 3px 14px rgba(20,30,50,.16);max-width:none}.pdf-meta{font-size:10px;color:var(--muted);margin-top:9px}.page-range{display:grid;grid-template-columns:1fr 1fr;gap:8px}.progress{height:6px;border-radius:99px;background:#edf0f6;overflow:hidden;margin-top:10px}.progress>span{display:block;width:0;height:100%;background:var(--accent);transition:width .15s}
+footer{margin-top:27px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#8a94a6;font-size:10px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.viewer-stage{max-height:60vh}}@media(max-width:520px){.shell{padding:18px 13px 30px}.panel{padding:13px}.topbar{margin-bottom:25px}.tab{padding:10px 9px;font-size:11px}.viewer-stage{min-height:270px;padding:8px}.footer{flex-direction:column;gap:5px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="topbar"><a class="brand" href="index.html"><span class="mark">U</span><span><p class="eyebrow">UTILITY HUB</p><p class="brand-name">ファイル / PDF編集</p></span></a><a class="back" href="index.html">← ツール一覧へ</a></header>
+<section class="hero"><span class="kicker">FILE / PDF TOOLS</span><h1>ファイルを、閲覧・整理・編集。</h1><p>PDFの閲覧とページ編集、複数ファイルのZIP圧縮などを行えます。ファイルの内容はサーバーへアップロードせず、ブラウザ内で処理します。</p></section>
+<nav class="tabs" aria-label="機能切り替え"><button class="tab active" id="tab-pdf" type="button">PDFビューワー・編集</button><button class="tab" id="tab-files" type="button">ファイル圧縮</button></nav>
+<section class="tab-panel" id="panel-pdf">
+<div class="layout">
+<div class="panel">
+<div class="panel-head"><h2>PDFビューワー</h2><span class="sub" id="pdf-status-label">PDF未選択</span></div>
+<div class="drop" id="pdf-drop"><strong>PDFファイルを選択</strong><p>PDFをここへドロップすることもできます</p><button class="btn primary" id="pdf-choose" type="button">PDFを開く</button><input class="file-input" id="pdf-file" type="file" accept="application/pdf,.pdf"></div>
+<div class="viewer-toolbar" style="margin-top:12px">
+<div class="viewer-tools"><button class="btn" id="prev-page" disabled>← 前</button><span class="page-counter" id="page-counter">- / -</span><button class="btn" id="next-page" disabled>次 →</button></div>
+<div class="viewer-tools"><button class="btn small" id="zoom-out" disabled>−</button><span class="zoom-label" id="zoom-label">100%</span><button class="btn small" id="zoom-in" disabled>＋</button><button class="btn small" id="zoom-reset" disabled>100%</button></div>
+</div>
+<div class="viewer-stage" id="viewer-stage"><div class="empty" id="viewer-empty">PDFを読み込むと、ここにページが表示されます。</div><canvas id="pdf-canvas" hidden></canvas></div>
+<div class="pdf-meta" id="pdf-meta"></div>
+<div class="status" id="pdf-view-status" role="status" aria-live="polite"></div>
+</div>
+<aside>
+<div class="panel">
+<div class="panel-head"><h2>ページ編集</h2><span class="sub">現在のページを基準に操作</span></div>
+<div class="group">
+<div class="group-title">ページを追加・削除</div>
+<div class="actions"><button class="btn" id="add-page" disabled>現在の次に空白ページを追加</button><button class="btn danger" id="delete-page" disabled>現在のページを削除</button></div>
+<p class="sub">空白ページは現在のページと同じ用紙サイズで追加します。最後の1ページは削除できません。</p>
+</div>
+<div class="group">
+<div class="group-title">回転・抽出</div>
+<div class="actions"><button class="btn" id="rotate-page" disabled>現在のページを右へ90°回転</button></div>
+<div class="field-row"><div class="field"><label for="extract-start">抽出開始ページ</label><input id="extract-start" type="number" min="1" value="1" disabled></div><div class="field"><label for="extract-end">抽出終了ページ</label><input id="extract-end" type="number" min="1" value="1" disabled></div></div>
+<button class="btn" id="extract-pages" disabled>指定範囲を別PDFとして保存</button>
+</div>
+<div class="group">
+<div class="group-title">保存</div>
+<div class="actions"><button class="btn primary" id="save-pdf" disabled>編集したPDFを保存</button><button class="btn" id="optimize-pdf" disabled>再保存して最適化</button></div>
+<p class="sub">最適化はPDF内部の構造を再保存する処理です。画像の再圧縮などは行わないため、必ず容量が小さくなるわけではありません。</p>
+</div>
+<div class="notice">暗号化・パスワード保護されたPDFや、一部の特殊なPDFは編集できない場合があります。編集前のファイルは変更されず、保存時に新しいPDFを作成します。</div>
+</div>
+</aside>
+</div>
+</section>
+<section class="tab-panel" id="panel-files" hidden>
+<div class="layout">
+<section class="panel">
+<div class="panel-head"><h2>ファイルを選択</h2><span class="sub">複数選択可</span></div>
+<div class="drop"><strong>圧縮したいファイルを追加</strong><p>文書・画像・PDFなど、さまざまなファイルをまとめられます</p><button class="btn primary" id="files-choose" type="button">ファイルを選択</button><input class="file-input" id="files-input" type="file" multiple></div>
+<div class="file-list" id="file-list"><div class="empty">選択したファイルがここに表示されます。</div></div>
+<div class="status" id="file-status" role="status" aria-live="polite"></div>
+</section>
+<aside class="panel">
+<div class="panel-head"><h2>圧縮・書き出し</h2><span class="sub">ローカル処理</span></div>
+<div class="group">
+<div class="group-title">ZIPアーカイブ</div>
+<p class="sub">選択した複数のファイルを、ひとつのZIPファイルにまとめて圧縮します。</p>
+<button class="btn primary" id="zip-btn" disabled>選択ファイルをZIP圧縮</button>
+<div class="progress"><span id="zip-progress"></span></div>
+</div>
+<div class="group">
+<div class="group-title">GZIP圧縮</div>
+<p class="sub">単一ファイルをGZIP形式（.gz）に圧縮します。主にテキストやログなどに向いています。</p>
+<button class="btn" id="gzip-btn" disabled>先頭のファイルをGZIP圧縮</button>
+</div>
+<div class="notice">ZIPは複数ファイルをまとめる形式、GZIPは単一データを圧縮する形式です。GZIPでは元のファイル名・拡張子の情報が圧縮データ自体に保持されない場合があります。圧縮率はファイルの種類によって異なります。</div>
+</aside>
+</div>
+</section>
+<footer><span>UTILITY HUB · FILE / PDF EDITOR</span><span>ファイルデータはこの端末内で処理されます</span></footer>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+function switchTab(which){var pdf=which==="pdf";$("tab-pdf").classList.toggle("active",pdf);$("tab-files").classList.toggle("active",!pdf);$("panel-pdf").hidden=!pdf;$("panel-files").hidden=pdf;}
+$("tab-pdf").addEventListener("click",function(){switchTab("pdf");});$("tab-files").addEventListener("click",function(){switchTab("files");});
+function bytesText(bytes){if(bytes<1024)return bytes+" B";if(bytes<1048576)return (bytes/1024).toFixed(1)+" KB";return (bytes/1048576).toFixed(2)+" MB";}
+function fileSafe(name){return (name||"file").replace(/[\\/:*?"<>|]/g,"_").slice(0,120)||"file";}
+function downloadBlob(blob,name){var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fileSafe(name);document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
+function setPdfEnabled(on){["prev-page","next-page","zoom-in","zoom-out","zoom-reset","add-page","delete-page","rotate-page","extract-pages","save-pdf","optimize-pdf","extract-start","extract-end"].forEach(function(id){$(id).disabled=!on;});}
+var pdfFile=null,pdfBytes=null,pdfView=null,pdfPage=1,zoom=1,renderTask=null,renderToken=0;
+if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}
+function renderPdfPage(){
+ if(!pdfView)return;var token=++renderToken;
+ if(renderTask){try{renderTask.cancel();}catch(e){}renderTask=null;}
+ pdfView.getPage(pdfPage).then(function(page){if(token!==renderToken)return;var viewport=page.getViewport({scale:zoom}),canvas=$("pdf-canvas"),context=canvas.getContext("2d");
+ canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);canvas.style.width=viewport.width+"px";canvas.style.height=viewport.height+"px";
+ $("viewer-empty").hidden=true;canvas.hidden=false;$("page-counter").textContent=pdfPage+" / "+pdfView.numPages;$("zoom-label").textContent=Math.round(zoom*100)+"%";
+ $("prev-page").disabled=pdfPage<=1;$("next-page").disabled=pdfPage>=pdfView.numPages;
+ renderTask=page.render({canvasContext:context,viewport:viewport});return renderTask.promise;
+ }).catch(function(err){if(err&&err.name!=="RenderingCancelledException")$("pdf-view-status").textContent="ページを表示できません: "+err.message;});
+}
+async function openPdf(file){
+ if(!file)return;if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){$("pdf-view-status").textContent="PDFファイルを選択してください。";return;}
+ try{$("pdf-view-status").textContent="PDFを読み込み中…";pdfFile=file;pdfBytes=new Uint8Array(await file.arrayBuffer());
+ if(!window.pdfjsLib||!window.PDFLib)throw new Error("PDFライブラリを読み込めませんでした。ネットワーク接続を確認してください。");
+ pdfView=await pdfjsLib.getDocument({data:pdfBytes.slice()}).promise;pdfPage=1;zoom=1;setPdfEnabled(true);
+ $("pdf-status-label").textContent=file.name;$("pdf-meta").textContent=pdfView.numPages+" ページ ・ "+bytesText(file.size);
+ $("extract-start").value=1;$("extract-end").value=pdfView.numPages;$("extract-end").max=pdfView.numPages;
+ $("pdf-drop").style.display="none";$("pdf-view-status").textContent="PDFを開きました。";renderPdfPage();
+ }catch(e){pdfView=null;pdfBytes=null;setPdfEnabled(false);$("pdf-view-status").textContent="PDFを開けませんでした: "+e.message;}
+}
+$("pdf-choose").addEventListener("click",function(){$("pdf-file").click();});$("pdf-file").addEventListener("change",function(e){openPdf(e.target.files[0]);});
+var pdfDrop=$("pdf-drop");pdfDrop.addEventListener("dragover",function(e){e.preventDefault();pdfDrop.style.borderColor="#4658d8";});pdfDrop.addEventListener("dragleave",function(){pdfDrop.style.borderColor="";});pdfDrop.addEventListener("drop",function(e){e.preventDefault();pdfDrop.style.borderColor="";openPdf(e.dataTransfer.files[0]);});
+$("prev-page").addEventListener("click",function(){if(pdfView&&pdfPage>1){pdfPage--;renderPdfPage();}});$("next-page").addEventListener("click",function(){if(pdfView&&pdfPage<pdfView.numPages){pdfPage++;renderPdfPage();}});
+$("zoom-in").addEventListener("click",function(){zoom=Math.min(3,zoom+.15);renderPdfPage();});$("zoom-out").addEventListener("click",function(){zoom=Math.max(.35,zoom-.15);renderPdfPage();});$("zoom-reset").addEventListener("click",function(){zoom=1;renderPdfPage();});
+async function mutatePdf(mutator,success){
+ if(!pdfBytes)return;try{$("pdf-view-status").textContent="PDFを編集中…";var doc=await PDFLib.PDFDocument.load(pdfBytes);await mutator(doc);var saved=await doc.save({useObjectStreams:true});pdfBytes=new Uint8Array(saved);
+ var oldName=pdfFile.name;pdfView=await pdfjsLib.getDocument({data:pdfBytes.slice()}).promise;pdfPage=Math.min(pdfPage,pdfView.numPages);$("pdf-meta").textContent=pdfView.numPages+" ページ ・ 編集済み（未保存）";$("extract-end").value=pdfView.numPages;$("extract-end").max=pdfView.numPages;
+ renderPdfPage();$("pdf-view-status").textContent=success;
+ }catch(e){$("pdf-view-status").textContent="PDFを編集できませんでした: "+e.message;}
+}
+$("add-page").addEventListener("click",function(){mutatePdf(function(doc){var pages=doc.getPages(),ref=pages[pdfPage-1],size=ref?ref.getSize():{width:595.28,height:841.89};doc.insertPage(pdfPage,[size.width,size.height]);pdfPage++;},"空白ページを追加しました。保存すると変更が反映されます。");});
+$("delete-page").addEventListener("click",function(){if(!pdfView||pdfView.numPages<=1){$("pdf-view-status").textContent="最後の1ページは削除できません。";return;}mutatePdf(function(doc){doc.removePage(pdfPage-1);pdfPage=Math.min(pdfPage,doc.getPageCount());},"現在のページを削除しました。");});
+$("rotate-page").addEventListener("click",function(){mutatePdf(function(doc){var page=doc.getPages()[pdfPage-1],current=page.getRotation().angle;page.setRotation(PDFLib.degrees((current+90)%360));},"現在のページを90°回転しました。");});
+$("save-pdf").addEventListener("click",function(){if(!pdfBytes)return;downloadBlob(new Blob([pdfBytes],{type:"application/pdf"}),fileSafe(pdfFile.name.replace(/\.pdf$/i,""))+"-edited.pdf");$("pdf-view-status").textContent="編集したPDFを保存しました。";});
+$("optimize-pdf").addEventListener("click",function(){mutatePdf(function(doc){return Promise.resolve();},"PDFを再保存しました。容量が小さくなるとは限りません。");});
+$("extract-pages").addEventListener("click",async function(){if(!pdfBytes)return;var start=Number($("extract-start").value),end=Number($("extract-end").value);if(!Number.isInteger(start)||!Number.isInteger(end)||start<1||end<start||end>pdfView.numPages){$("pdf-view-status").textContent="ページ範囲を確認してください。";return;}
+ try{var src=await PDFLib.PDFDocument.load(pdfBytes),out=await PDFLib.PDFDocument.create(),indices=[];for(var i=start-1;i<end;i++)indices.push(i);var copied=await out.copyPages(src,indices);copied.forEach(function(p){out.addPage(p);});var data=await out.save({useObjectStreams:true});downloadBlob(new Blob([data],{type:"application/pdf"}),fileSafe(pdfFile.name.replace(/\.pdf$/i,""))+"-pages-"+start+"-"+end+".pdf");$("pdf-view-status").textContent="指定範囲を別PDFとして保存しました。";}catch(e){$("pdf-view-status").textContent="ページを抽出できませんでした: "+e.message;}
+});
+$("viewer-stage").addEventListener("keydown",function(e){if(e.key==="ArrowLeft"&&pdfPage>1){pdfPage--;renderPdfPage();}else if(e.key==="ArrowRight"&&pdfView&&pdfPage<pdfView.numPages){pdfPage++;renderPdfPage();}});
+
+var selectedFiles=[];
+function renderFileList(){var list=$("file-list");list.innerHTML="";if(!selectedFiles.length){list.innerHTML='<div class="empty">選択したファイルがここに表示されます。</div>';$("zip-btn").disabled=true;$("gzip-btn").disabled=true;return;}
+ selectedFiles.forEach(function(f,i){var row=document.createElement("div");row.className="file-row";var left=document.createElement("div"),name=document.createElement("strong"),meta=document.createElement("span"),remove=document.createElement("button");name.textContent=f.name;meta.textContent=(f.type||"種類不明")+" ・ "+bytesText(f.size);left.appendChild(name);left.appendChild(meta);remove.className="btn small";remove.textContent="削除";remove.type="button";remove.addEventListener("click",function(){selectedFiles.splice(i,1);renderFileList();});row.appendChild(left);row.appendChild(remove);list.appendChild(row);});
+ $("zip-btn").disabled=false;$("gzip-btn").disabled=selectedFiles.length===0;
+}
+$("files-choose").addEventListener("click",function(){$("files-input").click();});$("files-input").addEventListener("change",function(e){Array.prototype.forEach.call(e.target.files,function(f){if(!selectedFiles.some(function(x){return x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified;}))selectedFiles.push(f);});e.target.value="";renderFileList();$("file-status").textContent=selectedFiles.length+" 個のファイルを選択中です。";});
+$("zip-btn").addEventListener("click",async function(){if(!selectedFiles.length)return;if(!window.JSZip){$("file-status").textContent="ZIPライブラリを読み込めませんでした。";return;}
+ try{$("zip-btn").disabled=true;$("file-status").textContent="ZIPを作成中…";$("zip-progress").style.width="0%";var zip=new JSZip(),used={};selectedFiles.forEach(function(f){var name=f.name,base=name,ext="",dot=name.lastIndexOf(".");if(dot>0){base=name.slice(0,dot);ext=name.slice(dot);}var n=2;while(used[name]){name=base+" ("+n+")"+ext;n++;}used[name]=true;zip.file(name,f);});
+ var blob=await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:6}},function(meta){$("zip-progress").style.width=meta.percent.toFixed(0)+"%";});downloadBlob(blob,"utility-hub-files.zip");$("file-status").textContent="ZIPを作成しました（"+bytesText(blob.size)+"）。";
+ }catch(e){$("file-status").textContent="ZIP作成に失敗しました: "+e.message;}finally{$("zip-btn").disabled=selectedFiles.length===0;}
+});
+$("gzip-btn").addEventListener("click",async function(){if(!selectedFiles.length)return;if(!("CompressionStream" in window)){$("file-status").textContent="このブラウザはGZIP圧縮に対応していません。";return;}
+ try{var f=selectedFiles[0],stream=f.stream().pipeThrough(new CompressionStream("gzip")),blob=await new Response(stream).blob();downloadBlob(blob,f.name+".gz");$("file-status").textContent="GZIPファイルを作成しました（"+bytesText(blob.size)+"）。";}catch(e){$("file-status").textContent="GZIP圧縮に失敗しました: "+e.message;}
+});
+})();
+</script>
+</body>
+</html>
