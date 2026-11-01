@@ -195,7 +195,7 @@
             <button class="key function" data-insert="max(" type="button">max</button>
             <button class="key function" data-insert="mean(" type="button">mean</button>
 
-            <button class="key function" data-insert="[[ " type="button">行列 [</button>
+            <button class="key function" data-insert="[[1, 2], [3, 4]]" type="button">行列例</button>
             <button class="key function" data-insert="i" type="button">虚数 i</button>
             <button class="key function" data-insert="/100" type="button">÷100</button>
             <button class="key equals" data-action="calculate" type="button">= 計算</button>
@@ -608,11 +608,11 @@
         mass: [["kg","キログラム (kg)"],["g","グラム (g)"],["mg","ミリグラム (mg)"],["lb","ポンド (lb)"],["oz","オンス (oz)"]],
         time: [["s","秒 (s)"],["min","分 (min)"],["h","時間 (h)"],["day","日 (day)"]],
         temperature: [["degC","摂氏 (°C)"],["degF","華氏 (°F)"],["K","ケルビン (K)"]],
-        volume: [["L","リットル (L)"],["mL","ミリリットル (mL)"],["m^3","立方メートル (m³)"],["galUS","米ガロン (gal)"]],
+        volume: [["L","リットル (L)"],["mL","ミリリットル (mL)"],["m^3","立方メートル (m³)"],["gal","ガロン (gal)"]],
         area: [["m^2","平方メートル (m²)"],["cm^2","平方センチメートル (cm²)"],["km^2","平方キロメートル (km²)"],["ha","ヘクタール (ha)"],["acre","エーカー"]],
-        speed: [["m/s","メートル毎秒 (m/s)"],["km/h","キロメートル毎時 (km/h)"],["mile/h","マイル毎時 (mph)"]],
+        speed: [["m/s","メートル毎秒 (m/s)"],["km/h","キロメートル毎時 (km/h)"],["mi/h","マイル毎時 (mph)"]],
         pressure: [["Pa","パスカル (Pa)"],["kPa","キロパスカル (kPa)"],["bar","バール (bar)"],["atm","気圧 (atm)"]],
-        energy: [["J","ジュール (J)"],["kJ","キロジュール (kJ)"],["cal","カロリー (cal)"],["kWh","キロワット時 (kWh)"]],
+        energy: [["J","ジュール (J)"],["kJ","キロジュール (kJ)"],["BTU","英熱量 (BTU)"],["kWh","キロワット時 (kWh)"]],
         angle: [["deg","度 (°)"],["rad","ラジアン (rad)"],["turn","回転 (turn)"]]
       };
 
@@ -738,6 +738,7 @@
       toSelect.addEventListener("change", convertUnits);
       renderHistory();
       fillUnitOptions();
+      expressionInput.value = "sqrt(2) + sin(30)";
 
       loadMathLibrary().then(function (engine) {
         mathEngine = engine;
