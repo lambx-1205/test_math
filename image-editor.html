@@ -82,7 +82,7 @@ function loadFile(file){
  if(!file||!file.type||file.type.indexOf("image/")!==0){say("画像ファイルを選択してください。");return;}
  if(sourceUrl)URL.revokeObjectURL(sourceUrl);
  sourceUrl=URL.createObjectURL(file);sourceName=file.name;var img=new Image();
- img.onload=function(){source=img;rotation=0;flipH=false;flipV=false;effect="none";symmetry="none";mosaicOn=false;squareCrop=false;resizeTo=null;
+ img.onload=function(){if(img.naturalWidth*img.naturalHeight>60000000){say("画像が大きすぎます。6000万画素以下の画像を選択してください。");URL.revokeObjectURL(sourceUrl);sourceUrl=null;$("drop-area").style.display="";return;}source=img;rotation=0;flipH=false;flipV=false;effect="none";symmetry="none";mosaicOn=false;squareCrop=false;resizeTo=null;
  ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});
  $("resize-width").value="";$("resize-height").value="";$("preview-label").textContent=file.name;
  setEnabled(true);$("drop-area").style.display="none";$("preview-wrap").classList.remove("empty");
@@ -159,7 +159,7 @@ $("apply-size").addEventListener("click",function(){
  resizeTo={width:w,height:h};$("resize-width").value=w;$("resize-height").value=h;render();say("出力サイズを設定しました。");
 });
 $("clear-size").addEventListener("click",function(){resizeTo=null;$("resize-width").value="";$("resize-height").value="";render();say("元のサイズに戻しました。");});
-function makeBlob(){return new Promise(function(resolve){var type=$("format").value,q=Number($("quality").value)/100;canvas.toBlob(function(blob){resolve(blob);},type,q);});}
+function makeBlob(){return new Promise(function(resolve){var type=$("format").value,q=Number($("quality").value)/100,output=canvas;if(type==="image/jpeg"){output=document.createElement("canvas");output.width=canvas.width;output.height=canvas.height;var outCtx=output.getContext("2d");outCtx.fillStyle="#fff";outCtx.fillRect(0,0,output.width,output.height);outCtx.drawImage(canvas,0,0);}output.toBlob(function(blob){resolve(blob);},type,q);});}
 $("download-btn").addEventListener("click",async function(){var blob=await makeBlob();if(!blob){say("画像を書き出せませんでした。");return;}var ext=blob.type==="image/jpeg"?"jpg":blob.type==="image/webp"?"webp":"png",a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=safeName(sourceName)+"-edited."+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);say("画像を保存しました。");});
 $("copy-btn").addEventListener("click",async function(){try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error("このブラウザでは画像コピーに対応していません");var blob=await new Promise(function(resolve){canvas.toBlob(resolve,"image/png");});await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);say("PNG画像をクリップボードへコピーしました。");}catch(e){say("コピーできませんでした。HTTPS環境で試すか、画像を保存してください。");}});
 $("reset-btn").addEventListener("click",reset);
