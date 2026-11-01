@@ -1640,7 +1640,9 @@
           const EditorView = viewModule.EditorView;
 
           if (!EditorState || !EditorView || !viewModule.drawSelection ||
-              !viewModule.keymap || !commandsModule.history) {
+              !viewModule.clickAddsSelectionRange || !viewModule.keymap ||
+              !commandsModule.history || !Array.isArray(commandsModule.defaultKeymap) ||
+              !Array.isArray(commandsModule.historyKeymap)) {
             throw new Error("CodeMirror modules could not be initialized.");
           }
 
@@ -1659,7 +1661,7 @@
               ]),
               // Do not enable rectangularSelection here: Option-click is reserved
               // for adding a separate cursor, as in common code editors.
-              EditorView.clickAddsSelectionRange.of(function (event) {
+              viewModule.clickAddsSelectionRange.of(function (event) {
                 return event.altKey;
               }),
               EditorView.theme({
@@ -1684,10 +1686,15 @@
           return true;
         } catch (error) {
           console.error("CodeMirror could not be loaded; using a standard textarea.", error);
+          if (editorView) {
+            editorView.destroy();
+            editorView = null;
+          }
           sourceEditorHost.hidden = true;
           source.hidden = false;
           source.addEventListener("input", renderPreview);
-          updateSavedFeedback("複数カーソルエディタを読み込めなかったため、通常の入力欄に切り替えました。", true);
+          const reason = error && error.message ? "（" + error.message + "）" : "";
+          updateSavedFeedback("複数カーソルエディタの初期化に失敗したため、通常の入力欄に切り替えました。" + reason, true);
           return false;
         }
       }
