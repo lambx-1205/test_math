@@ -4,13 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
-  <title>test_math | 数式プレビュー</title>
-  <meta name="description" content="KaTeXを使ってLaTeX数式をリアルタイムにプレビューするシンプルなエディタです。">
-
-  <link id="katex-css" rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css"
-    onerror="this.onerror=null;this.href='https://unpkg.com/katex@0.19.0/dist/katex.min.css';">
-
+  <title>UTILITY HUB | 便利ツール集</title>
+  <meta name="description" content="日常の小さな作業を、ブラウザひとつで。文章、計算、変換などの便利ツールを集めたUTILITY HUBです。">
   <style>
     :root {
       color-scheme: light;
@@ -23,1721 +18,181 @@
       --accent-soft: #eef0ff;
       --shadow: 0 12px 34px rgba(28, 43, 77, 0.06);
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-width: 320px;
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(ellipse at 8% 0%, rgba(70, 88, 216, 0.07), transparent 32rem),
+        radial-gradient(ellipse at 8% 0%, rgba(70, 88, 216, 0.08), transparent 34rem),
         var(--canvas);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP",
         "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
     }
-
-    .app-shell {
-      width: min(1440px, 100%);
-      margin: 0 auto;
-      padding: 28px 30px 24px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      min-width: 0;
-    }
-
+    a { color: inherit; }
+    .shell { width: min(1120px, 100%); margin: 0 auto; padding: 34px 28px 28px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 62px; }
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
     .brand-mark {
-      display: grid;
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      place-items: center;
-      border-radius: 13px;
-      background: var(--accent);
-      color: white;
-      box-shadow: 0 7px 15px rgba(70, 88, 216, 0.23);
-      font-size: 23px;
-      font-weight: 700;
-    }
-
-    .eyebrow {
-      margin: 0 0 3px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 750;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(20px, 2.3vw, 27px);
-      font-weight: 760;
-      letter-spacing: -0.035em;
-    }
-
-    .version-pill {
-      flex: 0 0 auto;
-      padding: 8px 11px;
-      border: 1px solid #dfe3ff;
-      border-radius: 999px;
-      background: #f0f2ff;
-      color: #3e4dc0;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .intro {
-      margin: 0 0 20px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .workbench {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .panel {
-      display: flex;
-      min-width: 0;
-      min-height: min(650px, calc(100vh - 240px));
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .panel-heading {
-      display: flex;
-      min-height: 68px;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 15px 18px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .panel-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .panel-icon {
-      display: grid;
-      width: 32px;
-      height: 32px;
-      flex: 0 0 32px;
-      place-items: center;
-      border-radius: 9px;
-      background: #f0f2f7;
-      color: #58647a;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .output-panel .panel-icon {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 750;
-    }
-
-    .panel-subtitle {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .panel-actions {
-      display: flex;
-      flex: 0 0 auto;
-      gap: 7px;
-    }
-
-    button {
-      min-height: 33px;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: white;
-      color: #475166;
-      font: inherit;
-      font-size: 12px;
-      font-weight: 650;
-      cursor: pointer;
-      transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
-    }
-
-    button:hover {
-      border-color: #c6cdef;
-      background: #f7f8ff;
-    }
-
-    button:active { transform: translateY(1px); }
-
-    button:focus-visible, textarea:focus-visible {
-      outline: 3px solid rgba(70, 88, 216, 0.25);
-      outline-offset: 2px;
-    }
-
-    .editor-area {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      padding: 14px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 390px;
-      flex: 1;
-      resize: vertical;
-      padding: 17px;
-      border: 1px solid #e4e8f0;
-      border-radius: 11px;
-      outline: none;
-      background: #fbfcff;
-      color: #243047;
-      font: 13px/1.85 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      tab-size: 2;
-    }
-
-    textarea:focus {
-      border-color: #aeb8f3;
-      background: white;
-    }
-
-    .source-editor {
-      display: flex;
-      flex: 1 1 auto;
-      min-height: 390px;
-      overflow: hidden;
-      border: 1px solid #e4e8f0;
-      border-radius: 11px;
-      background: #fbfcff;
-    }
-
-    .source-editor:focus-within {
-      border-color: #aeb8f3;
-      background: white;
-    }
-
-    .source-editor[hidden] {
-      display: none;
-    }
-
-    #source[hidden] {
-      display: none !important;
-    }
-
-    .source-editor .cm-editor {
-      width: 100%;
-      height: 100%;
-      min-height: 390px;
-      background: transparent;
-      color: #243047;
-      font-size: 13px;
-    }
-
-    .source-editor .cm-scroller {
-      overflow: auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      line-height: 1.85;
-    }
-
-    .source-editor .cm-content {
-      padding: 17px 0;
-      caret-color: var(--accent);
-    }
-
-    .source-editor .cm-line {
-      padding: 0 17px;
-    }
-
-    .source-editor .cm-gutters {
-      border-right: 1px solid #e4e8f0;
-      background: #f7f8fc;
-      color: #8993a6;
-    }
-
-    .source-editor .cm-cursor {
-      border-left-color: var(--accent);
-    }
-
-    .source-editor .cm-selectionBackground,
-    .source-editor .cm-content ::selection {
-      background: rgba(70, 88, 216, 0.18);
-    }
-
-    .source-editor .cm-editor.cm-focused {
-      outline: none;
-    }
-
-    .editor-hint {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 11px 4px 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    code {
-      padding: 2px 5px;
-      border: 1px solid #e8ebf2;
-      border-radius: 5px;
-      background: #f7f8fb;
-      color: #44516a;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #3d8067;
-      font-size: 11px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
-    .status.error { color: #b45309; }
-
-    .preview-wrap {
-      flex: 1;
-      padding: 25px 24px;
-      overflow: auto;
-    }
-
-    #preview {
-      min-height: 100%;
-      color: #273347;
-      font-size: 15px;
-      line-height: 1.95;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-    }
-
-    #preview,
-    .saved-note-rendered {
-      overflow-wrap: anywhere;
-      line-height: 1.55;
-    }
-
-    #preview.markdown-rendered,
-    .saved-note-rendered.markdown-rendered {
-      white-space: normal;
-      line-height: 1.5;
-    }
-
-    #preview.markdown-rendered p,
-    .saved-note-rendered.markdown-rendered p {
-      margin: 0.3em 0;
-    }
-
-    #preview.markdown-rendered h1,
-    #preview.markdown-rendered h2,
-    #preview.markdown-rendered h3,
-    #preview.markdown-rendered h4,
-    .saved-note-rendered.markdown-rendered h1,
-    .saved-note-rendered.markdown-rendered h2,
-    .saved-note-rendered.markdown-rendered h3,
-    .saved-note-rendered.markdown-rendered h4 {
-      margin: 0.75em 0 0.3em;
-    }
-
-    #preview.markdown-rendered ul,
-    #preview.markdown-rendered ol,
-    .saved-note-rendered.markdown-rendered ul,
-    .saved-note-rendered.markdown-rendered ol {
-      margin: 0.25em 0;
-    }
-
-    #preview.markdown-rendered li,
-    .saved-note-rendered.markdown-rendered li {
-      margin: 0.08em 0;
-    }
-
-    #preview.markdown-rendered blockquote,
-    .saved-note-rendered.markdown-rendered blockquote {
-      margin: 0.45em 0;
-    }
-
-    .math-display-wrapper {
-      display: block;
-      margin: 0.35em 0;
-      text-align: center;
-    }
-
-    #preview.markdown-rendered .katex-display,
-    .saved-note-rendered.markdown-rendered .katex-display {
-      margin: 0;
-    }
-
-    #preview h1, #preview h2, #preview h3, #preview h4,
-    .saved-note-rendered h1, .saved-note-rendered h2,
-    .saved-note-rendered h3, .saved-note-rendered h4 {
-      margin: 1.15em 0 0.55em;
-      line-height: 1.35;
-    }
-
-    #preview h1, .saved-note-rendered h1 { font-size: 1.65em; }
-    #preview h2, .saved-note-rendered h2 { font-size: 1.4em; }
-    #preview h3, .saved-note-rendered h3 { font-size: 1.2em; }
-    #preview p, .saved-note-rendered p { margin: 0.65em 0; }
-    #preview ul, #preview ol,
-    .saved-note-rendered ul, .saved-note-rendered ol { padding-left: 1.7em; }
-    #preview blockquote, .saved-note-rendered blockquote {
-      margin: 0.9em 0;
-      padding: 0.15em 1em;
-      border-left: 3px solid var(--line);
-      color: var(--muted);
-    }
-    #preview pre, .saved-note-rendered pre {
-      overflow-x: auto;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: #f5f7fb;
-      white-space: pre;
-    }
-    #preview code, .saved-note-rendered code {
-      padding: 0.12em 0.32em;
-      border-radius: 4px;
-      background: #f0f2f7;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.9em;
-    }
-    #preview pre code, .saved-note-rendered pre code {
-      padding: 0;
-      background: transparent;
-    }
-    #preview table, .saved-note-rendered table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1em 0;
-      display: block;
-      overflow-x: auto;
-    }
-    #preview th, #preview td,
-    .saved-note-rendered th, .saved-note-rendered td {
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      text-align: left;
-    }
-    #preview th, .saved-note-rendered th { background: #f5f7fb; }
-    #preview hr, .saved-note-rendered hr {
-      border: 0;
-      border-top: 1px solid var(--line);
-      margin: 1.3em 0;
-    }
-    #preview img, .saved-note-rendered img { max-width: 100%; height: auto; }
-    #preview a, .saved-note-rendered a { color: var(--accent); }
-
-    #preview .katex,
-    .saved-note-rendered .katex {
-      margin-inline: 0.16em;
-    }
-
-    #preview .katex-display .katex,
-    .saved-note-rendered .katex-display .katex {
-      margin-inline: 0;
-    }
-
-    #preview .katex-display {
-      max-width: 100%;
-      margin: 1.15em 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 3px 0;
-    }
-
-    #preview .katex-error {
-      color: #b42318;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.92em;
-    }
-
-    .primary-button {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .primary-button:hover {
-      border-color: #3645bd;
-      background: #3645bd;
-      color: #fff;
-    }
-
-    .character-count-panel {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      margin-top: 18px;
-      padding: 17px 21px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .character-count-label {
-      margin: 0;
-      color: var(--ink);
-      font-size: 13px;
-      font-weight: 750;
-    }
-
-    .character-count-hint {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .character-count-value {
-      color: var(--accent);
-      font-size: clamp(22px, 3vw, 30px);
-      font-weight: 780;
-      letter-spacing: -0.035em;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .saved-section {
-      margin-top: 22px;
-      padding: 21px 22px;
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .saved-section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-
-    .saved-heading {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .saved-count {
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 750;
-      white-space: nowrap;
-    }
-
-    .saved-description {
-      margin: 9px 0 13px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .saved-feedback {
-      margin: 0 0 12px;
-      color: #3d8067;
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    .saved-feedback.error { color: #b45309; }
-
-    .saved-notes {
-      display: grid;
-      gap: 12px;
-    }
-
-    .saved-empty {
-      padding: 27px 18px;
-      border: 1px dashed #dbe1eb;
-      border-radius: 12px;
-      color: #8a94a6;
-      font-size: 13px;
-      line-height: 1.7;
-      text-align: center;
-    }
-
-    .saved-note {
-      min-width: 0;
-      padding: 15px 16px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fcfdff;
-    }
-
-    .saved-note-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .saved-note-heading {
-      display: flex;
-      flex: 1 1 auto;
-      align-items: baseline;
-      gap: 9px;
-      min-width: 0;
-    }
-
-    .saved-note-title {
-      flex: 0 1 auto;
-      max-width: 48%;
-      min-width: 0;
-      margin: 0;
-      color: #273347;
-      font-size: 14px;
-      font-weight: 750;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    .saved-note-excerpt {
-      display: block;
-      flex: 1 1 auto;
-      min-width: 0;
-      overflow: hidden;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .saved-note-date {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    .saved-note-actions {
-      display: flex;
-      flex: 0 0 auto;
-      gap: 7px;
-    }
-
-    .saved-note-expanded {
-      margin-top: 13px;
-      padding-top: 13px;
-      border-top: 1px solid var(--line);
-    }
-
-    .saved-note-expanded[hidden] {
-      display: none;
-    }
-
-    .saved-note-detail-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .saved-note-date {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    .saved-note-content {
-      margin: 0;
-      min-width: 0;
-      overflow-wrap: anywhere;
-      color: #273347;
-      font-size: 14px;
-      line-height: 1.85;
-    }
-
-    .saved-note-rendered {
-      white-space: pre-wrap;
-    }
-
-    .saved-note-rendered .katex-display {
-      max-width: 100%;
-      margin: 0.9em 0;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 3px 0;
-    }
-
-    .saved-note-rendered .katex-error {
-      color: #b42318;
-    }
-
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px 18px;
-      margin-top: 17px;
-      color: #8a94a6;
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    .footer-meta {
-      display: grid;
-      flex-basis: 100%;
-      gap: 4px;
-      margin-top: 4px;
-      padding-top: 10px;
-      border-top: 1px solid var(--line);
-      overflow-wrap: anywhere;
-    }
-
-    .footer-meta strong {
-      color: #5b6679;
-      font-weight: 700;
-    }
-
-    .footer-meta ul {
-      margin: 3px 0 0;
-      padding-left: 1.4em;
-    }
-
-    .footer-meta li {
-      margin: 2px 0;
-    }
-
-    .footer-meta a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    .footer-meta a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 820px) {
-      .app-shell { padding: 22px 16px; }
-      .workbench { grid-template-columns: minmax(0, 1fr); }
-      .panel { min-height: 480px; }
-      textarea { min-height: 330px; }
-      .source-editor { min-height: 330px; }
-      .source-editor .cm-editor { min-height: 330px; }
-      .preview-wrap { min-height: 350px; }
-    }
-
-    @media (max-width: 430px) {
-      .topbar { align-items: flex-start; }
-      .version-pill { margin-top: 5px; }
-      .panel-heading { align-items: flex-start; padding: 13px; }
-      .panel-actions { flex-direction: column; }
-      .saved-section { padding: 17px 14px; }
-      .saved-note-actions { flex-direction: column; }
-      .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
-      .saved-note-title { max-width: 100%; }
-      .saved-note-excerpt { flex-basis: 100%; }
-      .editor-area { padding: 10px; }
-      textarea { padding: 12px; font-size: 12px; }
-      .source-editor .cm-editor { font-size: 12px; }
-      .source-editor .cm-content { padding: 12px 0; }
-      .source-editor .cm-line { padding: 0 12px; }
-      .preview-wrap { padding: 19px 15px; }
+      display: grid; width: 44px; height: 44px; flex: 0 0 44px; place-items: center;
+      border-radius: 14px; background: var(--accent); color: #fff;
+      box-shadow: 0 7px 15px rgba(70, 88, 216, 0.23); font-size: 22px; font-weight: 800;
+    }
+    .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+    .brand-name { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.03em; }
+    .top-note { color: var(--muted); font-size: 12px; }
+    .hero { max-width: 760px; margin-bottom: 37px; }
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px;
+      border: 1px solid #dfe3ff; border-radius: 999px; background: #f0f2ff;
+      color: #3e4dc0; font-size: 11px; font-weight: 750;
+    }
+    h1 { margin: 19px 0 12px; font-size: clamp(34px, 6vw, 55px); line-height: 1.15; letter-spacing: -.055em; }
+    .hero p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.9; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 0 0 15px; }
+    h2 { margin: 0; font-size: 16px; font-weight: 800; }
+    .section-caption { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .featured {
+      position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center; gap: 24px; min-height: 220px; padding: 30px;
+      overflow: hidden; border: 1px solid #dce2f4; border-radius: 20px;
+      background: linear-gradient(120deg, #fff 0%, #f8f9ff 100%); box-shadow: var(--shadow);
+      text-decoration: none; transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+    }
+    .featured:hover { transform: translateY(-2px); border-color: #b9c3f3; box-shadow: 0 16px 38px rgba(28,43,77,.10); }
+    .featured-copy { position: relative; z-index: 1; min-width: 0; }
+    .tool-label { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+    .featured h3 { margin: 9px 0 8px; font-size: 25px; letter-spacing: -.04em; }
+    .featured p { max-width: 590px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 17px; }
+    .chip { padding: 5px 9px; border: 1px solid #e0e5f0; border-radius: 7px; background: #fff; color: #566177; font-size: 10px; font-weight: 650; }
+    .tool-icon {
+      display: grid; width: 112px; height: 112px; flex: 0 0 112px; place-items: center;
+      border-radius: 25px; background: var(--accent-soft); color: var(--accent);
+      font-family: Georgia, serif; font-size: 55px; font-weight: 700;
+    }
+    .open-label {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 19px;
+      color: var(--accent); font-size: 12px; font-weight: 800;
+    }
+    .open-arrow { font-size: 17px; transition: transform 150ms ease; }
+    .featured:hover .open-arrow { transform: translateX(4px); }
+    .coming-section { margin-top: 35px; }
+    .coming-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .coming-card {
+      min-height: 112px; padding: 17px; border: 1px solid var(--line); border-radius: 13px;
+      background: rgba(255,255,255,.7);
+    }
+    .coming-icon { display: inline-grid; width: 28px; height: 28px; place-items: center; margin-bottom: 10px; border-radius: 8px; background: #f0f2f7; color: #657187; font-size: 14px; }
+    .coming-card h3 { margin: 0; font-size: 13px; }
+    .coming-card p { margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .status { display: inline-block; margin-left: 6px; color: #8b94a5; font-size: 9px; font-weight: 700; }
+    footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 15px; border-top: 1px solid var(--line); color: #8a94a6; font-size: 10px; }
+    @media (max-width: 650px) {
+      .shell { padding: 23px 16px; }
+      .topbar { margin-bottom: 43px; }
+      .top-note { display: none; }
+      .featured { grid-template-columns: minmax(0,1fr); padding: 23px; }
+      .tool-icon { display: none; }
+      .coming-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 390px) {
+      .coming-grid { grid-template-columns: minmax(0,1fr); }
+      footer { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <main class="app-shell">
+  <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">∑</div>
+        <div class="brand-mark" aria-hidden="true">U</div>
         <div>
-          <p class="eyebrow">test_math</p>
-          <h1>数式プレビュー</h1>
+          <p class="eyebrow">A COLLECTION OF USEFUL TOOLS</p>
+          <p class="brand-name">UTILITY HUB</p>
         </div>
       </div>
-      <div class="version-pill">KaTeX 0.19.0</div>
+      <div class="top-note">小さな作業を、ひとつの場所で。</div>
     </header>
 
-    <p class="intro">
-      左側に Markdown と LaTeX を入力すると、右側にリアルタイムで表示されます。数式は必ず区切り記号で囲んでください。
-      表示数式は <code>$ ... $</code> または <code>\[ ... \]</code>、
-      文中の数式は <code>$ ... $</code> または <code>\( ... \)</code> を使います。区切りのない LaTeX は数式として描画されません。
-    </p>
-
-    <section class="workbench" aria-label="数式エディタ">
-      <section class="panel editor-panel" aria-labelledby="editor-title">
-        <div class="panel-heading">
-          <div class="panel-title-wrap">
-            <div class="panel-icon" aria-hidden="true">⌘</div>
-            <div>
-              <h2 id="editor-title">入力</h2>
-              <p class="panel-subtitle">LaTeX ソース</p>
-            </div>
-          </div>
-          <div class="panel-actions">
-            <button id="save-button" class="primary-button" type="button">保存</button>
-            <button id="overwrite-save-button" type="button" hidden>上書き保存</button>
-            <button id="rename-save-button" type="button" hidden>保存名変更</button>
-            <button id="sample-button" type="button">サンプル</button>
-            <button id="clear-button" type="button">クリア</button>
-          </div>
-        </div>
-        <div class="editor-area">
-          <label for="source-editor" class="eyebrow">SOURCE EDITOR</label>
-          <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
-          <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
-          <div class="editor-hint">
-            <span>Option + クリック：カーソルを追加して複数箇所に同時入力</span>
-            <span id="char-count">0 文字</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel output-panel" aria-labelledby="preview-title">
-        <div class="panel-heading">
-          <div class="panel-title-wrap">
-            <div class="panel-icon" aria-hidden="true">∑</div>
-            <div>
-              <h2 id="preview-title">出力</h2>
-              <p class="panel-subtitle">レンダリング結果</p>
-            </div>
-          </div>
-          <div id="status" class="status" role="status" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span id="status-text">準備中</span>
-          </div>
-        </div>
-        <div class="preview-wrap">
-          <div id="preview" aria-label="数式のプレビュー"></div>
-        </div>
-      </section>
+    <section class="hero">
+      <span class="hero-kicker">✦ BROWSER-BASED TOOLBOX</span>
+      <h1>必要な道具を、<br>必要なときに。</h1>
+      <p>文章を書く。データを整える。計算する。<br>日々の作業で使う小さな道具を、ひとつの場所に集めていきます。</p>
     </section>
 
-    <section class="character-count-panel" aria-label="現在の文字数" aria-live="polite">
-      <div>
-        <p class="character-count-label">現在の文字数</p>
-        <p class="character-count-hint">入力欄の内容をリアルタイムで集計（空白・改行を含む）</p>
-      </div>
-      <output id="current-character-count" class="character-count-value" aria-label="現在の文字数">0 文字</output>
-    </section>
-
-    <section class="saved-section" aria-labelledby="saved-title">
-      <div class="saved-section-header">
-        <div class="saved-heading">
-          <div class="panel-icon" aria-hidden="true">▤</div>
-          <div>
-            <h2 id="saved-title">保存したメモ</h2>
-            <p class="panel-subtitle">保存した内容はここに追加されます</p>
-          </div>
-        </div>
-        <span id="saved-count" class="saved-count">0 件</span>
-      </div>
-      <p class="saved-description">「保存」を押すとタイトル入力ダイアログが開き、タイトル付きで一覧に追加されます。保存内容はこのブラウザに保存されます。</p>
-      <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">まだメモはありません。内容を入力して「保存」を押してください。</p>
-      <div id="saved-notes" class="saved-notes"></div>
-    </section>
-
-    <footer class="footer">
-      <span>Powered by KaTeX · 入力内容はこのページ内で処理されます。</span>
-      <span>GitHub Pages 用の静的ページ</span>
-      <div class="footer-meta" aria-live="polite">
-        <div><strong>最終更新日時：</strong><time id="last-updated">GitHubから取得中…</time></div>
+    <section aria-labelledby="tools-heading">
+      <div class="section-head">
         <div>
-          <strong>更新履歴：</strong>
-          <ul id="update-history">
-            <li><a href="https://github.com/lambx-1205/test_math/commits/main/index.html" target="_blank" rel="noopener noreferrer">GitHubで更新履歴を確認</a></li>
-          </ul>
+          <h2 id="tools-heading">ツール</h2>
+          <p class="section-caption">現在利用できるツール</p>
+        </div>
+        <span class="section-caption">1 TOOL AVAILABLE</span>
+      </div>
+
+      <a class="featured" href="latex-memo.html" aria-label="LaTeX メモ帳を開く">
+        <div class="featured-copy">
+          <span class="tool-label">WRITING / MATHEMATICS</span>
+          <h3>LaTeX メモ帳</h3>
+          <p>MarkdownとLaTeXを同時に扱えるメモ帳。数式のリアルタイムプレビュー、タイトル付き保存、複数カーソル編集に対応します。</p>
+          <div class="chips">
+            <span class="chip">Markdown</span>
+            <span class="chip">KaTeX</span>
+            <span class="chip">複数カーソル</span>
+            <span class="chip">ローカル保存</span>
+          </div>
+          <span class="open-label">メモ帳を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+        </div>
+        <div class="tool-icon" aria-hidden="true">∑</div>
+      </a>
+    </section>
+
+    <section class="coming-section" aria-labelledby="coming-heading">
+      <div class="section-head">
+        <div>
+          <h2 id="coming-heading">これから追加するツール</h2>
+          <p class="section-caption">今後、順次拡張していく予定です</p>
         </div>
       </div>
+      <div class="coming-grid">
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">{ }</span>
+          <h3>JSON 整形・検証 <span class="status">COMING</span></h3>
+          <p>JSONの整形、圧縮、構文チェック。</p>
+        </article>
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">⇄</span>
+          <h3>テキスト差分比較 <span class="status">COMING</span></h3>
+          <p>2つの文章やコードの違いを表示。</p>
+        </article>
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">◷</span>
+          <h3>タイマー・時間管理 <span class="status">COMING</span></h3>
+          <p>ポモドーロ、ストップウォッチなど。</p>
+        </article>
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">⇄</span>
+          <h3>単位・進数変換 <span class="status">COMING</span></h3>
+          <p>単位、進数、日時などをすばやく変換。</p>
+        </article>
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">▦</span>
+          <h3>CSV・データ可視化 <span class="status">COMING</span></h3>
+          <p>表データの確認とグラフ作成。</p>
+        </article>
+        <article class="coming-card">
+          <span class="coming-icon" aria-hidden="true">▧</span>
+          <h3>画像・ファイル処理 <span class="status">COMING</span></h3>
+          <p>画像変換、圧縮、ファイル整理。</p>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span>UTILITY HUB · 個人向けブラウザツール集</span>
+      <span>GitHub Pages</span>
     </footer>
   </main>
-
-  <script>
-    function loadKatex() {
-      const sources = [
-        "https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js",
-        "https://unpkg.com/katex@0.19.0/dist/katex.min.js"
-      ];
-
-      return new Promise(function (resolve, reject) {
-        let index = 0;
-
-        function tryNextSource() {
-          if (index >= sources.length) {
-            reject(new Error("KaTeX could not be loaded from either CDN."));
-            return;
-          }
-
-          const script = document.createElement("script");
-          script.src = sources[index++];
-          script.async = true;
-          script.onload = function () {
-            if (window.katex && typeof window.katex.render === "function") {
-              resolve();
-            } else {
-              script.remove();
-              tryNextSource();
-            }
-          };
-          script.onerror = function () {
-            script.remove();
-            tryNextSource();
-          };
-          document.head.appendChild(script);
-        }
-
-        tryNextSource();
-      });
-    }
-
-    function loadScriptWithFallback(urls, check) {
-      return new Promise(function (resolve, reject) {
-        let index = 0;
-        function next() {
-          if (index >= urls.length) {
-            reject(new Error("Could not load a required rendering library."));
-            return;
-          }
-          const script = document.createElement("script");
-          script.src = urls[index++];
-          script.async = true;
-          script.onload = function () {
-            if (check()) resolve();
-            else { script.remove(); next(); }
-          };
-          script.onerror = function () { script.remove(); next(); };
-          document.head.appendChild(script);
-        }
-        next();
-      });
-    }
-
-    function loadMarkdownLibraries() {
-      return loadScriptWithFallback([
-        "https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js",
-        "https://unpkg.com/marked@15.0.7/marked.min.js"
-      ], function () { return Boolean(window.marked && typeof window.marked.parse === "function"); })
-      .then(function () {
-        return loadScriptWithFallback([
-          "https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js",
-          "https://unpkg.com/dompurify@3.2.6/dist/purify.min.js"
-        ], function () { return Boolean(window.DOMPurify && typeof window.DOMPurify.sanitize === "function"); });
-      });
-    }
-
-    function formatJstDateTime(isoString) {
-      return new Intl.DateTimeFormat("ja-JP", {
-        timeZone: "Asia/Tokyo",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23"
-      }).format(new Date(isoString)) + " JST";
-    }
-
-    function loadFooterHistory() {
-      const updatedAt = document.getElementById("last-updated");
-      const history = document.getElementById("update-history");
-      const historyUrl = "https://github.com/lambx-1205/test_math/commits/main/index.html";
-      fetch("https://api.github.com/repos/lambx-1205/test_math/commits?path=index.html&per_page=5", {
-        headers: { Accept: "application/vnd.github+json" }
-      })
-        .then(function (response) {
-          if (!response.ok) throw new Error("GitHub commit history unavailable");
-          return response.json();
-        })
-        .then(function (commits) {
-          if (!Array.isArray(commits) || commits.length === 0) {
-            throw new Error("No commits returned");
-          }
-
-          const latest = commits[0];
-          const latestDate = latest.commit.committer.date || latest.commit.author.date;
-          updatedAt.dateTime = latestDate;
-          updatedAt.textContent = formatJstDateTime(latestDate);
-          history.replaceChildren();
-
-          commits.forEach(function (item) {
-            const li = document.createElement("li");
-            const time = document.createElement("time");
-            const commitDate = item.commit.committer.date || item.commit.author.date;
-            time.dateTime = commitDate;
-            time.textContent = formatJstDateTime(commitDate);
-            const link = document.createElement("a");
-            link.href = item.html_url;
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            link.textContent = item.commit.message.split("\n")[0];
-            li.appendChild(time);
-            li.appendChild(document.createTextNode(" · "));
-            li.appendChild(link);
-            history.appendChild(li);
-          });
-        })
-        .catch(function (error) {
-          updatedAt.textContent = "取得できません";
-          history.replaceChildren();
-          const li = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = historyUrl;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = "GitHubで更新履歴を確認";
-          li.appendChild(link);
-          history.appendChild(li);
-          console.warn(error);
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      loadFooterHistory();
-      const source = document.getElementById("source");
-      const sourceEditorHost = document.getElementById("source-editor");
-      const preview = document.getElementById("preview");
-      const status = document.getElementById("status");
-      const statusText = document.getElementById("status-text");
-      const charCount = document.getElementById("char-count");
-      const currentCharacterCount = document.getElementById("current-character-count");
-      const sampleButton = document.getElementById("sample-button");
-      const clearButton = document.getElementById("clear-button");
-      const saveButton = document.getElementById("save-button");
-      const overwriteSaveButton = document.getElementById("overwrite-save-button");
-      const renameSaveButton = document.getElementById("rename-save-button");
-      const savedNotesContainer = document.getElementById("saved-notes");
-      const savedCount = document.getElementById("saved-count");
-      const savedFeedback = document.getElementById("saved-feedback");
-      const storageKey = "test_math_saved_notes_v1";
-
-      const sample = [
-        "インライン数式は $a^2+b^2=c^2$ のように文章中に置けます。",
-        "",
-        "ディスプレイ数式：",
-        "",
-        "$$",
-        "\\int_0^1 x^2\\,dx=\\frac{1}{3}",
-        "$$",
-        "",
-        "和の公式も、表示数式の区切り記号で囲んで入力します。",
-        "$" + "$",
-        "\\sum_{k=1}^{n} k=\\frac{n(n+1)}{2}",
-        "$" + "$",
-        "",
-        "集合の例：",
-        "",
-        "\\[",
-        "A\\cap B = \\{x\\mid x\\in A,\\ x\\in B\\}",
-        "\\]"
-      ].join("\n");
-
-      function readSavedNotes() {
-        try {
-          const stored = localStorage.getItem(storageKey);
-          if (!stored) return [];
-          const parsed = JSON.parse(stored);
-          if (!Array.isArray(parsed)) return [];
-          return parsed
-            .filter(function (note) {
-              return note && typeof note.id === "string" &&
-                typeof note.content === "string" &&
-                typeof note.savedAt === "string";
-            })
-            .map(function (note) {
-              // Keep notes created by older versions readable.
-              return {
-                ...note,
-                title: typeof note.title === "string" && note.title.trim()
-                  ? note.title
-                  : "無題のメモ"
-              };
-            });
-        } catch (error) {
-          console.warn("Saved notes could not be read:", error);
-          savedFeedback.textContent = "保存データを読み込めませんでした。ブラウザの保存設定を確認してください。";
-          savedFeedback.classList.add("error");
-          return [];
-        }
-      }
-
-      let savedNotes = readSavedNotes();
-      let editingNoteId = null;
-      let editorView = null;
-
-      function setEditorContent(value) {
-        source.value = value;
-        if (editorView) {
-          editorView.dispatch({
-            changes: {
-              from: 0,
-              to: editorView.state.doc.length,
-              insert: value
-            },
-            selection: { anchor: value.length }
-          });
-        } else {
-          renderPreview();
-        }
-      }
-
-      function focusEditor() {
-        if (editorView) editorView.focus();
-        else source.focus();
-      }
-
-      function setEditingNote(note) {
-        editingNoteId = note ? note.id : null;
-        overwriteSaveButton.hidden = !note;
-        renameSaveButton.hidden = !note;
-        if (note) {
-          overwriteSaveButton.title = "「" + note.title + "」の内容を上書き保存";
-          renameSaveButton.title = "「" + note.title + "」の保存名を変更";
-        } else {
-          overwriteSaveButton.removeAttribute("title");
-          renameSaveButton.removeAttribute("title");
-        }
-      }
-
-      function persistSavedNotes() {
-        try {
-          localStorage.setItem(storageKey, JSON.stringify(savedNotes));
-          return true;
-        } catch (error) {
-          console.error("Saved notes could not be stored:", error);
-          savedFeedback.textContent = "ブラウザへの保存に失敗しました。プライベートブラウズや保存容量の設定を確認してください。";
-          savedFeedback.classList.add("error");
-          return false;
-        }
-      }
-
-      function updateSavedFeedback(message, isError) {
-        savedFeedback.textContent = message;
-        savedFeedback.classList.toggle("error", Boolean(isError));
-      }
-
-      function formatSavedDate(value) {
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return "保存日時不明";
-        return date.toLocaleString("ja-JP", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-      }
-
-      function renderSavedNotes() {
-        savedNotesContainer.replaceChildren();
-        savedCount.textContent = savedNotes.length.toLocaleString("ja-JP") + " 件";
-
-        if (savedNotes.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "saved-empty";
-          empty.textContent = "保存したメモはまだありません。入力欄に内容を書き、「保存」を押してください。";
-          savedNotesContainer.appendChild(empty);
-          return;
-        }
-
-        savedNotes.forEach(function (note) {
-          const article = document.createElement("article");
-          article.className = "saved-note";
-
-          const header = document.createElement("div");
-          header.className = "saved-note-header";
-
-          const title = document.createElement("h3");
-          title.className = "saved-note-title";
-          title.textContent = note.title || "無題のメモ";
-
-          const titleHeading = document.createElement("div");
-          titleHeading.className = "saved-note-heading";
-          const excerpt = document.createElement("span");
-          excerpt.className = "saved-note-excerpt";
-          const openingText = (note.content || "").trim().replace(/\s+/g, " ");
-          const openingCharacters = Array.from(openingText);
-          excerpt.textContent = openingCharacters.length > 64
-            ? openingCharacters.slice(0, 64).join("") + "…"
-            : openingText;
-          excerpt.title = openingText;
-          titleHeading.append(title, excerpt);
-
-          const actions = document.createElement("div");
-          actions.className = "saved-note-actions";
-
-          const body = document.createElement("div");
-          body.className = "saved-note-expanded";
-          body.hidden = true;
-
-          const openButton = document.createElement("button");
-          openButton.type = "button";
-          openButton.textContent = "開く";
-          openButton.setAttribute("aria-expanded", "false");
-          openButton.addEventListener("click", function () {
-            body.hidden = !body.hidden;
-            openButton.textContent = body.hidden ? "開く" : "閉じる";
-            openButton.setAttribute("aria-expanded", String(!body.hidden));
-          });
-
-          const copyButton = document.createElement("button");
-          copyButton.type = "button";
-          copyButton.textContent = "コピー";
-          copyButton.addEventListener("click", function () {
-            copyTextToClipboard(note.content)
-              .then(function () {
-                updateSavedFeedback("「" + (note.title || "無題のメモ") + "」の内容をコピーしました。", false);
-              })
-              .catch(function (error) {
-                console.error("Clipboard copy failed:", error);
-                updateSavedFeedback("コピーできませんでした。ブラウザのクリップボード利用設定を確認してください。", true);
-              });
-          });
-
-          const editButton = document.createElement("button");
-          editButton.type = "button";
-          editButton.textContent = "編集欄に戻す";
-          editButton.addEventListener("click", function () {
-            setEditorContent(note.content);
-            setEditingNote(note);
-            focusEditor();
-            document.querySelector(".editor-panel").scrollIntoView({
-              behavior: "smooth",
-              block: "start"
-            });
-            updateSavedFeedback("「" + (note.title || "無題のメモ") + "」を編集中です。編集後は「上書き保存」を押してください。", false);
-          });
-
-          actions.append(openButton, copyButton, editButton);
-          header.append(titleHeading, actions);
-
-          const renderedContent = document.createElement("div");
-          renderedContent.className = "saved-note-content saved-note-rendered";
-          renderMathContent(renderedContent, note.content);
-
-          const detailFooter = document.createElement("div");
-          detailFooter.className = "saved-note-detail-footer";
-
-          const date = document.createElement("time");
-          date.className = "saved-note-date";
-          date.dateTime = note.updatedAt || note.savedAt;
-          date.textContent = (note.updatedAt && note.updatedAt !== note.savedAt)
-            ? "最終更新： " + formatSavedDate(note.updatedAt)
-            : "保存日時： " + formatSavedDate(note.savedAt);
-
-          const deleteButton = document.createElement("button");
-          deleteButton.type = "button";
-          deleteButton.textContent = "削除";
-          deleteButton.addEventListener("click", function () {
-            const deletingActiveNote = editingNoteId === note.id;
-            savedNotes = savedNotes.filter(function (item) {
-              return item.id !== note.id;
-            });
-            const stored = persistSavedNotes();
-            if (deletingActiveNote) setEditingNote(null);
-            renderSavedNotes();
-            updateSavedFeedback(
-              stored ? "「" + (note.title || "無題のメモ") + "」を削除しました。" : "一覧から削除しましたが、ブラウザへの保存更新に失敗しました。",
-              !stored
-            );
-          });
-
-          detailFooter.append(date, deleteButton);
-          body.append(renderedContent, detailFooter);
-          article.append(header, body);
-          savedNotesContainer.appendChild(article);
-        });
-      }
-
-      function fallbackCopyText(text) {
-        return new Promise(function (resolve, reject) {
-          const temporary = document.createElement("textarea");
-          temporary.value = text;
-          temporary.setAttribute("readonly", "");
-          temporary.style.position = "fixed";
-          temporary.style.opacity = "0";
-          temporary.style.pointerEvents = "none";
-          document.body.appendChild(temporary);
-          temporary.focus();
-          temporary.select();
-
-          let copied = false;
-          try {
-            copied = document.execCommand("copy");
-          } catch (error) {
-            copied = false;
-          }
-          temporary.remove();
-
-          if (copied) resolve();
-          else reject(new Error("Clipboard copy is unavailable."));
-        });
-      }
-
-      function copyTextToClipboard(text) {
-        if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-          return navigator.clipboard.writeText(text).catch(function () {
-            return fallbackCopyText(text);
-          });
-        }
-        return fallbackCopyText(text);
-      }
-
-      function saveCurrentNote() {
-        const text = source.value;
-        if (!text.trim()) {
-          updateSavedFeedback("空の内容は保存できません。先に入力欄へ内容を書いてください。", true);
-          focusEditor();
-          return;
-        }
-
-        const enteredTitle = window.prompt("保存するメモのタイトルを入力してください。", "");
-        if (enteredTitle === null) return;
-        const title = enteredTitle.trim();
-        if (!title) {
-          updateSavedFeedback("タイトルが空欄のため、保存しませんでした。", true);
-          return;
-        }
-
-        const now = new Date().toISOString();
-        const note = {
-          id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
-          title: title,
-          content: text,
-          savedAt: now,
-          updatedAt: now
-        };
-
-        savedNotes.unshift(note);
-        setEditingNote(null);
-        const stored = persistSavedNotes();
-        renderSavedNotes();
-
-        if (stored) {
-          updateSavedFeedback("「" + title + "」を保存しました。", false);
-        } else {
-          updateSavedFeedback("一覧には追加しましたが、ブラウザに永続保存できませんでした。", true);
-        }
-      }
-
-      function overwriteCurrentNote() {
-        if (!editingNoteId) {
-          updateSavedFeedback("上書きするメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
-          return;
-        }
-        const text = source.value;
-        if (!text.trim()) {
-          updateSavedFeedback("空の内容では上書き保存できません。", true);
-          focusEditor();
-          return;
-        }
-
-        const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
-        if (!note) {
-          setEditingNote(null);
-          updateSavedFeedback("編集対象のメモが見つかりません。保存一覧を確認してください。", true);
-          return;
-        }
-
-        note.content = text;
-        note.updatedAt = new Date().toISOString();
-        const stored = persistSavedNotes();
-        renderSavedNotes();
-        updateSavedFeedback(
-          stored ? "「" + note.title + "」を上書き保存しました。" : "画面上では更新しましたが、ブラウザへの保存に失敗しました。",
-          !stored
-        );
-      }
-
-      function renameCurrentNote() {
-        if (!editingNoteId) {
-          updateSavedFeedback("名前を変更するメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
-          return;
-        }
-
-        const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
-        if (!note) {
-          setEditingNote(null);
-          updateSavedFeedback("編集対象のメモが見つかりません。保存一覧を確認してください。", true);
-          return;
-        }
-
-        const enteredTitle = window.prompt("新しい保存名を入力してください。", note.title || "");
-        if (enteredTitle === null) return;
-        const title = enteredTitle.trim();
-        if (!title) {
-          updateSavedFeedback("保存名が空欄のため、変更しませんでした。", true);
-          return;
-        }
-
-        note.title = title;
-        note.updatedAt = new Date().toISOString();
-        const stored = persistSavedNotes();
-        setEditingNote(note);
-        renderSavedNotes();
-        updateSavedFeedback(
-          stored ? "保存名を「" + title + "」に変更しました。" : "画面上では名前を変更しましたが、ブラウザへの保存に失敗しました。",
-          !stored
-        );
-      }
-
-      function setStatus(message, isError) {
-        status.classList.toggle("error", Boolean(isError));
-        statusText.textContent = message;
-      }
-
-      function appendText(target, text) {
-        if (text) target.appendChild(document.createTextNode(text));
-      }
-
-      function appendFormula(target, expression, displayMode) {
-        const container = document.createElement(displayMode ? "div" : "span");
-        if (displayMode) container.className = "math-display-wrapper";
-        target.appendChild(container);
-        try {
-          window.katex.render(expression, container, {
-            displayMode: displayMode,
-            throwOnError: false,
-            strict: "ignore",
-            output: "htmlAndMathml"
-          });
-        } catch (error) {
-          container.textContent = expression;
-          console.error("KaTeX render error:", error);
-        }
-      }
-
-      function looksLikeMarkdown(text) {
-        return /(^|\n)\s{0,3}(#{1,6}\s|>\s|[-*+]\s|\d+[.)]\s|([-*_]){3,}\s*$|\|.*\|\s*$|\x60{3})|\*\*[^*]+\*\*|__[^_]+__|~~[^~]+~~|\[[^\]]+\]\([^)]+\)|(^|[^\\])\x60[^\x60]+\x60/m.test(text);
-      }
-
-      function renderMathInTextNode(node) {
-        const text = node.nodeValue;
-        const pattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
-        const matches = Array.from(text.matchAll(pattern));
-        if (!matches.length) return;
-
-        const fragment = document.createDocumentFragment();
-        let cursor = 0;
-        matches.forEach(function (match) {
-          appendText(fragment, text.slice(cursor, match.index));
-          const token = match[0];
-          let expression = token;
-          let displayMode = false;
-          if (token.startsWith("$$") && token.endsWith("$$")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
-            expression = token.slice(2, -2);
-          } else {
-            expression = token.slice(1, -1);
-          }
-          appendFormula(fragment, expression, displayMode);
-          cursor = match.index + token.length;
-        });
-        appendText(fragment, text.slice(cursor));
-        node.parentNode.replaceChild(fragment, node);
-      }
-
-      function renderMarkdownContent(target, text) {
-        if (!window.marked || !window.DOMPurify) {
-          target.textContent = text;
-          return false;
-        }
-
-        // Protect math before Markdown parsing so multiline display math isn't split across HTML nodes.
-        const mathTokens = [];
-        const mathPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
-        const protectedText = text.replace(mathPattern, function (token) {
-          const placeholder = "MATHPLACEHOLDER" + mathTokens.length + "ENDTOKEN";
-          let expression = token;
-          let displayMode = false;
-          if (token.startsWith("$$") && token.endsWith("$$")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
-            expression = token.slice(2, -2);
-          } else {
-            expression = token.slice(1, -1);
-          }
-          mathTokens.push({ placeholder, expression, displayMode });
-          return placeholder;
-        });
-
-        const html = window.marked.parse(protectedText, { gfm: true, breaks: false });
-        target.innerHTML = window.DOMPurify.sanitize(html, {
-          USE_PROFILES: { html: true }
-        });
-
-        if (mathTokens.length) {
-          const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
-          const nodes = [];
-          let node;
-          while ((node = walker.nextNode())) {
-            if (node.parentElement && !node.parentElement.closest("code, pre, script, style")) {
-              nodes.push(node);
-            }
-          }
-          nodes.forEach(function (textNode) {
-            const value = textNode.nodeValue;
-            const fragment = document.createDocumentFragment();
-            let cursor = 0;
-            let found = false;
-            mathTokens.forEach(function (item) {
-              const index = value.indexOf(item.placeholder, cursor);
-              if (index < 0) return;
-              found = true;
-              appendText(fragment, value.slice(cursor, index));
-              appendFormula(fragment, item.expression, item.displayMode);
-              cursor = index + item.placeholder.length;
-            });
-            if (found) {
-              appendText(fragment, value.slice(cursor));
-              textNode.parentNode.replaceChild(fragment, textNode);
-            }
-          });
-        }
-        target.classList.add("markdown-rendered");
-        return true;
-      }
-
-      function renderMathContent(target, text) {
-        target.replaceChildren();
-        if (!text.trim()) return;
-
-        if (!window.katex || typeof window.katex.render !== "function") {
-          target.textContent = text;
-          return;
-        }
-
-        if (looksLikeMarkdown(text) && window.marked && window.DOMPurify) {
-          renderMarkdownContent(target, text);
-          return;
-        }
-        target.classList.remove("markdown-rendered");
-
-        const pattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
-        const matches = Array.from(text.matchAll(pattern));
-        if (!matches.length) {
-          target.textContent = text;
-          return;
-        }
-
-        let cursor = 0;
-        matches.forEach(function (match) {
-          appendText(target, text.slice(cursor, match.index));
-          const token = match[0];
-          let expression = token;
-          let displayMode = false;
-          if (token.startsWith("$$") && token.endsWith("$$")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
-            expression = token.slice(2, -2);
-            displayMode = true;
-          } else if (token.startsWith("\\(") && token.endsWith("\\)")) {
-            expression = token.slice(2, -2);
-          } else {
-            expression = token.slice(1, -1);
-          }
-          appendFormula(target, expression, displayMode);
-          cursor = match.index + token.length;
-        });
-        appendText(target, text.slice(cursor));
-      }
-
-      function containsUndelimitedLatex(text) {
-        const mathPattern = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g;
-        const withoutDelimitedMath = text
-          .replace(/\x60{3}[\s\S]*?\x60{3}/g, " ")
-          .replace(/\x60[^\x60]*\x60/g, " ")
-          .replace(mathPattern, " ");
-        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
-      }
-
-      function renderPreview() {
-        const text = source.value;
-        const characterLength = Array.from(text).length;
-        charCount.textContent = characterLength.toLocaleString("ja-JP") + " 文字";
-        currentCharacterCount.textContent = characterLength.toLocaleString("ja-JP") + " 文字";
-        renderMathContent(preview, text);
-
-        if (!text.trim()) {
-          setStatus("入力待ち", false);
-          return;
-        }
-
-        if (!window.katex || typeof window.katex.render !== "function") {
-          setStatus("KaTeXを読み込めません。通信を確認してください", true);
-          return;
-        }
-
-        if (containsUndelimitedLatex(text)) {
-          setStatus("数式には区切り記号が必要です（例：$$ ... $$ または $ ... $）", true);
-          return;
-        }
-
-        const hasFormulaError = Boolean(preview.querySelector(".katex-error"));
-        setStatus(
-          hasFormulaError ? "式の記法を確認してください" : "Markdown・数式を描画済み",
-          hasFormulaError
-        );
-      }
-
-      async function initializeCodeMirror() {
-        try {
-          const [stateModule, viewModule, commandsModule] = await Promise.all([
-            import("https://esm.sh/@codemirror/state@6.7.1"),
-            import("https://esm.sh/@codemirror/view@6.43.9?deps=@codemirror/state@6.7.1"),
-            import("https://esm.sh/@codemirror/commands@6.11.0?deps=@codemirror/state@6.7.1,@codemirror/view@6.43.9")
-          ]);
-          const EditorState = stateModule.EditorState;
-          const EditorView = viewModule.EditorView;
-
-          const missingApis = [];
-          if (!EditorState) missingApis.push("EditorState");
-          if (!EditorView) missingApis.push("EditorView");
-          if (typeof viewModule.drawSelection !== "function") missingApis.push("drawSelection");
-          if (!EditorView || !EditorView.clickAddsSelectionRange ||
-              typeof EditorView.clickAddsSelectionRange.of !== "function") {
-            missingApis.push("EditorView.clickAddsSelectionRange");
-          }
-          if (!viewModule.keymap || typeof viewModule.keymap.of !== "function") missingApis.push("keymap");
-          if (typeof commandsModule.history !== "function") missingApis.push("history");
-          if (!Array.isArray(commandsModule.defaultKeymap)) missingApis.push("defaultKeymap");
-          if (!Array.isArray(commandsModule.historyKeymap)) missingApis.push("historyKeymap");
-          if (missingApis.length) {
-            throw new Error("CodeMirror の必要なAPIが見つかりません: " + missingApis.join(", "));
-          }
-
-          editorView = new EditorView({
-            doc: source.value,
-            parent: sourceEditorHost,
-            extensions: [
-              // Enable multi-range selections and draw every cursor.
-              EditorState.allowMultipleSelections.of(true),
-              viewModule.drawSelection(),
-              EditorView.lineWrapping,
-              commandsModule.history(),
-              viewModule.keymap.of([
-                ...commandsModule.defaultKeymap,
-                ...commandsModule.historyKeymap
-              ]),
-              // Do not enable rectangularSelection here: Option-click is reserved
-              // for adding a separate cursor, as in common code editors.
-              EditorView.clickAddsSelectionRange.of(function (event) {
-                return event.altKey;
-              }),
-              EditorView.theme({
-                "&": {
-                  height: "100%",
-                  minHeight: "100%"
-                },
-                ".cm-content": {
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-                },
-                ".cm-cursor": {
-                  borderLeftColor: "#4658d8"
-                }
-              }),
-              EditorView.updateListener.of(function (update) {
-                if (!update.docChanged) return;
-                source.value = update.state.doc.toString();
-                renderPreview();
-              })
-            ]
-          });
-          return true;
-        } catch (error) {
-          console.error("CodeMirror could not be loaded; using a standard textarea.", error);
-          if (editorView) {
-            editorView.destroy();
-            editorView = null;
-          }
-          sourceEditorHost.hidden = true;
-          source.hidden = false;
-          source.addEventListener("input", renderPreview);
-          const reason = error && error.message ? "（" + error.message + "）" : "";
-          updateSavedFeedback("複数カーソルエディタの初期化に失敗したため、通常の入力欄に切り替えました。" + reason, true);
-          return false;
-        }
-      }
-
-      saveButton.addEventListener("click", saveCurrentNote);
-      overwriteSaveButton.addEventListener("click", overwriteCurrentNote);
-      renameSaveButton.addEventListener("click", renameCurrentNote);
-      sampleButton.addEventListener("click", function () {
-        setEditorContent(sample);
-        focusEditor();
-      });
-      clearButton.addEventListener("click", function () {
-        setEditorContent("");
-        focusEditor();
-      });
-
-      source.value = sample;
-      preview.textContent = sample;
-      setEditingNote(null);
-      renderSavedNotes();
-      setStatus("KaTeXを読み込み中…", false);
-
-      const codeMirrorReady = initializeCodeMirror();
-      Promise.all([loadKatex(), loadMarkdownLibraries(), codeMirrorReady])
-        .then(function () {
-          renderPreview();
-          renderSavedNotes();
-        })
-        .catch(function (error) {
-          preview.textContent = source.value;
-          setStatus("描画ライブラリを読み込めません。通信を確認してください", true);
-          console.error(error);
-        });
-    });
-  </script>
 </body>
 </html>
