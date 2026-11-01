@@ -232,6 +232,72 @@
       background: white;
     }
 
+    .source-editor {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 390px;
+      overflow: hidden;
+      border: 1px solid #e4e8f0;
+      border-radius: 11px;
+      background: #fbfcff;
+    }
+
+    .source-editor:focus-within {
+      border-color: #aeb8f3;
+      background: white;
+    }
+
+    .source-editor[hidden] {
+      display: none;
+    }
+
+    #source[hidden] {
+      display: none !important;
+    }
+
+    .source-editor .cm-editor {
+      width: 100%;
+      height: 100%;
+      min-height: 390px;
+      background: transparent;
+      color: #243047;
+      font-size: 13px;
+    }
+
+    .source-editor .cm-scroller {
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      line-height: 1.85;
+    }
+
+    .source-editor .cm-content {
+      padding: 17px 0;
+      caret-color: var(--accent);
+    }
+
+    .source-editor .cm-line {
+      padding: 0 17px;
+    }
+
+    .source-editor .cm-gutters {
+      border-right: 1px solid #e4e8f0;
+      background: #f7f8fc;
+      color: #8993a6;
+    }
+
+    .source-editor .cm-cursor {
+      border-left-color: var(--accent);
+    }
+
+    .source-editor .cm-selectionBackground,
+    .source-editor .cm-content ::selection {
+      background: rgba(70, 88, 216, 0.18);
+    }
+
+    .source-editor .cm-editor.cm-focused {
+      outline: none;
+    }
+
     .editor-hint {
       display: flex;
       flex-wrap: wrap;
@@ -552,8 +618,17 @@
       min-width: 0;
     }
 
-    .saved-note-title {
+    .saved-note-heading {
+      display: flex;
       flex: 1 1 auto;
+      align-items: baseline;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .saved-note-title {
+      flex: 0 1 auto;
+      max-width: 48%;
       min-width: 0;
       margin: 0;
       color: #273347;
@@ -561,6 +636,18 @@
       font-weight: 750;
       line-height: 1.5;
       overflow-wrap: anywhere;
+    }
+
+    .saved-note-excerpt {
+      display: block;
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .saved-note-date {
@@ -674,6 +761,8 @@
       .workbench { grid-template-columns: minmax(0, 1fr); }
       .panel { min-height: 480px; }
       textarea { min-height: 330px; }
+      .source-editor { min-height: 330px; }
+      .source-editor .cm-editor { min-height: 330px; }
       .preview-wrap { min-height: 350px; }
     }
 
@@ -684,8 +773,14 @@
       .panel-actions { flex-direction: column; }
       .saved-section { padding: 17px 14px; }
       .saved-note-actions { flex-direction: column; }
+      .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
+      .saved-note-title { max-width: 100%; }
+      .saved-note-excerpt { flex-basis: 100%; }
       .editor-area { padding: 10px; }
       textarea { padding: 12px; font-size: 12px; }
+      .source-editor .cm-editor { font-size: 12px; }
+      .source-editor .cm-content { padding: 12px 0; }
+      .source-editor .cm-line { padding: 0 12px; }
       .preview-wrap { padding: 19px 15px; }
     }
   </style>
@@ -728,10 +823,11 @@
           </div>
         </div>
         <div class="editor-area">
-          <label for="source" class="eyebrow">SOURCE EDITOR</label>
-          <textarea id="source" spellcheck="false" aria-label="LaTeX 入力欄" autocapitalize="off" autocomplete="off"></textarea>
+          <label for="source-editor" class="eyebrow">SOURCE EDITOR</label>
+          <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
+          <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
-            <span>式だけなら区切り記号は不要　<code>$...$</code> 文中　<code>$$...$$</code> 別行</span>
+            <span>Option + クリック：カーソルを追加して複数箇所に同時入力</span>
             <span id="char-count">0 文字</span>
           </div>
         </div>
@@ -938,6 +1034,7 @@
     document.addEventListener("DOMContentLoaded", function () {
       loadFooterHistory();
       const source = document.getElementById("source");
+      const sourceEditorHost = document.getElementById("source-editor");
       const preview = document.getElementById("preview");
       const status = document.getElementById("status");
       const statusText = document.getElementById("status-text");
@@ -1005,6 +1102,28 @@
 
       let savedNotes = readSavedNotes();
       let editingNoteId = null;
+      let editorView = null;
+
+      function setEditorContent(value) {
+        source.value = value;
+        if (editorView) {
+          editorView.dispatch({
+            changes: {
+              from: 0,
+              to: editorView.state.doc.length,
+              insert: value
+            },
+            selection: { anchor: value.length }
+          });
+        } else {
+          renderPreview();
+        }
+      }
+
+      function focusEditor() {
+        if (editorView) editorView.focus();
+        else focusEditor();
+      }
 
       function setEditingNote(note) {
         editingNoteId = note ? note.id : null;
@@ -1071,6 +1190,18 @@
           title.className = "saved-note-title";
           title.textContent = note.title || "無題のメモ";
 
+          const titleHeading = document.createElement("div");
+          titleHeading.className = "saved-note-heading";
+          const excerpt = document.createElement("span");
+          excerpt.className = "saved-note-excerpt";
+          const openingText = (note.content || "").trim().replace(/\s+/g, " ");
+          const openingCharacters = Array.from(openingText);
+          excerpt.textContent = openingCharacters.length > 64
+            ? openingCharacters.slice(0, 64).join("") + "…"
+            : openingText;
+          excerpt.title = openingText;
+          titleHeading.append(title, excerpt);
+
           const actions = document.createElement("div");
           actions.className = "saved-note-actions";
 
@@ -1106,10 +1237,9 @@
           editButton.type = "button";
           editButton.textContent = "編集欄に戻す";
           editButton.addEventListener("click", function () {
-            source.value = note.content;
+            setEditorContent(note.content);
             setEditingNote(note);
-            renderPreview();
-            source.focus();
+            focusEditor();
             document.querySelector(".editor-panel").scrollIntoView({
               behavior: "smooth",
               block: "start"
@@ -1118,7 +1248,7 @@
           });
 
           actions.append(openButton, copyButton, editButton);
-          header.append(title, actions);
+          header.append(titleHeading, actions);
 
           const renderedContent = document.createElement("div");
           renderedContent.className = "saved-note-content saved-note-rendered";
@@ -1196,7 +1326,7 @@
         const text = source.value;
         if (!text.trim()) {
           updateSavedFeedback("空の内容は保存できません。先に入力欄へ内容を書いてください。", true);
-          source.focus();
+          focusEditor();
           return;
         }
 
@@ -1237,7 +1367,7 @@
         const text = source.value;
         if (!text.trim()) {
           updateSavedFeedback("空の内容では上書き保存できません。", true);
-          source.focus();
+          focusEditor();
           return;
         }
 
@@ -1499,19 +1629,67 @@
         );
       }
 
-      source.addEventListener("input", renderPreview);
+      async function initializeCodeMirror() {
+        try {
+          const codeMirrorUrl = "https://esm.sh/codemirror@6.0.2?bundle";
+          const codeMirror = await import(codeMirrorUrl);
+          const EditorView = codeMirror.EditorView;
+          const basicSetup = codeMirror.basicSetup;
+
+          if (!EditorView || !basicSetup) {
+            throw new Error("CodeMirror exports are unavailable.");
+          }
+
+          editorView = new EditorView({
+            doc: source.value,
+            parent: sourceEditorHost,
+            extensions: [
+              basicSetup,
+              // On macOS, Option is reported by the browser as altKey.
+              // This adds an additional cursor on Option-click.
+              EditorView.clickAddsSelectionRange.of(function (event) {
+                return event.altKey;
+              }),
+              EditorView.theme({
+                "&": {
+                  height: "100%",
+                  minHeight: "100%"
+                },
+                ".cm-content": {
+                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+                },
+                ".cm-cursor": {
+                  borderLeftColor: "#4658d8"
+                }
+              }),
+              EditorView.updateListener.of(function (update) {
+                if (!update.docChanged) return;
+                source.value = update.state.doc.toString();
+                renderPreview();
+              })
+            ]
+          });
+          return true;
+        } catch (error) {
+          console.error("CodeMirror could not be loaded; using a standard textarea.", error);
+          sourceEditorHost.hidden = true;
+          source.hidden = false;
+          source.addEventListener("input", renderPreview);
+          updateSavedFeedback("複数カーソルエディタを読み込めなかったため、通常の入力欄に切り替えました。", true);
+          return false;
+        }
+      }
+
       saveButton.addEventListener("click", saveCurrentNote);
       overwriteSaveButton.addEventListener("click", overwriteCurrentNote);
       renameSaveButton.addEventListener("click", renameCurrentNote);
       sampleButton.addEventListener("click", function () {
-        source.value = sample;
-        renderPreview();
-        source.focus();
+        setEditorContent(sample);
+        focusEditor();
       });
       clearButton.addEventListener("click", function () {
-        source.value = "";
-        renderPreview();
-        source.focus();
+        setEditorContent("");
+        focusEditor();
       });
 
       source.value = sample;
@@ -1520,7 +1698,8 @@
       renderSavedNotes();
       setStatus("KaTeXを読み込み中…", false);
 
-      Promise.all([loadKatex(), loadMarkdownLibraries()])
+      const codeMirrorReady = initializeCodeMirror();
+      Promise.all([loadKatex(), loadMarkdownLibraries(), codeMirrorReady])
         .then(function () {
           renderPreview();
           renderSavedNotes();
