@@ -53,6 +53,7 @@
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 0 0 15px; }
     h2 { margin: 0; font-size: 16px; font-weight: 800; }
     .section-caption { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .tools-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
     .featured {
       position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
       align-items: center; gap: 24px; min-height: 220px; padding: 30px;
@@ -93,6 +94,7 @@
       .shell { padding: 23px 16px; }
       .topbar { margin-bottom: 43px; }
       .top-note { display: none; }
+      .tools-grid { grid-template-columns:minmax(0,1fr); }
       .featured { grid-template-columns: minmax(0,1fr); padding: 23px; }
       .tool-icon { display: none; }
       .coming-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -128,24 +130,41 @@
           <h2 id="tools-heading">ツール</h2>
           <p class="section-caption">現在利用できるツール</p>
         </div>
-        <span class="section-caption">1 TOOL AVAILABLE</span>
+        <span class="section-caption">2 TOOLS AVAILABLE</span>
       </div>
 
-      <a class="featured" href="latex-memo.html" aria-label="LaTeX メモ帳を開く">
-        <div class="featured-copy">
-          <span class="tool-label">WRITING / MATHEMATICS</span>
-          <h3>LaTeX メモ帳</h3>
-          <p>MarkdownとLaTeXを同時に扱えるメモ帳。数式のリアルタイムプレビュー、タイトル付き保存、複数カーソル編集に対応します。</p>
-          <div class="chips">
-            <span class="chip">Markdown</span>
-            <span class="chip">KaTeX</span>
-            <span class="chip">複数カーソル</span>
-            <span class="chip">ローカル保存</span>
+      <div class="tools-grid">
+        <a class="featured" href="latex-memo.html" aria-label="LaTeX メモ帳を開く">
+          <div class="featured-copy">
+            <span class="tool-label">WRITING / MATHEMATICS</span>
+            <h3>LaTeX メモ帳</h3>
+            <p>MarkdownとLaTeXを同時に扱えるメモ帳。数式のリアルタイムプレビュー、タイトル付き保存、複数カーソル編集に対応します。</p>
+            <div class="chips">
+              <span class="chip">Markdown</span>
+              <span class="chip">KaTeX</span>
+              <span class="chip">複数カーソル</span>
+              <span class="chip">ローカル保存</span>
+            </div>
+            <span class="open-label">メモ帳を開く <span class="open-arrow" aria-hidden="true">→</span></span>
           </div>
-          <span class="open-label">メモ帳を開く <span class="open-arrow" aria-hidden="true">→</span></span>
-        </div>
-        <div class="tool-icon" aria-hidden="true">∑</div>
-      </a>
+          <div class="tool-icon" aria-hidden="true">∑</div>
+        </a>
+        <a class="featured" href="calculator.html" aria-label="万能電卓を開く">
+          <div class="featured-copy">
+            <span class="tool-label">CALCULATION / CONVERSION</span>
+            <h3>万能電卓</h3>
+            <p>科学計算、三角関数、複素数、行列、単位変換。履歴を残しながら、さまざまな計算をひとつの画面で。</p>
+            <div class="chips">
+              <span class="chip">科学計算</span>
+              <span class="chip">複素数・行列</span>
+              <span class="chip">単位変換</span>
+              <span class="chip">計算履歴</span>
+            </div>
+            <span class="open-label">電卓を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+          </div>
+          <div class="tool-icon" aria-hidden="true">⌗</div>
+        </a>
+      </div>
     </section>
 
     <section class="coming-section" aria-labelledby="coming-heading">
