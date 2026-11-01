@@ -1651,6 +1651,7 @@
               // Enable multi-range selections and draw every cursor.
               EditorState.allowMultipleSelections.of(true),
               viewModule.drawSelection(),
+              EditorView.lineWrapping,
               commandsModule.history(),
               viewModule.keymap.of([
                 ...commandsModule.defaultKeymap,
