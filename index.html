@@ -438,6 +438,41 @@
       color: #fff;
     }
 
+    .character-count-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 18px;
+      padding: 17px 21px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .character-count-label {
+      margin: 0;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .character-count-hint {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .character-count-value {
+      color: var(--accent);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 780;
+      letter-spacing: -0.035em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
     .saved-section {
       margin-top: 22px;
       padding: 21px 22px;
@@ -722,6 +757,14 @@
       </section>
     </section>
 
+    <section class="character-count-panel" aria-label="現在の文字数" aria-live="polite">
+      <div>
+        <p class="character-count-label">現在の文字数</p>
+        <p class="character-count-hint">入力欄の内容をリアルタイムで集計（空白・改行を含む）</p>
+      </div>
+      <output id="current-character-count" class="character-count-value" aria-label="現在の文字数">0 文字</output>
+    </section>
+
     <section class="saved-section" aria-labelledby="saved-title">
       <div class="saved-section-header">
         <div class="saved-heading">
@@ -899,6 +942,7 @@
       const status = document.getElementById("status");
       const statusText = document.getElementById("status-text");
       const charCount = document.getElementById("char-count");
+      const currentCharacterCount = document.getElementById("current-character-count");
       const sampleButton = document.getElementById("sample-button");
       const clearButton = document.getElementById("clear-button");
       const saveButton = document.getElementById("save-button");
@@ -1428,7 +1472,9 @@
 
       function renderPreview() {
         const text = source.value;
-        charCount.textContent = text.length.toLocaleString("ja-JP") + " 文字";
+        const characterLength = Array.from(text).length;
+        charCount.textContent = characterLength.toLocaleString("ja-JP") + " 文字";
+        currentCharacterCount.textContent = characterLength.toLocaleString("ja-JP") + " 文字";
         renderMathContent(preview, text);
 
         if (!text.trim()) {
