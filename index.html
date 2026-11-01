@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f7fb">
-  <title>UTILITY HUB | 便利ツール集</title>
-  <meta name="description" content="日常の小さな作業を、ブラウザひとつで。文章、計算、変換などの便利ツールを集めたUTILITY HUBです。">
+  <title>UTILITY HUB</title>
+  <meta name="description" content="LaTeXメモ帳、万能電卓、画像編集、PDF編集・ファイル圧縮。">
   <style>
     :root {
       color-scheme: light;
@@ -103,6 +103,20 @@
       .coming-grid { grid-template-columns: minmax(0,1fr); }
       footer { flex-direction: column; }
     }
+  
+    /* Minimal tool directory */
+    .shell { padding-top: 28px; }
+    .topbar { margin-bottom: 24px; }
+    .brand { gap: 12px; }
+    .brand .brand-name { font-size: 19px; }
+    .tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .featured { display: block; min-height: 0; padding: 22px; }
+    .featured-copy { min-height: 0; }
+    .featured h3 { margin: 0 0 8px; font-size: 20px; }
+    .featured p { line-height: 1.7; }
+    .tool-label, .chips, .tool-icon { display: none !important; }
+    .open-label { margin-top: 13px; }
+    @media (max-width: 650px) { .tools-grid { grid-template-columns: minmax(0, 1fr); } }
   </style>
 </head>
 <body>
@@ -110,138 +124,41 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">U</div>
-        <div>
-          <p class="eyebrow">A COLLECTION OF USEFUL TOOLS</p>
-          <p class="brand-name">UTILITY HUB</p>
-        </div>
+        <p class="brand-name">UTILITY HUB</p>
       </div>
-      <div class="top-note">小さな作業を、ひとつの場所で。</div>
     </header>
-
-    <section class="hero">
-      <span class="hero-kicker">✦ BROWSER-BASED TOOLBOX</span>
-      <h1>必要な道具を、<br>必要なときに。</h1>
-      <p>文章を書く。データを整える。計算する。<br>日々の作業で使う小さな道具を、ひとつの場所に集めていきます。</p>
-    </section>
-
-    <section aria-labelledby="tools-heading">
-      <div class="section-head">
-        <div>
-          <h2 id="tools-heading">ツール</h2>
-          <p class="section-caption">現在利用できるツール</p>
-        </div>
-        <span class="section-caption">4 TOOLS AVAILABLE</span>
-      </div>
-
+    <section aria-label="ツール">
       <div class="tools-grid">
         <a class="featured" href="latex-memo.html" aria-label="LaTeX メモ帳を開く">
           <div class="featured-copy">
-            <span class="tool-label">WRITING / MATHEMATICS</span>
             <h3>LaTeX メモ帳</h3>
-            <p>MarkdownとLaTeXを同時に扱えるメモ帳。数式のリアルタイムプレビュー、タイトル付き保存、複数カーソル編集に対応します。</p>
-            <div class="chips">
-              <span class="chip">Markdown</span>
-              <span class="chip">KaTeX</span>
-              <span class="chip">複数カーソル</span>
-              <span class="chip">ローカル保存</span>
-            </div>
-            <span class="open-label">メモ帳を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+            <p>Markdown・LaTeXの入力、数式プレビュー、メモ保存。</p>
+            <span class="open-label">開く <span class="open-arrow" aria-hidden="true">→</span></span>
           </div>
-          <div class="tool-icon" aria-hidden="true">∑</div>
         </a>
         <a class="featured" href="calculator.html" aria-label="万能電卓を開く">
           <div class="featured-copy">
-            <span class="tool-label">CALCULATION / CONVERSION</span>
             <h3>万能電卓</h3>
-            <p>科学計算、三角関数、複素数、行列、単位変換。履歴を残しながら、さまざまな計算をひとつの画面で。</p>
-            <div class="chips">
-              <span class="chip">科学計算</span>
-              <span class="chip">複素数・行列</span>
-              <span class="chip">単位変換</span>
-              <span class="chip">計算履歴</span>
-            </div>
-            <span class="open-label">電卓を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+            <p>科学計算、複素数・行列、単位変換、計算履歴。</p>
+            <span class="open-label">開く <span class="open-arrow" aria-hidden="true">→</span></span>
           </div>
-          <div class="tool-icon" aria-hidden="true">⌗</div>
         </a>
         <a class="featured" href="image-editor.html" aria-label="画像編集を開く">
           <div class="featured-copy">
-            <span class="tool-label">IMAGE / EDITING</span>
             <h3>画像編集</h3>
-            <p>左右対称化、反転、回転、モザイク、色調補正、トリミング、リサイズ。加工した画像を保存・コピーできます。</p>
-            <div class="chips">
-              <span class="chip">左右対称化</span>
-              <span class="chip">モザイク</span>
-              <span class="chip">色調補正</span>
-              <span class="chip">画像変換</span>
-            </div>
-            <span class="open-label">画像編集を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+            <p>反転・対称化、モザイク、色調補正、トリミング、リサイズ。</p>
+            <span class="open-label">開く <span class="open-arrow" aria-hidden="true">→</span></span>
           </div>
-          <div class="tool-icon" aria-hidden="true">▧</div>
         </a>
         <a class="featured" href="file-editor.html" aria-label="ファイル・PDF編集を開く">
           <div class="featured-copy">
-            <span class="tool-label">FILE / PDF</span>
             <h3>ファイル / PDF編集</h3>
-            <p>PDFの閲覧、ページ追加・削除・回転・抽出。複数ファイルのZIP圧縮や単一ファイルのGZIP圧縮にも対応します。</p>
-            <div class="chips">
-              <span class="chip">PDFビューワー</span>
-              <span class="chip">ページ編集</span>
-              <span class="chip">ZIP / GZIP</span>
-              <span class="chip">ローカル処理</span>
-            </div>
-            <span class="open-label">ファイル編集を開く <span class="open-arrow" aria-hidden="true">→</span></span>
+            <p>PDF閲覧・ページ編集、ZIP / GZIP圧縮。</p>
+            <span class="open-label">開く <span class="open-arrow" aria-hidden="true">→</span></span>
           </div>
-          <div class="tool-icon" aria-hidden="true">▤</div>
         </a>
       </div>
     </section>
-
-    <section class="coming-section" aria-labelledby="coming-heading">
-      <div class="section-head">
-        <div>
-          <h2 id="coming-heading">これから追加するツール</h2>
-          <p class="section-caption">今後、順次拡張していく予定です</p>
-        </div>
-      </div>
-      <div class="coming-grid">
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">{ }</span>
-          <h3>JSON 整形・検証 <span class="status">COMING</span></h3>
-          <p>JSONの整形、圧縮、構文チェック。</p>
-        </article>
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">⇄</span>
-          <h3>テキスト差分比較 <span class="status">COMING</span></h3>
-          <p>2つの文章やコードの違いを表示。</p>
-        </article>
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">◷</span>
-          <h3>タイマー・時間管理 <span class="status">COMING</span></h3>
-          <p>ポモドーロ、ストップウォッチなど。</p>
-        </article>
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">⇄</span>
-          <h3>単位・進数変換 <span class="status">COMING</span></h3>
-          <p>単位、進数、日時などをすばやく変換。</p>
-        </article>
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">▦</span>
-          <h3>CSV・データ可視化 <span class="status">COMING</span></h3>
-          <p>表データの確認とグラフ作成。</p>
-        </article>
-        <article class="coming-card">
-          <span class="coming-icon" aria-hidden="true">▣</span>
-          <h3>QRコード作成 <span class="status">COMING</span></h3>
-          <p>URLやテキストからQRコードを作成。</p>
-        </article>
-      </div>
-    </section>
-
-    <footer>
-      <span>UTILITY HUB · 個人向けブラウザツール集</span>
-      <span>GitHub Pages</span>
-    </footer>
   </main>
 </body>
 </html>
