@@ -72,7 +72,7 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;p
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-var source=null,sourceUrl=null,rotation=0,flipH=false,flipV=false,effect="none",symmetry="none",mosaicOn=false,squareCrop=false,resizeTo=null;
+var source=null,sourceUrl=null,sourceName="image",rotation=0,flipH=false,flipV=false,effect="none",symmetry="none",mosaicOn=false,squareCrop=false,resizeTo=null;
 var canvas=$("preview"),ctx=canvas.getContext("2d",{willReadFrequently:true}),busy=false;
 var controls=Array.prototype.slice.call(document.querySelectorAll("button[data-op],button[data-effect]"));
 function say(message){$("status").textContent=message;}
@@ -81,7 +81,7 @@ function safeName(name){return (name||"image").replace(/\.[^.]+$/,"").replace(/[
 function loadFile(file){
  if(!file||!file.type||file.type.indexOf("image/")!==0){say("画像ファイルを選択してください。");return;}
  if(sourceUrl)URL.revokeObjectURL(sourceUrl);
- sourceUrl=URL.createObjectURL(file);var img=new Image();
+ sourceUrl=URL.createObjectURL(file);sourceName=file.name;var img=new Image();
  img.onload=function(){source=img;rotation=0;flipH=false;flipV=false;effect="none";symmetry="none";mosaicOn=false;squareCrop=false;resizeTo=null;
  ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});
  $("resize-width").value="";$("resize-height").value="";$("preview-label").textContent=file.name;
@@ -89,7 +89,7 @@ function loadFile(file){
  $("image-meta").textContent=img.naturalWidth+" × "+img.naturalHeight+" px ・ "+(file.size/1024).toFixed(1)+" KB ・ "+file.type;
  say("画像を読み込みました。編集を選択してください。");render();
  };
- img.onerror=function(){say("画像を読み込めませんでした。別の形式を試してください。";);};
+ img.onerror=function(){say("画像を読み込めませんでした。別の形式を試してください。");};
  img.src=sourceUrl;$("image-file").value="";
 }
 function clamp(v){return Math.max(0,Math.min(255,v));}
@@ -160,7 +160,7 @@ $("apply-size").addEventListener("click",function(){
 });
 $("clear-size").addEventListener("click",function(){resizeTo=null;$("resize-width").value="";$("resize-height").value="";render();say("元のサイズに戻しました。");});
 function makeBlob(){return new Promise(function(resolve){var type=$("format").value,q=Number($("quality").value)/100;canvas.toBlob(function(blob){resolve(blob);},type,q);});}
-$("download-btn").addEventListener("click",async function(){var blob=await makeBlob();if(!blob){say("画像を書き出せませんでした。");return;}var ext=blob.type==="image/jpeg"?"jpg":blob.type==="image/webp"?"webp":"png",a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=safeName($("preview-label").textContent)+"-edited."+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);say("画像を保存しました。");});
+$("download-btn").addEventListener("click",async function(){var blob=await makeBlob();if(!blob){say("画像を書き出せませんでした。");return;}var ext=blob.type==="image/jpeg"?"jpg":blob.type==="image/webp"?"webp":"png",a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=safeName(sourceName)+"-edited."+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);say("画像を保存しました。");});
 $("copy-btn").addEventListener("click",async function(){try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error("このブラウザでは画像コピーに対応していません");var blob=await new Promise(function(resolve){canvas.toBlob(resolve,"image/png");});await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);say("PNG画像をクリップボードへコピーしました。");}catch(e){say("コピーできませんでした。HTTPS環境で試すか、画像を保存してください。");}});
 $("reset-btn").addEventListener("click",reset);
 })();
