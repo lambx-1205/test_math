@@ -21,15 +21,15 @@ footer{margin-top:27px;padding-top:14px;border-top:1px solid var(--line);display
 </head>
 <body>
 <main class="shell">
-<header class="topbar"><a class="brand" href="index.html"><span class="mark">U</span><span><p class="eyebrow">UTILITY HUB</p><p class="brand-name">ファイル / PDF編集</p></span></a><a class="back" href="index.html">← ツール一覧へ</a></header>
-<section class="hero"><span class="kicker">FILE / PDF TOOLS</span><h1>ファイルを、閲覧・整理・編集。</h1><p>PDFの閲覧とページ編集、複数ファイルのZIP圧縮などを行えます。ファイルの内容はサーバーへアップロードせず、ブラウザ内で処理します。</p></section>
+<header class="topbar"><a class="brand" href="index.html"><span class="mark">U</span><span><p class="brand-name">ファイル / PDF編集</p></span></a><a class="back" href="index.html">← ツール一覧へ</a></header>
+
 <nav class="tabs" aria-label="機能切り替え"><button class="tab active" id="tab-pdf" type="button">PDFビューワー・編集</button><button class="tab" id="tab-files" type="button">ファイル圧縮</button></nav>
 <section class="tab-panel" id="panel-pdf">
 <div class="pdf-workspace">
 <section class="panel pdf-controls">
  <div class="pdf-control-head">
-  <div><div class="panel-head" style="margin:0"><h2>PDFの読み込み</h2><span class="sub" id="pdf-status-label">PDF未選択</span></div><span class="sub">PDFをドロップするか、ファイルを選択</span></div>
-  <div class="drop pdf-dropzone" id="pdf-drop"><div><strong>PDFファイルをここにドロップ</strong><p>PDF形式に対応</p></div><button class="btn primary" id="pdf-choose" type="button">PDFを開く</button><input class="file-input" id="pdf-file" type="file" accept="application/pdf,.pdf"></div>
+  <div><div class="panel-head" style="margin:0"><h2>PDFの読み込み</h2><span class="sub" id="pdf-status-label">PDF未選択</span></div></div>
+  <div class="drop pdf-dropzone" id="pdf-drop"><div><strong>PDFファイルをここにドロップ</strong></div><button class="btn primary" id="pdf-choose" type="button">PDFを開く</button><input class="file-input" id="pdf-file" type="file" accept="application/pdf,.pdf"></div>
  </div>
  <div class="pdf-control-grid">
   <div class="pdf-control-block">
@@ -53,7 +53,7 @@ footer{margin-top:27px;padding-top:14px;border-top:1px solid var(--line);display
  <div class="notice">閲覧表示：1ページ、見開き2ページ、連続スクロール。倍率は「幅に合わせる」「ページ全体」から調整できます。暗号化・パスワード保護PDFなど、一部のPDFは編集できない場合があります。</div>
 </section>
 <section class="panel pdf-viewer-panel">
- <div class="panel-head"><h2>PDFプレビュー</h2><span class="sub">高解像度表示</span></div>
+ <div class="panel-head"><h2>PDFプレビュー</h2></div>
  <div class="viewer-stage" id="viewer-stage" tabindex="0" aria-label="PDFページ表示">
   <div class="empty" id="viewer-empty">PDFを開くと、ここに大きく表示されます。</div>
   <div class="pdf-pages single" id="pdf-pages" hidden></div>
@@ -71,23 +71,23 @@ footer{margin-top:27px;padding-top:14px;border-top:1px solid var(--line);display
 <div class="status" id="file-status" role="status" aria-live="polite"></div>
 </section>
 <aside class="panel">
-<div class="panel-head"><h2>圧縮・書き出し</h2><span class="sub">ローカル処理</span></div>
+<div class="panel-head"><h2>圧縮・書き出し</h2></div>
 <div class="group">
 <div class="group-title">ZIPアーカイブ</div>
-<p class="sub">選択した複数のファイルを、ひとつのZIPファイルにまとめて圧縮します。</p>
+<p class="sub">選択したファイルを1つのZIPファイルにまとめます。</p>
 <button class="btn primary" id="zip-btn" disabled>選択ファイルをZIP圧縮</button>
 <div class="progress"><span id="zip-progress"></span></div>
 </div>
 <div class="group">
 <div class="group-title">GZIP圧縮</div>
-<p class="sub">単一ファイルをGZIP形式（.gz）に圧縮します。主にテキストやログなどに向いています。</p>
+<p class="sub">先頭のファイルをGZIP形式（.gz）に圧縮します。</p>
 <button class="btn" id="gzip-btn" disabled>先頭のファイルをGZIP圧縮</button>
 </div>
-<div class="notice">ZIPは複数ファイルをまとめる形式、GZIPは単一データを圧縮する形式です。GZIPでは元のファイル名・拡張子の情報が圧縮データ自体に保持されない場合があります。圧縮率はファイルの種類によって異なります。</div>
+
 </aside>
 </div>
 </section>
-<footer><span>UTILITY HUB · FILE / PDF EDITOR</span><span>ファイルデータはこの端末内で処理されます</span></footer>
+
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
