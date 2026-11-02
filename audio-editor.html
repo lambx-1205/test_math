@@ -83,7 +83,7 @@ function drawWaveform(cursorTime){
   for(var x=0;x<width;x++){
    var first=Math.floor(x/width*length),last=Math.max(first+1,Math.floor((x+1)/width*length)),step=Math.max(1,Math.floor((last-first)/24)),min=1,max=-1;
    for(var i=first;i<last;i+=step){var value=0;for(var c=0;c<channels;c++)value+=audioBuffer.getChannelData(c)[i]||0;value/=channels;if(value<min)min=value;if(value>max)max=value;}
-   var y=(max-min)*mid/2,top=mid-(max+min)*mid/2;ctx.fillRect(x,top,Math.max(1,ratio),Math.max(1,y));
+   var y=(max-min)*mid,top=mid-max*mid;ctx.fillRect(x,top,Math.max(1,ratio),Math.max(1,y));
   }
   ctx.strokeStyle="rgba(70,88,216,.85)";ctx.lineWidth=Math.max(1,ratio);ctx.strokeRect(x1,0,Math.max(1,x2-x1),height);
   if(Number.isFinite(cursorTime)){var cx=cursorTime/audioBuffer.duration*width;ctx.strokeStyle="#d04444";ctx.lineWidth=2*ratio;ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,height);ctx.stroke();}
@@ -131,7 +131,7 @@ function makeWav(rendered){
  for(var i=0;i<count;i++)for(var c=0;c<num;c++){var sample=Math.max(-1,Math.min(1,channels[c][i]));view.setInt16(offset,sample<0?sample*32768:sample*32767,true);offset+=2;}
  return new Blob([buffer],{type:"audio/wav"});
 }
-function loadLame(){if(window.lamejs&&window.lamejs.Mp3Encoder)return Promise.resolve();if(window.__lameLoading)return window.__lameLoading;window.__lameLoading=new Promise(function(resolve,reject){var script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js";script.onload=function(){if(window.lamejs&&window.lamejs.Mp3Encoder)resolve();else reject(new Error("MP3エンコーダを初期化できませんでした。"));};script.onerror=function(){reject(new Error("MP3エンコーダを読み込めません。ネットワーク接続を確認してください。"));};document.head.appendChild(script);});return window.__lameLoading;}
+function loadLame(){if(window.lamejs&&window.lamejs.Mp3Encoder)return Promise.resolve();if(window.__lameLoading)return window.__lameLoading;window.__lameLoading=new Promise(function(resolve,reject){var script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js";script.onload=function(){if(window.lamejs&&window.lamejs.Mp3Encoder)resolve();else{window.__lameLoading=null;reject(new Error("MP3エンコーダを初期化できませんでした。"));}};script.onerror=function(){window.__lameLoading=null;reject(new Error("MP3エンコーダを読み込めません。ネットワーク接続を確認してください。"));};document.head.appendChild(script);});return window.__lameLoading;}
 async function makeMp3(rendered,bitrate){
  await loadLame();var input=rendered.channels,channelCount=input.length,outChannels=channelCount===1?1:2,offlineFrames=Math.max(1,Math.ceil(rendered.duration*44100));
  var Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!Offline)throw new Error("このブラウザは MP3 用の音声変換に対応していません。");
