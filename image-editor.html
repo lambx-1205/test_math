@@ -36,10 +36,13 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;p
 <div class="group-title">反転・対称化・回転</div>
 <div class="control-grid">
 <button class="btn" data-op="flip-h" disabled>左右反転</button><button class="btn" data-op="flip-v" disabled>上下反転</button>
-<button class="btn" data-op="sym-left" disabled>左半分で左右対称</button><button class="btn" data-op="sym-right" disabled>右半分で左右対称</button>
-<button class="btn" data-op="sym-top" disabled>上半分で上下対称</button><button class="btn" data-op="sym-bottom" disabled>下半分で上下対称</button>
+<button class="btn" data-op="sym-left" disabled>左側を基準に左右対称</button><button class="btn" data-op="sym-right" disabled>右側を基準に左右対称</button>
+<button class="btn" data-op="sym-top" disabled>上側を基準に上下対称</button><button class="btn" data-op="sym-bottom" disabled>下側を基準に上下対称</button>
 <button class="btn" data-op="rotate-left" disabled>↶ 90°回転</button><button class="btn" data-op="rotate-right" disabled>↷ 90°回転</button>
-</div></div>
+</div>
+<div class="slider-row"><label for="symmetry-x">左右対称軸（縦）</label><output id="symmetry-x-out">50%</output><input id="symmetry-x" type="range" min="5" max="95" value="50" disabled></div>
+<div class="slider-row"><label for="symmetry-y">上下対称軸（横）</label><output id="symmetry-y-out">50%</output><input id="symmetry-y" type="range" min="5" max="95" value="50" disabled></div>
+</div>
 <div class="group">
 <div class="group-title">色・画質</div>
 <div class="control-grid">
@@ -76,14 +79,14 @@ var source=null,sourceUrl=null,sourceName="image",rotation=0,flipH=false,flipV=f
 var canvas=$("preview"),ctx=canvas.getContext("2d",{willReadFrequently:true}),busy=false;
 var controls=Array.prototype.slice.call(document.querySelectorAll("button[data-op],button[data-effect]"));
 function say(message){$("status").textContent=message;}
-function setEnabled(enabled){$("download-btn").disabled=!enabled;$("copy-btn").disabled=!enabled;$("reset-btn").disabled=!enabled;document.querySelectorAll("[data-op],[data-effect],#brightness,#contrast,#blur,#mosaic,#mosaic-btn,#square-btn,#apply-size,#clear-size").forEach(function(el){el.disabled=!enabled;});}
+function setEnabled(enabled){$("download-btn").disabled=!enabled;$("copy-btn").disabled=!enabled;$("reset-btn").disabled=!enabled;document.querySelectorAll("[data-op],[data-effect],#brightness,#contrast,#blur,#mosaic,#symmetry-x,#symmetry-y,#mosaic-btn,#square-btn,#apply-size,#clear-size").forEach(function(el){el.disabled=!enabled;});}
 function safeName(name){return (name||"image").replace(/\.[^.]+$/,"").replace(/[\\/:*?"<>|]/g,"_").slice(0,80)||"image";}
 function loadFile(file){
  if(!file||!file.type||file.type.indexOf("image/")!==0){say("画像ファイルを選択してください。");return;}
  if(sourceUrl)URL.revokeObjectURL(sourceUrl);
  sourceUrl=URL.createObjectURL(file);sourceName=file.name;var img=new Image();
  img.onload=function(){if(img.naturalWidth*img.naturalHeight>60000000){say("画像が大きすぎます。6000万画素以下の画像を選択してください。");URL.revokeObjectURL(sourceUrl);sourceUrl=null;$("drop-area").style.display="";return;}source=img;rotation=0;flipH=false;flipV=false;effect="none";symmetry="none";mosaicOn=false;squareCrop=false;resizeTo=null;
- ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});
+ ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});["symmetry-x","symmetry-y"].forEach(function(id){$(id).value=50;$(id+"-out").textContent="50%";});
  $("resize-width").value="";$("resize-height").value="";$("preview-label").textContent=file.name;
  setEnabled(true);$("preview-wrap").classList.remove("empty");$("preview").hidden=false;$("empty-preview").hidden=true;
  $("image-meta").textContent=img.naturalWidth+" × "+img.naturalHeight+" px ・ "+(file.size/1024).toFixed(1)+" KB ・ "+file.type;
@@ -110,13 +113,16 @@ function applyColor(){
 }
 function applySymmetry(){
  if(symmetry==="none")return;
- var w=canvas.width,h=canvas.height,image=ctx.getImageData(0,0,w,h),d=image.data,copy=new Uint8ClampedArray(d),halfX=Math.floor(w/2),halfY=Math.floor(h/2);
+ var w=canvas.width,h=canvas.height,image=ctx.getImageData(0,0,w,h),d=image.data,copy=new Uint8ClampedArray(d);
+ var axisX=(Number($("symmetry-x").value)/100)*(w-1);
+ var axisY=(Number($("symmetry-y").value)/100)*(h-1);
+ function clampIndex(value,max){return Math.max(0,Math.min(max,Math.round(value)));}
  function copyPixel(dx,dy,sx,sy){var di=(dy*w+dx)*4,si=(sy*w+sx)*4;d[di]=copy[si];d[di+1]=copy[si+1];d[di+2]=copy[si+2];d[di+3]=copy[si+3];}
  for(var y=0;y<h;y++)for(var x=0;x<w;x++){
- if(symmetry==="left"&&x>=halfX)copyPixel(x,y,Math.max(0,2*halfX-1-x),y);
- if(symmetry==="right"&&x<halfX)copyPixel(x,y,Math.min(w-1,2*halfX-1-x),y);
- if(symmetry==="top"&&y>=halfY)copyPixel(x,y,x,Math.max(0,2*halfY-1-y));
- if(symmetry==="bottom"&&y<halfY)copyPixel(x,y,x,Math.min(h-1,2*halfY-1-y));
+  if(symmetry==="left"&&x>axisX)copyPixel(x,y,clampIndex(2*axisX-x,w-1),y);
+  else if(symmetry==="right"&&x<axisX)copyPixel(x,y,clampIndex(2*axisX-x,w-1),y);
+  else if(symmetry==="top"&&y>axisY)copyPixel(x,y,x,clampIndex(2*axisY-y,h-1));
+  else if(symmetry==="bottom"&&y<axisY)copyPixel(x,y,x,clampIndex(2*axisY-y,h-1));
  }
  ctx.putImageData(image,0,0);
 }
@@ -140,7 +146,7 @@ function render(){
  $("preview-label").textContent=canvas.width+" × "+canvas.height+" px";}catch(e){say("処理中にエラーが発生しました: "+e.message);}finally{busy=false;}
 }
 function reset(){rotation=0;flipH=false;flipV=false;effect="none";symmetry="none";mosaicOn=false;squareCrop=false;resizeTo=null;
- ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});$("resize-width").value="";$("resize-height").value="";render();say("編集をリセットしました。");}
+ ["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).value=0;$(id+"-out").textContent="0";});["symmetry-x","symmetry-y"].forEach(function(id){$(id).value=50;$(id+"-out").textContent="50%";});$("resize-width").value="";$("resize-height").value="";render();say("編集をリセットしました。");}
 $("choose-btn").addEventListener("click",function(){$("image-file").click();});
 $("image-file").addEventListener("change",function(e){loadFile(e.target.files[0]);});
 var drop=$("drop-area");drop.addEventListener("dragover",function(e){e.preventDefault();drop.classList.add("drag");});drop.addEventListener("dragleave",function(){drop.classList.remove("drag");});drop.addEventListener("drop",function(e){e.preventDefault();drop.classList.remove("drag");loadFile(e.dataTransfer.files[0]);});
@@ -162,7 +168,7 @@ document.querySelectorAll("[data-op]").forEach(function(btn){btn.addEventListene
  var op=btn.dataset.op;if(op==="flip-h")flipH=!flipH;else if(op==="flip-v")flipV=!flipV;else if(op==="rotate-left")rotation=(rotation+270)%360;else if(op==="rotate-right")rotation=(rotation+90)%360;else if(op==="sym-left"||op==="sym-right"||op==="sym-top"||op==="sym-bottom")symmetry=op.replace("sym-","");render();say("編集を反映しました。");
 });});
 document.querySelectorAll("[data-effect]").forEach(function(btn){btn.addEventListener("click",function(){effect=btn.dataset.effect;render();say("色調を変更しました。");});});
-["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).addEventListener("input",function(){$(id+"-out").textContent=$(id).value;render();});});
+["brightness","contrast","blur","mosaic"].forEach(function(id){$(id).addEventListener("input",function(){$(id+"-out").textContent=$(id).value;render();});});["symmetry-x","symmetry-y"].forEach(function(id){$(id).addEventListener("input",function(){$(id+"-out").textContent=$(id).value+"%";render();});});
 $("mosaic-btn").addEventListener("click",function(){mosaicOn=!mosaicOn;render();say(mosaicOn?"モザイクを適用しました。":"モザイクを解除しました。");});
 $("square-btn").addEventListener("click",function(){squareCrop=!squareCrop;render();say(squareCrop?"中央を正方形に切り抜きました。":"正方形トリミングを解除しました。");});
 $("apply-size").addEventListener("click",function(){
