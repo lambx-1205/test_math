@@ -108,7 +108,7 @@ function drawWaveform(cursorTime){
  }else{ctx.fillStyle="#929bad";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("音声ファイルを読み込むと波形が表示されます",width/2,height/2);}
 }
 async function ensureContext(){if(!audioContext){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error("このブラウザは Web Audio API に対応していません。");audioContext=new AC();}if(audioContext.state==="suspended")await audioContext.resume();return audioContext;}
-function stopPlayback(){if(sourceNode){var old=sourceNode;sourceNode=null;try{old.stop();old.disconnect();}catch(e){}}if(rafId)cancelAnimationFrame(rafId);rafId=0;if(previewNodes){Object.keys(previewNodes).forEach(function(key){try{previewNodes[key].disconnect();}catch(e){}});}previewNodes=null;previewTailDuration=0;isPlaying=false;$("stop-play").disabled=true;if(audioBuffer){$("play-time").textContent=formatTime(0)+" / "+formatTime(audioBuffer.duration);drawWaveform();}}
+function stopPlayback(cancelPending){if(cancelPending!==false)previewToken++;if(sourceNode){var old=sourceNode;sourceNode=null;try{old.stop();old.disconnect();}catch(e){}}if(rafId)cancelAnimationFrame(rafId);rafId=0;if(previewNodes){Object.keys(previewNodes).forEach(function(key){try{previewNodes[key].disconnect();}catch(e){}});}previewNodes=null;previewTailDuration=0;isPlaying=false;previewBusy=false;$("stop-play").disabled=true;if(audioBuffer){$("play-time").textContent=formatTime(0)+" / "+formatTime(audioBuffer.duration);drawWaveform();}if(audioBuffer){$("play-selection").disabled=false;$("play-all").disabled=false;}}
 function makeReverseBuffer(){if(reverseBuffer)return reverseBuffer;var reversed=audioContext.createBuffer(audioBuffer.numberOfChannels,audioBuffer.length,audioBuffer.sampleRate);for(var c=0;c<audioBuffer.numberOfChannels;c++){var src=audioBuffer.getChannelData(c),dst=reversed.getChannelData(c);for(var i=0,j=src.length-1;i<src.length;i++,j--)dst[i]=src[j];}reverseBuffer=reversed;return reverseBuffer;}
 function envelopeValue(t,duration,fadeIn,fadeOut){var gain=1;if(fadeIn>0&&t<fadeIn)gain*=Math.max(0,t/fadeIn);if(fadeOut>0&&t>duration-fadeOut)gain*=Math.max(0,(duration-t)/fadeOut);return gain;}
 function schedulePreviewEnvelope(node,elapsed){if(!previewNodes||!node)return;var now=audioContext.currentTime,duration=playDuration,fadeIn=Math.min(duration,Math.max(0,Number($("fade-in").value)||0)),fadeOut=Math.min(duration,Math.max(0,Number($("fade-out").value)||0)),from=Math.max(0,Math.min(duration,elapsed));node.gain.cancelScheduledValues(now);node.gain.setValueAtTime(envelopeValue(from,duration,fadeIn,fadeOut),now);if(from>=duration)return;var remaining=duration-from,steps=Math.min(1200,Math.max(1,Math.ceil(remaining/0.025)));for(var k=1;k<=steps;k++){var t=from+remaining*k/steps;node.gain.linearRampToValueAtTime(envelopeValue(t,duration,fadeIn,fadeOut),now+(t-from));}}
@@ -116,10 +116,88 @@ function makeImpulseResponse(ac){var length=Math.floor(ac.sampleRate*1.8),impuls
 function makeDistortionCurve(amount){if(amount<=0)return null;var samples=2048,curve=new Float32Array(samples),drive=1+amount/9,scale=Math.tanh(drive);for(var i=0;i<samples;i++){var x=i*2/samples-1;curve[i]=Math.tanh(x*drive)/scale;}return curve;}
 function applyLiveEffects(){if(!previewNodes||!audioContext)return;var n=previewNodes,now=audioContext.currentTime,volume=Number($("volume").value)/100,normalizeGain=$("normalize").checked?previewNormalizeGain:1;n.volume.gain.setTargetAtTime(volume*normalizeGain,now,0.015);var filterType=$("filter-type").value;n.filter.type=filterType==="none"?"allpass":filterType;n.filter.frequency.setTargetAtTime(Number($("filter-frequency").value),now,0.02);n.shaper.curve=makeDistortionCurve(Number($("distortion").value));n.echoWet.gain.setTargetAtTime(Number($("echo").value)/100,now,0.02);n.feedback.gain.setTargetAtTime(Number($("echo").value)>0?0.28:0,now,0.02);n.reverbWet.gain.setTargetAtTime(Number($("reverb").value)/100,now,0.02);}
 function updateLivePreviewSettings(envelopeChanged){if(!isPlaying||!previewNodes)return;var elapsed=Math.max(0,audioContext.currentTime-playStartAt);applyLiveEffects();if(envelopeChanged)schedulePreviewEnvelope(previewNodes.envelope,elapsed);}
-function updatePlayhead(){if(!isPlaying||!audioContext)return;var elapsed=audioContext.currentTime-playStartAt,at=Math.min(playDuration,elapsed),now=playReverse?playSelectionEnd-at:playSelectionStart+at;$("play-time").textContent=formatTime(now)+" / "+formatTime(audioBuffer.duration);drawWaveform(now);if(elapsed>=playDuration+previewTailDuration){stopPlayback();return;}rafId=requestAnimationFrame(updatePlayhead);}
+function updatePlayhead(){if(!isPlaying||!audioContext)return;var elapsed=audioContext.currentTime-playStartAt,at=Math.min(playDuration,elapsed),sourceElapsed=Math.min(playSelectionEnd-playSelectionStart,at*playSpeed),now=playReverse?playSelectionEnd-sourceElapsed:playSelectionStart+sourceElapsed;$("play-time").textContent=formatTime(now)+" / "+formatTime(audioBuffer.duration);drawWaveform(now);if(elapsed>=playDuration+previewTailDuration){stopPlayback();return;}rafId=requestAnimationFrame(updatePlayhead);}
+
+async function loadDspModules(){
+ if(dspModules)return dspModules;
+ if(!dspLoading){
+  dspLoading=Promise.all([
+   import("https://esm.sh/@audio/stretch@2.3.0?bundle"),
+   import("https://esm.sh/@audio/shift@1.2.0?bundle")
+  ]).then(function(modules){
+   var stretch=modules[0].transient||modules[0].default;
+   var pitchShift=modules[1].transient||modules[1].default;
+   if(typeof stretch!=="function"||typeof pitchShift!=="function")throw new Error("速度・音高処理モジュールを読み込めませんでした。");
+   dspModules={stretch:stretch,pitchShift:pitchShift};return dspModules;
+  }).catch(function(error){dspLoading=null;throw error;});
+ }
+ return dspLoading;
+}
+function selectChannels(channels,mode){
+ if(mode==="stereo"||channels.length===1)return channels;
+ if(mode==="left")return [channels[0]];
+ if(mode==="right")return [channels[Math.min(1,channels.length-1)]];
+ if(mode==="mono"){
+  var length=channels[0].length,mono=new Float32Array(length);
+  for(var i=0;i<length;i++){var sum=0;for(var c=0;c<channels.length;c++)sum+=channels[c][i];mono[i]=sum/channels.length;}
+  return [mono];
+ }
+ return channels;
+}
+async function applySpeedPitch(channels,sampleRate){
+ var speed=Number($("speed").value)/100,pitch=Number($("pitch").value);
+ var output=channels.map(function(channel){return channel.slice();});
+ if(Math.abs(speed-1)>0.0001||pitch!==0){
+  var modules=await loadDspModules();
+  if(Math.abs(speed-1)>0.0001){
+   setExportStatus("速度を変換中…");
+   output=output.map(function(channel){return modules.stretch(channel,{factor:1/speed,sampleRate:sampleRate});});
+  }
+  if(pitch!==0){
+   setExportStatus("音高を変換中…");
+   output=output.map(function(channel){return modules.pitchShift(channel,{semitones:pitch,sampleRate:sampleRate});});
+  }
+ }
+ return output.map(function(channel){return channel instanceof Float32Array?channel:new Float32Array(channel);});
+}
+function makePreviewBuffer(channels,sampleRate){
+ if(!channels.length||!channels[0].length)throw new Error("プレビュー音声を生成できませんでした。");
+ var buffer=audioContext.createBuffer(channels.length,channels[0].length,sampleRate);
+ channels.forEach(function(channel,index){buffer.copyToChannel(channel,index);});
+ return buffer;
+}
+async function buildPreviewBuffer(selectionOnly){
+ var sel=getSelection(),start=selectionOnly?sel.start:0,end=selectionOnly?sel.end:audioBuffer.duration;
+ var first=Math.max(0,Math.floor(start*audioBuffer.sampleRate)),last=Math.min(audioBuffer.length,Math.ceil(end*audioBuffer.sampleRate));
+ if(last<=first)throw new Error("再生範囲が短すぎます。");
+ var channels=[];
+ for(var c=0;c<audioBuffer.numberOfChannels;c++){
+  var data=audioBuffer.getChannelData(c).slice(first,last);
+  if($("reverse").checked)data.reverse();
+  channels.push(data);
+ }
+ channels=selectChannels(channels,$("channel-mode").value);
+ channels=await applySpeedPitch(channels,audioBuffer.sampleRate);
+ return {buffer:makePreviewBuffer(channels,audioBuffer.sampleRate),start:start,end:end};
+}
 function getPeakGain(start,end){if(!$("normalize").checked)return 1;var peak=0,a=Math.max(0,Math.floor(start*audioBuffer.sampleRate)),b=Math.min(audioBuffer.length,Math.ceil(end*audioBuffer.sampleRate));for(var c=0;c<audioBuffer.numberOfChannels;c++){var data=audioBuffer.getChannelData(c);for(var i=a;i<b;i++){var value=Math.abs(data[i]);if(value>peak)peak=value;}}return peak>0?0.98/peak:1;}
 var previewNormalizeGain=1;
-async function playAudio(selectionOnly){if(!audioBuffer||busy)return;stopPlayback();try{var ac=await ensureContext(),sel=getSelection(),start=selectionOnly?sel.start:0,end=selectionOnly?sel.end:audioBuffer.duration,reverse=$("reverse").checked,buffer=reverse?makeReverseBuffer():audioBuffer,offset=reverse?audioBuffer.duration-end:start;var src=ac.createBufferSource(),envelope=ac.createGain(),volume=ac.createGain(),filter=ac.createBiquadFilter(),shaper=ac.createWaveShaper(),dry=ac.createGain(),delay=ac.createDelay(2),feedback=ac.createGain(),echoWet=ac.createGain(),convolver=ac.createConvolver(),reverbWet=ac.createGain();src.buffer=buffer;src.connect(envelope);envelope.connect(volume);volume.connect(filter);filter.connect(shaper);shaper.connect(dry);dry.connect(ac.destination);shaper.connect(delay);delay.connect(echoWet);echoWet.connect(ac.destination);delay.connect(feedback);feedback.connect(delay);shaper.connect(convolver);convolver.buffer=makeImpulseResponse(ac);convolver.connect(reverbWet);reverbWet.connect(ac.destination);delay.delayTime.value=0.28;previewNodes={envelope:envelope,volume:volume,filter:filter,shaper:shaper,dry:dry,delay:delay,feedback:feedback,echoWet:echoWet,convolver:convolver,reverbWet:reverbWet};playSelectionStart=start;playSelectionEnd=end;playReverse=reverse;playOffset=offset;playDuration=end-start;previewTailDuration=Math.max(Number($("echo").value)>0?2:0,Number($("reverb").value)>0?2.2:0);playStartAt=ac.currentTime;previewNormalizeGain=getPeakGain(start,end);applyLiveEffects();schedulePreviewEnvelope(envelope,0);sourceNode=src;isPlaying=true;$("stop-play").disabled=false;src.onended=function(){if(sourceNode===src)sourceNode=null;};src.start(0,offset,playDuration);updatePlayhead();}catch(e){setStatus("再生できません: "+e.message);}}
+async function playAudio(selectionOnly){
+ if(!audioBuffer||busy||previewBusy)return;
+ var token=++previewToken;stopPlayback(false);previewBusy=true;lastPlaySelectionOnly=selectionOnly;$("play-selection").disabled=true;$("play-all").disabled=true;$("stop-play").disabled=false;setStatus("速度・音高を処理中…");
+ try{
+  var ac=await ensureContext(),built=await buildPreviewBuffer(selectionOnly);
+  if(token!==previewToken)return;
+  var buffer=built.buffer,start=built.start,end=built.end,reverse=$("reverse").checked;
+  var src=ac.createBufferSource(),envelope=ac.createGain(),volume=ac.createGain(),filter=ac.createBiquadFilter(),shaper=ac.createWaveShaper(),dry=ac.createGain(),delay=ac.createDelay(2),feedback=ac.createGain(),echoWet=ac.createGain(),convolver=ac.createConvolver(),reverbWet=ac.createGain();
+  src.buffer=buffer;src.connect(envelope);envelope.connect(volume);volume.connect(filter);filter.connect(shaper);shaper.connect(dry);dry.connect(ac.destination);shaper.connect(delay);delay.connect(echoWet);echoWet.connect(ac.destination);delay.connect(feedback);feedback.connect(delay);shaper.connect(convolver);convolver.buffer=makeImpulseResponse(ac);convolver.connect(reverbWet);reverbWet.connect(ac.destination);delay.delayTime.value=0.28;
+  previewNodes={envelope:envelope,volume:volume,filter:filter,shaper:shaper,dry:dry,delay:delay,feedback:feedback,echoWet:echoWet,convolver:convolver,reverbWet:reverbWet};
+  playSelectionStart=start;playSelectionEnd=end;playReverse=reverse;playOffset=0;playSpeed=Number($("speed").value)/100;playDuration=buffer.duration;previewTailDuration=Math.max(Number($("echo").value)>0?2:0,Number($("reverb").value)>0?2.2:0);playStartAt=ac.currentTime;
+  previewNormalizeGain=getPeakGain(start,end);applyLiveEffects();schedulePreviewEnvelope(envelope,0);sourceNode=src;isPlaying=true;previewBusy=false;$("stop-play").disabled=false;setStatus("プレビュー再生中。速度・音高は変更後に再生し直すと反映されます。");
+  src.onended=function(){if(sourceNode===src)sourceNode=null;};src.start(0);updatePlayhead();
+ }catch(e){if(token===previewToken)setStatus("再生できません: "+e.message);}
+ finally{if(token===previewToken){previewBusy=false;$("play-selection").disabled=!audioBuffer;$("play-all").disabled=!audioBuffer;$("stop-play").disabled=!isPlaying;}}
+}
 async function loadFile(file){
  if(!file)return;var name=file.name||"audio";
  if(!/\.(mp3|wav)$/i.test(name)&&!/^audio\/(mpeg|wav|x-wav)$/i.test(file.type||"")){setStatus("MP3 または WAV ファイルを選択してください。");return;}
