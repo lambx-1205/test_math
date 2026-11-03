@@ -224,7 +224,7 @@ updateEffectLabels();
 function updateRatePitchLabels(){
  var speed=Number($("speed").value)/100,pitch=Number($("pitch").value);
  $("speed-out").textContent=speed.toFixed(2)+"×";
- $("pitch-out").textContent=(pitch>0?"+":"")+pitch+" semitone";
+ $("pitch-out").textContent=(pitch>0?"+":"")+pitch+" 半音";
 }
 function restartPreviewWithNewTransform(){
  if(!isPlaying&&!previewBusy)return;
