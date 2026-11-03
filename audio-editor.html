@@ -46,13 +46,22 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
   <label class="checkline"><input type="checkbox" id="normalize" disabled> 音量をノーマライズ（ピークを調整）</label>
  </div>
  <div class="group">
+  <div class="group-title">特殊エフェクト</div>
+  <label class="checkline"><input type="checkbox" id="reverse" disabled> 逆再生</label>
+  <div class="range-row"><label for="echo">エコー</label><output id="echo-out">0%</output><input id="echo" type="range" min="0" max="60" value="0" step="1" disabled></div>
+  <div class="range-row"><label for="reverb">リバーブ</label><output id="reverb-out">0%</output><input id="reverb" type="range" min="0" max="60" value="0" step="1" disabled></div>
+  <div class="range-row"><label for="distortion">歪み</label><output id="distortion-out">0%</output><input id="distortion" type="range" min="0" max="100" value="0" step="1" disabled></div>
+  <div class="field"><label for="filter-type">フィルター</label><select id="filter-type" disabled><option value="none">なし</option><option value="lowpass">ローパス（高音を抑える）</option><option value="highpass">ハイパス（低音を抑える）</option></select></div>
+  <div class="range-row"><label for="filter-frequency">カットオフ周波数</label><output id="filter-frequency-out">4000 Hz</output><input id="filter-frequency" type="range" min="300" max="10000" value="4000" step="100" disabled></div>
+ </div>
+ <div class="group">
   <div class="group-title">書き出し</div>
   <div class="field-row"><div class="field"><label for="output-format">形式</label><select id="output-format" disabled><option value="wav">WAV</option><option value="mp3">MP3</option></select></div><div class="field"><label for="bitrate">MP3ビットレート</label><select id="bitrate" disabled><option value="96">96 kbps</option><option value="128" selected>128 kbps</option><option value="192">192 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option></select></div></div>
   <button class="btn primary" id="export-btn" style="width:100%" disabled>編集した音声を保存</button>
   <div class="progress"><span id="export-progress"></span></div>
   <div class="status" id="export-status" role="status" aria-live="polite"></div>
  </div>
- <div class="notice">MP3 / WAV の読み込みに対応します。音声データはブラウザ内で処理し、サーバーには送信しません。MP3書き出し時はエンコーダを外部CDNから読み込みます。長い音声は処理に時間がかかり、メモリを多く使います。</div>
+ <div class="notice">音量・フェード・エフェクトは再生中のプレビューにも反映されます。エコーやリバーブは音声の末尾に余韻が追加されます。音声データはブラウザ内で処理し、サーバーには送信しません。MP3書き出し時はエンコーダを外部CDNから読み込みます。</div>
 </aside>
 </div>
 </main>
@@ -60,14 +69,14 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-var audioContext=null,audioBuffer=null,currentFile=null,sourceNode=null,playStartAt=0,playOffset=0,playDuration=0,rafId=0,isPlaying=false,dragStart=null,dragEnd=null,busy=false;
+var audioContext=null,audioBuffer=null,reverseBuffer=null,currentFile=null,sourceNode=null,previewNodes=null,playStartAt=0,playOffset=0,playDuration=0,playSelectionStart=0,playSelectionEnd=0,playReverse=false,rafId=0,isPlaying=false,dragStart=null,dragEnd=null,busy=false;
 var canvas=$("waveform"),ctx=canvas.getContext("2d");
 var setStatus=function(message){$("status").textContent=message;};
 var setExportStatus=function(message){$("export-status").textContent=message;};
 function formatTime(seconds){if(!Number.isFinite(seconds)||seconds<0)seconds=0;var m=Math.floor(seconds/60),s=seconds-m*60;return String(m).padStart(2,"0")+":"+s.toFixed(2).padStart(5,"0");}
 function baseName(name){return (name||"audio").replace(/\.[^.]+$/,"").replace(/[\\/:*?"<>|]/g,"_").slice(0,100)||"audio";}
 function downloadBlob(blob,name){var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},2000);}
-function setControls(on){["start-time","end-time","export-mode","volume","fade-in","fade-out","normalize","output-format","bitrate","export-btn","play-selection","play-all"].forEach(function(id){$(id).disabled=!on;});$("bitrate").disabled=!on||$("output-format").value!=="mp3";$("stop-play").disabled=!on||!isPlaying;}
+function setControls(on){["start-time","end-time","export-mode","volume","fade-in","fade-out","normalize","reverse","echo","reverb","distortion","filter-type","filter-frequency","output-format","bitrate","export-btn","play-selection","play-all"].forEach(function(id){$(id).disabled=!on;});$("bitrate").disabled=!on||$("output-format").value!=="mp3";$("filter-frequency").disabled=!on||$("filter-type").value==="none";$("stop-play").disabled=!on||!isPlaying;}
 function resizeCanvas(){var rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);if(!rect.width)return;canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(190*ratio);drawWaveform();}
 function getSelection(){if(!audioBuffer)return {start:0,end:0};var start=Math.max(0,Math.min(audioBuffer.duration,Number($("start-time").value)||0));var end=Math.max(0,Math.min(audioBuffer.duration,Number($("end-time").value)||0));if(end<=start)end=Math.min(audioBuffer.duration,start+0.05);return {start:start,end:end};}
 function setSelection(start,end){if(!audioBuffer)return;var duration=audioBuffer.duration;start=Math.max(0,Math.min(duration,start));end=Math.max(0,Math.min(duration,end));if(end-start<0.02){if(start+0.02<=duration)end=start+0.02;else start=Math.max(0,end-0.02);} $("start-time").value=start.toFixed(2);$("end-time").value=end.toFixed(2);$("selection-label").textContent=formatTime(start)+" – "+formatTime(end);drawWaveform();}
