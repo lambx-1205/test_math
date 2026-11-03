@@ -69,7 +69,7 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
   <div class="progress"><span id="export-progress"></span></div>
   <div class="status" id="export-status" role="status" aria-live="polite"></div>
  </div>
- <div class="notice">音量・フェード・エフェクトは再生中のプレビューにも反映されます。速度・音高の変更は再生を再処理して反映します。速度変更と音高変更は独立しており、速度を変えても音高は保たれ、音高を変えても長さは保たれます。長い音声の処理には時間とメモリを使います。</div>
+ <div class="notice">音量・フェード・エフェクトは再生中のプレビューにも反映されます。速度変更と音高変更は独立しており、速度を変えても音高は保たれ、音高を変えても長さは保たれます。速度・音高の処理ライブラリは初回に外部CDNから読み込みますが、音声データはブラウザ内で処理し、サーバーには送信しません。長い音声はメモリを多く使います。</div>
 </aside>
 </div>
 </main>
@@ -108,7 +108,7 @@ function drawWaveform(cursorTime){
  }else{ctx.fillStyle="#929bad";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("音声ファイルを読み込むと波形が表示されます",width/2,height/2);}
 }
 async function ensureContext(){if(!audioContext){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw new Error("このブラウザは Web Audio API に対応していません。");audioContext=new AC();}if(audioContext.state==="suspended")await audioContext.resume();return audioContext;}
-function stopPlayback(cancelPending){if(cancelPending!==false)previewToken++;if(sourceNode){var old=sourceNode;sourceNode=null;try{old.stop();old.disconnect();}catch(e){}}if(rafId)cancelAnimationFrame(rafId);rafId=0;if(previewNodes){Object.keys(previewNodes).forEach(function(key){try{previewNodes[key].disconnect();}catch(e){}});}previewNodes=null;previewTailDuration=0;isPlaying=false;previewBusy=false;$("stop-play").disabled=true;if(audioBuffer){$("play-time").textContent=formatTime(0)+" / "+formatTime(audioBuffer.duration);drawWaveform();}if(audioBuffer){$("play-selection").disabled=false;$("play-all").disabled=false;}}
+function stopPlayback(cancelPending){if(cancelPending!==false)previewToken++;if(sourceNode){var old=sourceNode;sourceNode=null;try{old.stop();old.disconnect();}catch(e){}}if(rafId)cancelAnimationFrame(rafId);rafId=0;if(previewNodes){Object.keys(previewNodes).forEach(function(key){try{previewNodes[key].disconnect();}catch(e){}});}previewNodes=null;previewAudioBuffer=null;previewTailDuration=0;isPlaying=false;previewBusy=false;$("stop-play").disabled=true;if(audioBuffer){$("play-time").textContent=formatTime(0)+" / "+formatTime(audioBuffer.duration);drawWaveform();}if(audioBuffer){$("play-selection").disabled=false;$("play-all").disabled=false;}}
 function makeReverseBuffer(){if(reverseBuffer)return reverseBuffer;var reversed=audioContext.createBuffer(audioBuffer.numberOfChannels,audioBuffer.length,audioBuffer.sampleRate);for(var c=0;c<audioBuffer.numberOfChannels;c++){var src=audioBuffer.getChannelData(c),dst=reversed.getChannelData(c);for(var i=0,j=src.length-1;i<src.length;i++,j--)dst[i]=src[j];}reverseBuffer=reversed;return reverseBuffer;}
 function envelopeValue(t,duration,fadeIn,fadeOut){var gain=1;if(fadeIn>0&&t<fadeIn)gain*=Math.max(0,t/fadeIn);if(fadeOut>0&&t>duration-fadeOut)gain*=Math.max(0,(duration-t)/fadeOut);return gain;}
 function schedulePreviewEnvelope(node,elapsed){if(!previewNodes||!node)return;var now=audioContext.currentTime,duration=playDuration,fadeIn=Math.min(duration,Math.max(0,Number($("fade-in").value)||0)),fadeOut=Math.min(duration,Math.max(0,Number($("fade-out").value)||0)),from=Math.max(0,Math.min(duration,elapsed));node.gain.cancelScheduledValues(now);node.gain.setValueAtTime(envelopeValue(from,duration,fadeIn,fadeOut),now);if(from>=duration)return;var remaining=duration-from,steps=Math.min(1200,Math.max(1,Math.ceil(remaining/0.025)));for(var k=1;k<=steps;k++){var t=from+remaining*k/steps;node.gain.linearRampToValueAtTime(envelopeValue(t,duration,fadeIn,fadeOut),now+(t-from));}}
@@ -144,17 +144,17 @@ function selectChannels(channels,mode){
  }
  return channels;
 }
-async function applySpeedPitch(channels,sampleRate){
- var speed=Number($("speed").value)/100,pitch=Number($("pitch").value);
+async function applySpeedPitch(channels,sampleRate,isPreview){
+ var speed=Number($("speed").value)/100,pitch=Number($("pitch").value),report=isPreview?setStatus:setExportStatus;
  var output=channels.map(function(channel){return channel.slice();});
  if(Math.abs(speed-1)>0.0001||pitch!==0){
   var modules=await loadDspModules();
   if(Math.abs(speed-1)>0.0001){
-   setExportStatus("速度を変換中…");
+   report("速度を変換中…");
    output=output.map(function(channel){return modules.stretch(channel,{factor:1/speed,sampleRate:sampleRate});});
   }
   if(pitch!==0){
-   setExportStatus("音高を変換中…");
+   report("音高を変換中…");
    output=output.map(function(channel){return modules.pitchShift(channel,{semitones:pitch,sampleRate:sampleRate});});
   }
  }
@@ -177,11 +177,12 @@ async function buildPreviewBuffer(selectionOnly){
   channels.push(data);
  }
  channels=selectChannels(channels,$("channel-mode").value);
- channels=await applySpeedPitch(channels,audioBuffer.sampleRate);
+ channels=await applySpeedPitch(channels,audioBuffer.sampleRate,true);
  return {buffer:makePreviewBuffer(channels,audioBuffer.sampleRate),start:start,end:end};
 }
 function getPeakGain(start,end){if(!$("normalize").checked)return 1;var peak=0,a=Math.max(0,Math.floor(start*audioBuffer.sampleRate)),b=Math.min(audioBuffer.length,Math.ceil(end*audioBuffer.sampleRate));for(var c=0;c<audioBuffer.numberOfChannels;c++){var data=audioBuffer.getChannelData(c);for(var i=a;i<b;i++){var value=Math.abs(data[i]);if(value>peak)peak=value;}}return peak>0?0.98/peak:1;}
-var previewNormalizeGain=1;
+var previewNormalizeGain=1,previewAudioBuffer=null;
+function getBufferPeakGain(buffer){if(!buffer)return 1;var peak=0;for(var c=0;c<buffer.numberOfChannels;c++){var data=buffer.getChannelData(c);for(var i=0;i<data.length;i++){var value=Math.abs(data[i]);if(value>peak)peak=value;}}return peak>0?0.98/peak:1;}
 async function playAudio(selectionOnly){
  if(!audioBuffer||busy||previewBusy)return;
  var token=++previewToken;stopPlayback(false);previewBusy=true;lastPlaySelectionOnly=selectionOnly;$("play-selection").disabled=true;$("play-all").disabled=true;$("stop-play").disabled=false;setStatus("速度・音高を処理中…");
@@ -192,8 +193,8 @@ async function playAudio(selectionOnly){
   var src=ac.createBufferSource(),envelope=ac.createGain(),volume=ac.createGain(),filter=ac.createBiquadFilter(),shaper=ac.createWaveShaper(),dry=ac.createGain(),delay=ac.createDelay(2),feedback=ac.createGain(),echoWet=ac.createGain(),convolver=ac.createConvolver(),reverbWet=ac.createGain();
   src.buffer=buffer;src.connect(envelope);envelope.connect(volume);volume.connect(filter);filter.connect(shaper);shaper.connect(dry);dry.connect(ac.destination);shaper.connect(delay);delay.connect(echoWet);echoWet.connect(ac.destination);delay.connect(feedback);feedback.connect(delay);shaper.connect(convolver);convolver.buffer=makeImpulseResponse(ac);convolver.connect(reverbWet);reverbWet.connect(ac.destination);delay.delayTime.value=0.28;
   previewNodes={envelope:envelope,volume:volume,filter:filter,shaper:shaper,dry:dry,delay:delay,feedback:feedback,echoWet:echoWet,convolver:convolver,reverbWet:reverbWet};
-  playSelectionStart=start;playSelectionEnd=end;playReverse=reverse;playOffset=0;playSpeed=Number($("speed").value)/100;playDuration=buffer.duration;previewTailDuration=Math.max(Number($("echo").value)>0?2:0,Number($("reverb").value)>0?2.2:0);playStartAt=ac.currentTime;
-  previewNormalizeGain=getPeakGain(start,end);applyLiveEffects();schedulePreviewEnvelope(envelope,0);sourceNode=src;isPlaying=true;previewBusy=false;$("stop-play").disabled=false;setStatus("プレビュー再生中。速度・音高は変更後に再生し直すと反映されます。");
+  playSelectionStart=start;playSelectionEnd=end;playReverse=reverse;playOffset=0;playSpeed=Number($("speed").value)/100;playDuration=buffer.duration;previewAudioBuffer=buffer;previewTailDuration=Math.max(Number($("echo").value)>0?2:0,Number($("reverb").value)>0?2.2:0);playStartAt=ac.currentTime;
+  previewNormalizeGain=getBufferPeakGain(buffer);applyLiveEffects();schedulePreviewEnvelope(envelope,0);sourceNode=src;isPlaying=true;previewBusy=false;$("stop-play").disabled=false;setStatus("プレビュー再生中。速度・音高は変更後に再生し直すと反映されます。");
   src.onended=function(){if(sourceNode===src)sourceNode=null;};src.start(0);updatePlayhead();
  }catch(e){if(token===previewToken)setStatus("再生できません: "+e.message);}
  finally{if(token===previewToken){previewBusy=false;$("play-selection").disabled=!audioBuffer;$("play-all").disabled=!audioBuffer;$("stop-play").disabled=!isPlaying;}}
@@ -216,7 +217,7 @@ function finishDrag(){dragStart=null;dragEnd=null;}
 $("waveform").addEventListener("pointerup",finishDrag);$("waveform").addEventListener("pointercancel",finishDrag);
 $("play-selection").addEventListener("click",function(){playAudio(true);});$("play-all").addEventListener("click",function(){playAudio(false);});$("stop-play").addEventListener("click",stopPlayback);
 function updateEffectLabels(){$("volume-out").textContent=$("volume").value+"%";$("echo-out").textContent=$("echo").value+"%";$("reverb-out").textContent=$("reverb").value+"%";$("distortion-out").textContent=$("distortion").value+"%";$("filter-frequency-out").textContent=$("filter-frequency").value+" Hz";}
-["volume","fade-in","fade-out","normalize","echo","reverb","distortion","filter-type","filter-frequency"].forEach(function(id){$(id).addEventListener("input",function(){updateEffectLabels();if(id==="filter-type")$("filter-frequency").disabled=!audioBuffer||this.value==="none";if(id==="normalize"&&isPlaying)previewNormalizeGain=getPeakGain(playSelectionStart,playSelectionEnd);updateLivePreviewSettings(id==="fade-in"||id==="fade-out");});$(id).addEventListener("change",function(){updateEffectLabels();if(id==="normalize"&&isPlaying)previewNormalizeGain=getPeakGain(playSelectionStart,playSelectionEnd);updateLivePreviewSettings(id==="fade-in"||id==="fade-out");});});
+["volume","fade-in","fade-out","normalize","echo","reverb","distortion","filter-type","filter-frequency"].forEach(function(id){$(id).addEventListener("input",function(){updateEffectLabels();if(id==="filter-type")$("filter-frequency").disabled=!audioBuffer||this.value==="none";if(id==="normalize"&&isPlaying)previewNormalizeGain=getBufferPeakGain(previewAudioBuffer);updateLivePreviewSettings(id==="fade-in"||id==="fade-out");});$(id).addEventListener("change",function(){updateEffectLabels();if(id==="normalize"&&isPlaying)previewNormalizeGain=getBufferPeakGain(previewAudioBuffer);updateLivePreviewSettings(id==="fade-in"||id==="fade-out");});});
 $("reverse").addEventListener("change",function(){if(isPlaying){stopPlayback();setStatus("逆再生の設定を変更しました。もう一度プレビューを再生してください。");}});
 $("output-format").addEventListener("change",function(){$("bitrate").disabled=!audioBuffer||this.value!=="mp3";});
 updateEffectLabels();
@@ -226,7 +227,7 @@ function updateRatePitchLabels(){
  $("pitch-out").textContent=(pitch>0?"+":"")+pitch+" semitone";
 }
 function restartPreviewWithNewTransform(){
- if(!isPlaying)return;
+ if(!isPlaying&&!previewBusy)return;
  var mode=lastPlaySelectionOnly;
  stopPlayback();
  playAudio(mode);
