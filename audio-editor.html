@@ -46,6 +46,13 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
   <label class="checkline"><input type="checkbox" id="normalize" disabled> 音量をノーマライズ（ピークを調整）</label>
  </div>
  <div class="group">
+  <div class="group-title">速度・音高</div>
+  <div class="range-row"><label for="speed">速度（音高を維持）</label><output id="speed-out">1.00×</output><input id="speed" type="range" min="50" max="200" value="100" step="5" disabled></div>
+  <div class="range-row"><label for="pitch">音高（速度を維持）</label><output id="pitch-out">+0 semitone</output><input id="pitch" type="range" min="-12" max="12" value="0" step="1" disabled></div>
+  <button class="btn small" id="reset-rate-pitch" type="button" disabled>速度・音高をリセット</button>
+  <p class="sub">速度は0.50〜2.00倍、音高は±12半音。変更後、プレビューを再生し直すと反映されます。</p>
+ </div>
+ <div class="group">
   <div class="group-title">特殊エフェクト</div>
   <label class="checkline"><input type="checkbox" id="reverse" disabled> 逆再生</label>
   <div class="range-row"><label for="echo">エコー</label><output id="echo-out">0%</output><input id="echo" type="range" min="0" max="60" value="0" step="1" disabled></div>
@@ -53,6 +60,7 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
   <div class="range-row"><label for="distortion">歪み</label><output id="distortion-out">0%</output><input id="distortion" type="range" min="0" max="100" value="0" step="1" disabled></div>
   <div class="field"><label for="filter-type">フィルター</label><select id="filter-type" disabled><option value="none">なし</option><option value="lowpass">ローパス（高音を抑える）</option><option value="highpass">ハイパス（低音を抑える）</option></select></div>
   <div class="range-row"><label for="filter-frequency">カットオフ周波数</label><output id="filter-frequency-out">4000 Hz</output><input id="filter-frequency" type="range" min="300" max="10000" value="4000" step="100" disabled></div>
+  <div class="field" style="margin-top:10px"><label for="channel-mode">チャンネル出力</label><select id="channel-mode" disabled><option value="stereo">そのまま</option><option value="mono">モノラルにミックス</option><option value="left">左チャンネルのみ</option><option value="right">右チャンネルのみ</option></select></div>
  </div>
  <div class="group">
   <div class="group-title">書き出し</div>
@@ -61,7 +69,7 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
   <div class="progress"><span id="export-progress"></span></div>
   <div class="status" id="export-status" role="status" aria-live="polite"></div>
  </div>
- <div class="notice">音量・フェード・エフェクトは再生中のプレビューにも反映されます。エコーやリバーブは音声の末尾に余韻が追加されます。音声データはブラウザ内で処理し、サーバーには送信しません。MP3書き出し時はエンコーダを外部CDNから読み込みます。</div>
+ <div class="notice">音量・フェード・エフェクトは再生中のプレビューにも反映されます。速度・音高の変更は再生を再処理して反映します。速度変更と音高変更は独立しており、速度を変えても音高は保たれ、音高を変えても長さは保たれます。長い音声の処理には時間とメモリを使います。</div>
 </aside>
 </div>
 </main>
@@ -69,14 +77,14 @@ button,input,select{font:inherit}a{color:inherit;text-decoration:none}.shell{wid
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-var audioContext=null,audioBuffer=null,reverseBuffer=null,currentFile=null,sourceNode=null,previewNodes=null,playStartAt=0,playOffset=0,playDuration=0,previewTailDuration=0,playSelectionStart=0,playSelectionEnd=0,playReverse=false,rafId=0,isPlaying=false,dragStart=null,dragEnd=null,busy=false;
+var audioContext=null,audioBuffer=null,reverseBuffer=null,currentFile=null,sourceNode=null,previewNodes=null,playStartAt=0,playOffset=0,playDuration=0,previewTailDuration=0,playSelectionStart=0,playSelectionEnd=0,playReverse=false,playSpeed=1,rafId=0,isPlaying=false,previewBusy=false,previewToken=0,lastPlaySelectionOnly=true,dragStart=null,dragEnd=null,busy=false,dspModules=null,dspLoading=null;
 var canvas=$("waveform"),ctx=canvas.getContext("2d");
 var setStatus=function(message){$("status").textContent=message;};
 var setExportStatus=function(message){$("export-status").textContent=message;};
 function formatTime(seconds){if(!Number.isFinite(seconds)||seconds<0)seconds=0;var m=Math.floor(seconds/60),s=seconds-m*60;return String(m).padStart(2,"0")+":"+s.toFixed(2).padStart(5,"0");}
 function baseName(name){return (name||"audio").replace(/\.[^.]+$/,"").replace(/[\\/:*?"<>|]/g,"_").slice(0,100)||"audio";}
 function downloadBlob(blob,name){var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},2000);}
-function setControls(on){["start-time","end-time","export-mode","volume","fade-in","fade-out","normalize","reverse","echo","reverb","distortion","filter-type","filter-frequency","output-format","bitrate","export-btn","play-selection","play-all"].forEach(function(id){$(id).disabled=!on;});$("bitrate").disabled=!on||$("output-format").value!=="mp3";$("filter-frequency").disabled=!on||$("filter-type").value==="none";$("stop-play").disabled=!on||!isPlaying;}
+function setControls(on){["start-time","end-time","export-mode","volume","fade-in","fade-out","normalize","speed","pitch","reset-rate-pitch","reverse","echo","reverb","distortion","filter-type","filter-frequency","channel-mode","output-format","bitrate","export-btn","play-selection","play-all"].forEach(function(id){$(id).disabled=!on;});$("bitrate").disabled=!on||$("output-format").value!=="mp3";$("filter-frequency").disabled=!on||$("filter-type").value==="none";$("stop-play").disabled=!on||(!isPlaying&&!previewBusy);}
 function resizeCanvas(){var rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);if(!rect.width)return;canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(190*ratio);drawWaveform();}
 function getSelection(){if(!audioBuffer)return {start:0,end:0};var start=Math.max(0,Math.min(audioBuffer.duration,Number($("start-time").value)||0));var end=Math.max(0,Math.min(audioBuffer.duration,Number($("end-time").value)||0));if(end<=start)end=Math.min(audioBuffer.duration,start+0.05);return {start:start,end:end};}
 function setSelection(start,end){if(!audioBuffer)return;var duration=audioBuffer.duration;start=Math.max(0,Math.min(duration,start));end=Math.max(0,Math.min(duration,end));if(end-start<0.02){if(start+0.02<=duration)end=start+0.02;else start=Math.max(0,end-0.02);} $("start-time").value=start.toFixed(2);$("end-time").value=end.toFixed(2);$("selection-label").textContent=formatTime(start)+" – "+formatTime(end);drawWaveform();}
