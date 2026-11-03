@@ -138,12 +138,50 @@ function makeOutputChannels(mode){
  var total=audioBuffer.length,rate=audioBuffer.sampleRate,sel=getSelection(),start=mode==="full"?0:Math.max(0,Math.floor(sel.start*rate)),end=mode==="full"?total:Math.min(total,Math.ceil(sel.end*rate));
  var outLength=mode==="remove"?total-(end-start):end-start;
  if(outLength<1)throw new Error("書き出す音声がありません。範囲を確認してください。");
- var arrays=[];for(var c=0;c<audioBuffer.numberOfChannels;c++){var input=audioBuffer.getChannelData(c),out=new Float32Array(outLength);if(mode==="remove"){out.set(input.subarray(0,start),0);out.set(input.subarray(end),start);}else out.set(input.subarray(start,end),0);arrays.push(out);}
+ var arrays=[];
+ for(var c=0;c<audioBuffer.numberOfChannels;c++){
+  var input=audioBuffer.getChannelData(c),out=new Float32Array(outLength);
+  if(mode==="remove"){out.set(input.subarray(0,start),0);out.set(input.subarray(end),start);}else out.set(input.subarray(start,end),0);
+  if($("reverse").checked)out.reverse();
+  arrays.push(out);
+ }
  var peak=0;arrays.forEach(function(a){for(var i=0;i<a.length;i++){var p=Math.abs(a[i]);if(p>peak)peak=p;}});
  var normalize=$("normalize").checked,normalGain=normalize&&peak>0?0.98/peak:1,volume=Number($("volume").value)/100,duration=outLength/rate;
  var fadeIn=Math.min(duration,Math.max(0,Number($("fade-in").value)||0)),fadeOut=Math.min(duration,Math.max(0,Number($("fade-out").value)||0));
- arrays.forEach(function(a){for(var i=0;i<a.length;i++){var t=i/rate,g=normalGain*volume;if(fadeIn>0&&t<fadeIn)g*=t/fadeIn;if(fadeOut>0&&t>duration-fadeOut)g*=(duration-t)/fadeOut;a[i]=Math.max(-1,Math.min(1,a[i]*g));}});
- return {channels:arrays,sampleRate:rate,duration:duration};
+ var filterType=$("filter-type").value,cutoff=Number($("filter-frequency").value)||4000,distortion=Number($("distortion").value),echo=Number($("echo").value)/100,reverb=Number($("reverb").value)/100;
+ var lowpassAlpha=1-Math.exp(-2*Math.PI*cutoff/rate),drive=1+distortion/9,driveScale=Math.tanh(drive);
+ arrays.forEach(function(a){
+  var low=0;
+  for(var i=0;i<a.length;i++){
+   var x=a[i];
+   if(filterType==="lowpass"||filterType==="highpass"){low+=lowpassAlpha*(x-low);x=filterType==="lowpass"?low:x-low;}
+   if(distortion>0)x=Math.tanh(x*drive)/driveScale;
+   var t=i/rate,g=normalGain*volume;
+   if(fadeIn>0&&t<fadeIn)g*=t/fadeIn;
+   if(fadeOut>0&&t>duration-fadeOut)g*=(duration-t)/fadeOut;
+   a[i]=Math.max(-1,Math.min(1,x*g));
+  }
+ });
+ var tailSeconds=Math.max(echo>0?2.0:0,reverb>0?2.2:0),tailLength=Math.ceil(tailSeconds*rate);
+ var finalChannels=arrays.map(function(dry){
+  if(!tailLength)return dry;
+  var length=dry.length+tailLength,work=new Float32Array(length);work.set(dry);
+  if(echo>0){
+   var delaySize=Math.max(1,Math.round(rate*0.28)),delayLine=new Float32Array(delaySize),pos=0;
+   for(var i=0;i<length;i++){var x=i<dry.length?work[i]:0,delayed=delayLine[pos];delayLine[pos]=x+delayed*0.28;work[i]=x+delayed*echo;pos++;if(pos===delaySize)pos=0;}
+  }
+  if(reverb>0){
+   var delayTimes=[0.0297,0.0371,0.0411,0.0437],lines=delayTimes.map(function(seconds){return {data:new Float32Array(Math.max(1,Math.round(rate*seconds))),pos:0};}),reverbOut=new Float32Array(length);
+   for(var i=0;i<length;i++){
+    var x=work[i],sum=0;
+    lines.forEach(function(line){var delayed=line.data[line.pos];line.data[line.pos]=x+delayed*0.72;line.pos++;if(line.pos===line.data.length)line.pos=0;sum+=delayed;});
+    reverbOut[i]=Math.max(-1,Math.min(1,x+sum*reverb*0.24));
+   }
+   work=reverbOut;
+  }
+  return work;
+ });
+ return {channels:finalChannels,sampleRate:rate,duration:finalChannels[0].length/rate};
 }
 function makeWav(rendered){
  var channels=rendered.channels,count=channels[0].length,num=channels.length,bits=16,blockAlign=num*bits/8,dataSize=count*blockAlign,buffer=new ArrayBuffer(44+dataSize),view=new DataView(buffer),offset=0;
