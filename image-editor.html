@@ -60,6 +60,7 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;p
 <div class="group-title">モザイク・トリミング</div>
 <div class="slider-row"><label for="mosaic">モザイクの粗さ</label><output id="mosaic-out">0</output><input id="mosaic" type="range" min="0" max="80" value="0" disabled></div>
 <div class="slider-row"><label for="degrade">画質劣化（ガビガビ）</label><output id="degrade-out">0%</output><input id="degrade" type="range" min="0" max="100" value="0" disabled></div>
+<p class="sub">低解像度化・色数削減・ブロックノイズを組み合わせます。</p>
 <div class="control-grid"><button class="btn" id="mosaic-btn" disabled>モザイク適用 / 解除</button><button class="btn" id="square-btn" disabled>中央を正方形に切り抜く</button></div>
 <p class="sub">モザイクは画像全体に適用します。範囲選択による部分加工には対応していません。</p>
 </div>
@@ -113,7 +114,7 @@ function resetHistory(){history=[captureState()];historyIndex=0;updateHistoryBut
 function restoreHistory(state){
  rotation=state.rotation;flipH=state.flipH;flipV=state.flipV;effect=state.effect;symmetry=state.symmetry;mosaicOn=state.mosaicOn;squareCrop=state.squareCrop;resizeTo=state.resizeTo?{width:state.resizeTo.width,height:state.resizeTo.height}:null;
  Object.keys(state.values).forEach(function(id){$(id).value=state.values[id];});
- updateSliderLabels();render();updateHistoryButtons();
+ updateSliderLabels();$("symmetry-x-out").textContent=$("symmetry-x").value+"%";$("symmetry-y-out").textContent=$("symmetry-y").value+"%";render();updateHistoryButtons();
 }
 function undo(){recordHistory();if(historyIndex>0){historyIndex--;restoreHistory(history[historyIndex]);say("1つ前の編集に戻しました。");}}
 function redo(){recordHistory();if(historyIndex<history.length-1){historyIndex++;restoreHistory(history[historyIndex]);say("編集をやり直しました。");}}
@@ -263,6 +264,8 @@ $("apply-size").addEventListener("click",function(){
  recordHistory();resizeTo={width:w,height:h};$("resize-width").value=w;$("resize-height").value=h;render();recordHistory();say("出力サイズを設定しました。");
 });
 $("clear-size").addEventListener("click",function(){recordHistory();resizeTo=null;$("resize-width").value="";$("resize-height").value="";render();recordHistory();say("元のサイズに戻しました。");});
+function updateExportOptions(){$("quality").disabled=$("format").value==="image/png";$("jpeg-bg").disabled=$("format").value!=="image/jpeg";}
+$("format").addEventListener("change",updateExportOptions);updateExportOptions();
 function makeBlob(){return new Promise(function(resolve){var type=$("format").value,q=Number($("quality").value)/100,output=canvas;if(type==="image/jpeg"){output=document.createElement("canvas");output.width=canvas.width;output.height=canvas.height;var outCtx=output.getContext("2d");outCtx.fillStyle=$("jpeg-bg").value||"#ffffff";outCtx.fillRect(0,0,output.width,output.height);outCtx.drawImage(canvas,0,0);}output.toBlob(function(blob){resolve(blob);},type,q);});}
 $("download-btn").addEventListener("click",async function(){var blob=await makeBlob();if(!blob){say("画像を書き出せませんでした。");return;}var ext=blob.type==="image/jpeg"?"jpg":blob.type==="image/webp"?"webp":"png",a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=safeName(sourceName)+"-edited."+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);say("画像を保存しました。");});
 $("copy-btn").addEventListener("click",async function(){try{if(!navigator.clipboard||!window.ClipboardItem)throw new Error("このブラウザでは画像コピーに対応していません");var blob=await new Promise(function(resolve){canvas.toBlob(resolve,"image/png");});await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);say("PNG画像をクリップボードへコピーしました。");}catch(e){say("コピーできませんでした。HTTPS環境で試すか、画像を保存してください。");}});
