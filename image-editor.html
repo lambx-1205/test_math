@@ -170,12 +170,12 @@ function applyDegrade(){
  var sctx=small.getContext("2d");sctx.imageSmoothingEnabled=true;sctx.drawImage(canvas,0,0,small.width,small.height);
  ctx.clearRect(0,0,w,h);ctx.imageSmoothingEnabled=false;ctx.drawImage(small,0,0,w,h);ctx.imageSmoothingEnabled=true;
  var image=ctx.getImageData(0,0,w,h),d=image.data,levels=Math.max(8,Math.round(256-strength*2.35)),step=255/(levels-1),noiseAmount=strength*0.12;
- for(var y=0;y<h;y++)for(var x=0;x<w;x++){
-  var i=(y*w+x)*4,bx=x>>3,by=y>>3,hash=(bx*374761393+by*668265263)>>>0;hash=((hash^(hash>>>13))*1274126177)>>>0;
+ for(var p=0;p<d.length;p+=4){
+  var pixel=p>>2,x=pixel%w,y=Math.floor(pixel/w),bx=x>>3,by=y>>3,hash=(bx*374761393+by*668265263)>>>0;hash=((hash^(hash>>>13))*1274126177)>>>0;
   var noise=((hash&255)/255-.5)*noiseAmount;
-  d[i]=clamp(Math.round((d[i]+noise)/step)*step);
-  d[i+1]=clamp(Math.round((d[i]+noise)/step)*step);
-  d[i+2]=clamp(Math.round((d[i+2]-noise)/step)*step);
+  d[p]=clamp(Math.round((d[p]+noise)/step)*step);
+  d[p+1]=clamp(Math.round((d[p+1]+noise)/step)*step);
+  d[p+2]=clamp(Math.round((d[p+2]-noise)/step)*step);
  }
  ctx.putImageData(image,0,0);
 }
