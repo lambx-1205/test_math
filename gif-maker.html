@@ -89,7 +89,6 @@ function addFiles(fileList){
 }
 files.addEventListener('change',e=>addFiles(e.target.files));
 $('add').addEventListener('click',()=>files.click());
-drop.addEventListener('click',e=>{if(e.target!==files)files.click();});
 $('clear').addEventListener('click',()=>{frames.forEach(f=>URL.revokeObjectURL(f.url));frames=[];render();});
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
@@ -118,7 +117,7 @@ $('make').addEventListener('click',async()=>{
   if(outputUrl)URL.revokeObjectURL(outputUrl);outputUrl=URL.createObjectURL(blob);
   const img=document.createElement('img');img.src=outputUrl;img.alt='作成したGIF';$('preview').replaceChildren(img);
   $('download').href=outputUrl;$('download').classList.add('show');$('download').textContent='GIFを保存（'+(blob.size/1024).toFixed(1)+' KB）';$('copy').disabled=false;status.textContent='完成しました。 '+w+' × '+h+' px / '+sequence.length+' フレーム';
- }catch(err){console.error(err);status.textContent='作成に失敗しました。画像形式やメモリ容量を確認してください。';}
+ }catch(err){console.error(err);status.textContent='作成に失敗しました：'+(err&&err.message?err.message:'画像形式やメモリ容量を確認してください。');}
  finally{busy=false;$('make').disabled=false;document.body.classList.remove('busy');}
 });
 function blobToDataURL(blob){
