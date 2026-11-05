@@ -72,7 +72,7 @@ function render(){
 function move(i,d){const j=i+d;if(j<0||j>=frames.length)return;[frames[i],frames[j]]=[frames[j],frames[i]];render();}
 function remove(i){URL.revokeObjectURL(frames[i].url);frames.splice(i,1);render();}
 function addFiles(fileList){
- const incoming=Array.from(fileList||[]).filter(file=>file.type.startsWith('image/')||/\\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(file.name));
+ const incoming=Array.from(fileList||[]).filter(file=>file.type.startsWith('image/')||/\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(file.name));
  if(!incoming.length){status.textContent='画像ファイルを選択してください。';files.value='';return;}
  const jobs=incoming.map(file=>new Promise(resolve=>{
   const url=URL.createObjectURL(file), image=new Image();
