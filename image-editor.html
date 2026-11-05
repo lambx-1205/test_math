@@ -51,11 +51,15 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;p
 </div>
 <div class="slider-row"><label for="brightness">明るさ</label><output id="brightness-out">0</output><input id="brightness" type="range" min="-100" max="100" value="0" disabled></div>
 <div class="slider-row"><label for="contrast">コントラスト</label><output id="contrast-out">0</output><input id="contrast" type="range" min="-100" max="100" value="0" disabled></div>
+<div class="slider-row"><label for="saturation">彩度</label><output id="saturation-out">0</output><input id="saturation" type="range" min="-100" max="100" value="0" disabled></div>
+<div class="slider-row"><label for="hue">色相</label><output id="hue-out">0°</output><input id="hue" type="range" min="-180" max="180" value="0" disabled></div>
 <div class="slider-row"><label for="blur">ぼかし</label><output id="blur-out">0</output><input id="blur" type="range" min="0" max="12" value="0" step="0.5" disabled></div>
+<div class="slider-row"><label for="sharpness">シャープネス</label><output id="sharpness-out">0</output><input id="sharpness" type="range" min="0" max="100" value="0" disabled></div>
 </div>
 <div class="group">
 <div class="group-title">モザイク・トリミング</div>
 <div class="slider-row"><label for="mosaic">モザイクの粗さ</label><output id="mosaic-out">0</output><input id="mosaic" type="range" min="0" max="80" value="0" disabled></div>
+<div class="slider-row"><label for="degrade">画質劣化（ガビガビ）</label><output id="degrade-out">0%</output><input id="degrade" type="range" min="0" max="100" value="0" disabled></div>
 <div class="control-grid"><button class="btn" id="mosaic-btn" disabled>モザイク適用 / 解除</button><button class="btn" id="square-btn" disabled>中央を正方形に切り抜く</button></div>
 <p class="sub">モザイクは画像全体に適用します。範囲選択による部分加工には対応していません。</p>
 </div>
@@ -64,6 +68,7 @@ a{color:inherit;text-decoration:none}.shell{width:min(1180px,100%);margin:auto;p
 <div class="field-row"><div class="field"><label for="resize-width">出力幅（px）</label><input id="resize-width" type="number" min="1" max="12000" placeholder="元の幅"></div><div class="field"><label for="resize-height">出力高さ（px）</label><input id="resize-height" type="number" min="1" max="12000" placeholder="元の高さ"></div></div>
 <label class="checkline"><input type="checkbox" id="keep-ratio" checked> 幅に合わせて縦横比を維持</label>
 <div class="field-row"><div class="field"><label for="format">保存形式</label><select id="format"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option></select></div><div class="field"><label for="quality">JPEG / WebP 品質</label><input id="quality" type="range" min="10" max="100" value="92"></div></div>
+<div class="field" style="margin:9px 0"><label for="jpeg-bg">JPEG保存時の背景色</label><input id="jpeg-bg" type="color" value="#ffffff"></div>
 <div class="actions"><button class="btn primary" id="apply-size" disabled>サイズを反映</button><button class="btn" id="clear-size" disabled>サイズを元に戻す</button></div>
 </div>
 <div class="notice">注意：編集後の画像は新しい画像として書き出されます。透明部分のある画像をJPEGで保存すると、透明部分は白くなります。元ファイルは変更されません。</div>
@@ -79,7 +84,7 @@ var source=null,sourceUrl=null,sourceName="image",rotation=0,flipH=false,flipV=f
 var canvas=$("preview"),ctx=canvas.getContext("2d",{willReadFrequently:true}),busy=false;
 var controls=Array.prototype.slice.call(document.querySelectorAll("button[data-op],button[data-effect]"));
 function say(message){$("status").textContent=message;}
-function setEnabled(enabled){$("download-btn").disabled=!enabled;$("copy-btn").disabled=!enabled;$("reset-btn").disabled=!enabled;document.querySelectorAll("[data-op],[data-effect],#brightness,#contrast,#blur,#mosaic,#symmetry-x,#symmetry-y,#mosaic-btn,#square-btn,#apply-size,#clear-size").forEach(function(el){el.disabled=!enabled;});}
+function setEnabled(enabled){$("download-btn").disabled=!enabled;$("copy-btn").disabled=!enabled;$("reset-btn").disabled=!enabled;document.querySelectorAll("[data-op],[data-effect],#brightness,#contrast,#saturation,#hue,#blur,#sharpness,#mosaic,#degrade,#symmetry-x,#symmetry-y,#mosaic-btn,#square-btn,#apply-size,#clear-size").forEach(function(el){el.disabled=!enabled;});}
 function safeName(name){return (name||"image").replace(/\.[^.]+$/,"").replace(/[\\/:*?"<>|]/g,"_").slice(0,80)||"image";}
 function loadFile(file){
  if(!file||!file.type||file.type.indexOf("image/")!==0){say("画像ファイルを選択してください。");return;}
