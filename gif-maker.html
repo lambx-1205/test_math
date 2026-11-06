@@ -8,7 +8,7 @@
 <style>
 :root{color-scheme:light;--ink:#182230;--muted:#657187;--line:#e1e7f0;--panel:#fff;--canvas:#f5f7fb;--accent:#4658d8;--soft:#eef0ff;--shadow:0 12px 34px rgba(28,43,77,.06)}
 *{box-sizing:border-box}body{margin:0;min-width:320px;background:radial-gradient(ellipse at 8% 0%,rgba(70,88,216,.08),transparent 34rem),var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(1120px,100%);margin:auto;padding:25px 24px 42px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.back{color:var(--muted);font-size:13px}.brand{font-weight:800;font-size:18px}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,.8fr);gap:18px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:var(--shadow)}h1{font-size:25px;margin:0 0 6px;letter-spacing:-.04em}.sub{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:1.7}.drop{position:relative;display:grid;place-items:center;min-height:125px;border:1.5px dashed #bfc8dc;border-radius:12px;background:#fafbff;text-align:center;padding:18px;cursor:pointer}.drop.drag{border-color:var(--accent);background:var(--soft)}.drop strong{display:block;margin-bottom:5px}.drop small{color:var(--muted)}.drop input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}.btn{border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn:disabled{opacity:.4;cursor:not-allowed}.frames{display:grid;gap:8px;margin-top:13px}.frame{display:grid;grid-template-columns:54px minmax(0,1fr) 90px auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px}.frame img{width:54px;height:48px;object-fit:contain;background:#f3f5f9;border-radius:6px}.fname{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frame label{font-size:10px;color:var(--muted)}.frame input{width:100%;margin-top:3px;padding:5px;border:1px solid var(--line);border-radius:6px;font-size:12px}.frame-actions{display:flex;gap:3px}.iconbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 7px;font-size:11px}.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.field{display:grid;gap:6px;margin:0 0 14px}.field>label{font-size:12px;font-weight:750}.field input[type=number],.field select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}.check{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:12px}.hint{font-size:11px;color:var(--muted);line-height:1.7}.preview{margin-top:16px;border:1px solid var(--line);border-radius:12px;min-height:180px;display:grid;place-items:center;padding:12px;background:repeating-conic-gradient(#f1f3f7 0% 25%,#fff 0% 50%) 50%/18px 18px}.preview img{max-width:100%;max-height:420px;object-fit:contain}.status{min-height:20px;margin:10px 0;color:var(--muted);font-size:11px}.download{display:none;margin-top:10px}.download.show{display:inline-flex}.output-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.output-actions .btn{margin:0}.busy{opacity:.6;pointer-events:none}@media(max-width:800px){.layout{grid-template-columns:1fr}.shell{padding:18px 13px 32px}}@media(max-width:470px){.panel{padding:14px}.frame{grid-template-columns:44px minmax(0,1fr) 76px}.frame img{width:44px;height:42px}.frame-actions{grid-column:2/-1;justify-content:flex-end}.frame label{font-size:9px}}
+button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(1120px,100%);margin:auto;padding:25px 24px 42px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.back{color:var(--muted);font-size:13px}.brand{font-weight:800;font-size:18px}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,.8fr);gap:18px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:var(--shadow)}h1{font-size:25px;margin:0 0 6px;letter-spacing:-.04em}.sub{margin:0 0 18px;color:var(--muted);font-size:12px;line-height:1.7}.drop{position:relative;display:grid;place-items:center;min-height:125px;border:1.5px dashed #bfc8dc;border-radius:12px;background:#fafbff;text-align:center;padding:18px;cursor:pointer}.drop.drag{border-color:var(--accent);background:var(--soft)}.drop strong{display:block;margin-bottom:5px}.drop small{color:var(--muted)}.drop input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}.btn{border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn:disabled{opacity:.4;cursor:not-allowed}.frames{display:grid;gap:8px;margin-top:13px}.frame{display:grid;grid-template-columns:54px minmax(0,1fr) 90px auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px}.frame img{width:54px;height:48px;object-fit:contain;background:#f3f5f9;border-radius:6px}.fname{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frame label{font-size:10px;color:var(--muted)}.frame input{width:100%;margin-top:3px;padding:5px;border:1px solid var(--line);border-radius:6px;font-size:12px}.frame-actions{display:flex;gap:3px}.iconbtn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 7px;font-size:11px}.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.field{display:grid;gap:6px;margin:0 0 14px}.field>label{font-size:12px;font-weight:750}.field input[type=number],.field select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}.field input[type=range]{width:100%;accent-color:var(--accent)}.field output{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums}.effect-info{margin:-4px 0 14px;padding:10px 11px;border-radius:9px;background:#f6f7ff;color:#59637a;font-size:11px;line-height:1.65}.check{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:12px}.hint{font-size:11px;color:var(--muted);line-height:1.7}.preview{margin-top:16px;border:1px solid var(--line);border-radius:12px;min-height:180px;display:grid;place-items:center;padding:12px;background:repeating-conic-gradient(#f1f3f7 0% 25%,#fff 0% 50%) 50%/18px 18px}.preview img{max-width:100%;max-height:420px;object-fit:contain}.status{min-height:20px;margin:10px 0;color:var(--muted);font-size:11px}.download{display:none;margin-top:10px}.download.show{display:inline-flex}.output-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.output-actions .btn{margin:0}.busy{opacity:.6;pointer-events:none}@media(max-width:800px){.layout{grid-template-columns:1fr}.shell{padding:18px 13px 32px}}@media(max-width:470px){.panel{padding:14px}.frame{grid-template-columns:44px minmax(0,1fr) 76px}.frame img{width:44px;height:42px}.frame-actions{grid-column:2/-1;justify-content:flex-end}.frame label{font-size:9px}}
 </style>
 </head>
 <body>
@@ -27,6 +27,12 @@ button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(1120px,1
 <div class="field"><label for="height">高さ（px）</label><input id="height" type="number" min="16" max="1600" value="480"></div>
 <div class="field"><label for="fit">画像の配置</label><select id="fit"><option value="contain">全体を表示（余白あり）</option><option value="cover">枠いっぱいに表示（端を切り取り）</option><option value="stretch">縦横比を無視して引き伸ばす</option></select></div>
 <div class="field"><label for="repeat">ループ</label><select id="repeat"><option value="0">無限ループ</option><option value="1">1回</option><option value="2">2回</option><option value="3">3回</option><option value="5">5回</option></select></div>
+<div class="field"><label for="effect">特殊効果</label><select id="effect">
+<option value="none">なし（通常の画像切替）</option><option value="gaming">ゲーミング（RGBネオン）</option><option value="sparkle">ピカピカ（星と光のきらめき）</option><option value="glitch">グリッチ（画面の乱れ）</option><option value="rainbow">レインボー（色相が循環）</option><option value="pulse">脈動ズーム（拡大・縮小）</option><option value="vhs">レトロTV（走査線・ノイズ）</option>
+</select></div>
+<p class="effect-info" id="effectInfo">特殊効果なし。選択した画像を順番に切り替えます。</p>
+<div class="field"><label for="intensity">効果の強さ <output id="intensityOut">70%</output></label><input id="intensity" type="range" min="10" max="100" step="5" value="70"></div>
+<div class="field"><label for="effectSpeed">効果の速さ <output id="effectSpeedOut">100%</output></label><input id="effectSpeed" type="range" min="25" max="200" step="5" value="100"></div>
 <label class="check"><input id="reverse" type="checkbox">逆順で再生</label>
 <label class="check"><input id="pingpong" type="checkbox">往復再生（最後から逆戻り）</label>
 <p class="hint">各画像の表示時間はフレームごとに設定できます。GIFの仕様上、時間はおおむね10ms単位に丸められます。</p>
@@ -62,15 +68,15 @@ function render(){
   const img=document.createElement('img');img.src=f.url;img.alt='';
   const name=document.createElement('div');name.className='fname';name.textContent=f.file.name;
   const time=document.createElement('label');time.textContent='表示時間 (ms)';
-  const input=document.createElement('input');input.type='number';input.min='20';input.max='10000';input.step='10';input.value=f.delay;input.setAttribute('aria-label',f.file.name+'の表示時間');input.addEventListener('change',()=>{f.delay=Math.max(20,Math.min(10000,Number(input.value)||100));input.value=f.delay;});
+  const input=document.createElement('input');input.type='number';input.min='20';input.max='10000';input.step='10';input.value=f.delay;input.setAttribute('aria-label',f.file.name+'の表示時間');input.addEventListener('change',()=>{f.delay=Math.max(20,Math.min(10000,Number(input.value)||100));input.value=f.delay;invalidateOutput();});
   time.append(input);
   const actions=document.createElement('div');actions.className='frame-actions';
   [['↑',()=>move(i,-1),'先頭へ移動'],['↓',()=>move(i,1),'後ろへ移動'],['×',()=>remove(i),'削除']].forEach(([label,fn,title])=>{const b=document.createElement('button');b.type='button';b.className='iconbtn';b.textContent=label;b.title=title;b.disabled=(label==='↑'&&i===0)||(label==='↓'&&i===frames.length-1);b.addEventListener('click',fn);actions.append(b);});
   row.append(img,name,time,actions);list.append(row);
  });
 }
-function move(i,d){const j=i+d;if(j<0||j>=frames.length)return;[frames[i],frames[j]]=[frames[j],frames[i]];render();}
-function remove(i){URL.revokeObjectURL(frames[i].url);frames.splice(i,1);render();}
+function move(i,d){const j=i+d;if(j<0||j>=frames.length)return;[frames[i],frames[j]]=[frames[j],frames[i]];render();invalidateOutput();}
+function remove(i){URL.revokeObjectURL(frames[i].url);frames.splice(i,1);render();invalidateOutput();}
 function addFiles(fileList){
  const incoming=Array.from(fileList||[]).filter(file=>file.type.startsWith('image/')||/\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(file.name));
  if(!incoming.length){status.textContent='画像ファイルを選択してください。';files.value='';return;}
@@ -82,21 +88,68 @@ function addFiles(fileList){
  }));
  Promise.all(jobs).then(loaded=>{
   const valid=loaded.filter(Boolean);
-  frames.push(...valid);render();
+  frames.push(...valid);render();if(valid.length)invalidateOutput();
   status.textContent=valid.length+'枚の画像を追加しました。'+(valid.length<incoming.length?' 一部の画像を読み込めませんでした。':'');
  });
  files.value='';
 }
 files.addEventListener('change',e=>addFiles(e.target.files));
 $('add').addEventListener('click',()=>files.click());
-$('clear').addEventListener('click',()=>{frames.forEach(f=>URL.revokeObjectURL(f.url));frames=[];render();});
+function bindRange(id,out,suffix){const el=$(id),label=$(out),fn=()=>{label.textContent=el.value+suffix;invalidateOutput();};el.addEventListener('input',fn);label.textContent=el.value+suffix;}
+bindRange('intensity','intensityOut','%');bindRange('effectSpeed','effectSpeedOut','%');
+$('effect').addEventListener('change',()=>{updateEffectInfo();invalidateOutput();});
+['width','height','fit','repeat','reverse','pingpong'].forEach(id=>$(id).addEventListener('change',invalidateOutput));
+updateEffectInfo();
+$('clear').addEventListener('click',()=>{frames.forEach(f=>URL.revokeObjectURL(f.url));frames=[];render();invalidateOutput();});
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
 drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
-function drawFrame(frame,w,h,fit){
- const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const c=canvas.getContext('2d',{willReadFrequently:true});
- c.fillStyle='#fff';c.fillRect(0,0,w,h);
- const im=new Image();return new Promise((resolve,reject)=>{im.onload=()=>{let dw=w,dh=h,dx=0,dy=0;const sx=w/im.naturalWidth,sy=h/im.naturalHeight;if(fit==='contain'){const s=Math.min(sx,sy);dw=im.naturalWidth*s;dh=im.naturalHeight*s;dx=(w-dw)/2;dy=(h-dh)/2;}else if(fit==='cover'){const s=Math.max(sx,sy);dw=im.naturalWidth*s;dh=im.naturalHeight*s;dx=(w-dw)/2;dy=(h-dh)/2;}c.drawImage(im,dx,dy,dw,dh);resolve(c.getImageData(0,0,w,h));};im.onerror=reject;im.src=frame.url;});
+function fitImage(ctx,img,w,h,fit,scale=1,ox=0,oy=0,rotation=0){
+ let dw=w,dh=h;
+ if(fit!=='stretch'){const s=(fit==='cover'?Math.max(w/img.naturalWidth,h/img.naturalHeight):Math.min(w/img.naturalWidth,h/img.naturalHeight))*scale;dw=img.naturalWidth*s;dh=img.naturalHeight*s;}else{dw*=scale;dh*=scale;}
+ ctx.save();ctx.translate(w/2+ox,h/2+oy);ctx.rotate(rotation);ctx.drawImage(img,-dw/2,-dh/2,dw,dh);ctx.restore();
+}
+function rand(i,s=0){const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
+function scanlines(ctx,w,h,alpha,spacing){ctx.save();ctx.fillStyle='rgba(0,0,0,'+alpha+')';for(let y=0;y<h;y+=spacing)ctx.fillRect(0,y,w,1);ctx.restore();}
+function sparkles(ctx,w,h,phase,power){
+ for(let i=0,n=18+Math.round(power*24);i<n;i++){
+  const x=rand(i,2)*w,y=rand(i,5)*h,tw=(Math.sin(phase*Math.PI*2*(1.2+rand(i,8)*1.8)+i*2.17)+1)/2,alpha=(.12+.88*tw)*power;
+  if(alpha<.22)continue;const r=1.2+rand(i,12)*(2.5+power*2.5);
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=i%4===0?'#9ffaff':'#fff8c9';ctx.fillStyle='#fff';ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=5+r*3;ctx.lineWidth=Math.max(1,r*.45);
+  ctx.beginPath();ctx.moveTo(x-r*2.4,y);ctx.lineTo(x+r*2.4,y);ctx.moveTo(x,y-r*2.4);ctx.lineTo(x,y+r*2.4);ctx.stroke();ctx.beginPath();ctx.arc(x,y,Math.max(.7,r*.42),0,Math.PI*2);ctx.fill();ctx.restore();
+ }
+}
+function drawEffectFrame(img,w,h,fit,effect,phase,intensity){
+ const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const c=canvas.getContext('2d',{willReadFrequently:true}),p=Math.max(.1,Math.min(1,intensity/100));
+ c.fillStyle=(effect==='gaming'||effect==='vhs'||effect==='glitch')?'#080b19':'#fff';c.fillRect(0,0,w,h);
+ if(effect==='none')fitImage(c,img,w,h,fit);
+ if(effect==='gaming'){
+  c.filter='saturate('+(1.45+p*.9)+') contrast(1.08) brightness(1.04)';fitImage(c,img,w,h,fit);
+  c.globalCompositeOperation='screen';c.globalAlpha=.23*p;c.filter='hue-rotate(125deg) saturate(2.2)';fitImage(c,img,w,h,fit,1,-(2+p*5),0);
+  c.globalAlpha=.2*p;c.filter='hue-rotate(285deg) saturate(2.2)';fitImage(c,img,w,h,fit,1,2+p*5,0);
+  c.filter='none';c.globalAlpha=1;c.globalCompositeOperation='source-over';scanlines(c,w,h,.12+p*.1,4);
+  const y=((phase*1.35)%1)*h,g=c.createLinearGradient(0,y-5,0,y+5);g.addColorStop(0,'rgba(0,255,255,0)');g.addColorStop(.5,'rgba(0,245,255,'+(.28*p)+')');g.addColorStop(1,'rgba(255,0,220,0)');c.fillStyle=g;c.fillRect(0,y-5,w,10);
+ }
+ if(effect==='sparkle'){fitImage(c,img,w,h,fit);sparkles(c,w,h,phase,p);}
+ if(effect==='glitch'){
+  const base=document.createElement('canvas');base.width=w;base.height=h;const bc=base.getContext('2d');bc.fillStyle='#080b19';bc.fillRect(0,0,w,h);fitImage(bc,img,w,h,fit);c.drawImage(base,0,0);
+  c.save();c.globalCompositeOperation='screen';c.globalAlpha=.18*p;c.filter='hue-rotate(150deg) saturate(2)';fitImage(c,img,w,h,fit,1,-3-p*5,0);c.filter='hue-rotate(300deg) saturate(2)';fitImage(c,img,w,h,fit,1,3+p*5,0);c.restore();
+  for(let i=0,n=3+Math.round(p*8);i<n;i++){const y=Math.floor(rand(i,Math.floor(phase*20)+4)*h),bh=Math.max(2,Math.floor(2+rand(i,9)*h*.025)),shift=Math.sin(phase*Math.PI*2*(1+i%3)+i)*p*(4+w*.035);c.drawImage(base,0,y,w,bh,shift,y,w,bh);c.fillStyle=i%2?'rgba(0,255,255,.28)':'rgba(255,0,140,.25)';c.fillRect(0,y,w,Math.max(1,bh*.18));}
+  c.fillStyle='rgba(255,255,255,'+(.06*p)+')';c.fillRect(0,Math.floor(phase*h),w,1+Math.floor(p*2));
+ }
+ if(effect==='rainbow'){c.filter='hue-rotate('+Math.round(phase*360)+'deg) saturate('+(1.35+p*.8)+')';fitImage(c,img,w,h,fit);c.filter='none';const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(255,0,120,'+(.12*p)+')');g.addColorStop(.32,'rgba(255,220,0,'+(.1*p)+')');g.addColorStop(.65,'rgba(0,220,255,'+(.12*p)+')');g.addColorStop(1,'rgba(150,0,255,'+(.12*p)+')');c.fillStyle=g;c.fillRect(0,0,w,h);}
+ if(effect==='pulse'){const wave=(Math.sin(phase*Math.PI*2)+1)/2;c.save();c.shadowColor='rgba(100,130,255,'+(.28*p)+')';c.shadowBlur=12+p*24;fitImage(c,img,w,h,fit,1+wave*.13*p,0,0,Math.sin(phase*Math.PI*2)*.012*p);c.restore();c.strokeStyle='rgba(120,145,255,'+(.18+.28*wave*p)+')';c.lineWidth=1+p*3;c.strokeRect(c.lineWidth/2,c.lineWidth/2,w-c.lineWidth,h-c.lineWidth);}
+ if(effect==='vhs'){c.filter='saturate(.82) contrast(1.12)';fitImage(c,img,w,h,fit);c.filter='none';c.save();c.globalCompositeOperation='screen';c.globalAlpha=.13*p;c.filter='hue-rotate(170deg)';fitImage(c,img,w,h,fit,1,-2-p*3,0);c.filter='hue-rotate(300deg)';fitImage(c,img,w,h,fit,1,2+p*3,0);c.restore();scanlines(c,w,h,.2,3);const y=((phase*1.7)%1)*h;c.fillStyle='rgba(190,220,255,'+(.12*p)+')';c.fillRect(0,y,w,2+p*5);c.fillStyle='rgba(255,255,255,'+(.08*p)+')';for(let i=0,n=Math.round(35*p);i<n;i++)c.fillRect(rand(i,Math.floor(phase*50)+7)*w,rand(i,11)*h,1+p*2,1);}
+ return c.getImageData(0,0,w,h);
+}
+function loadFrameImage(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('画像を読み込めませんでした。'));im.src=url;});}
+function updateEffectInfo(){
+ const text={none:'特殊効果なし。画像を順番に切り替えます。',gaming:'シアン・マゼンタのRGBずれ、ネオン光、走査線を重ねます。',sparkle:'星形の光がランダムにきらめきます。',glitch:'横方向のズレ、色の分離、ノイズでデジタルな乱れを作ります。',rainbow:'画像の色相が虹のように循環します。',pulse:'画像がリズムに合わせて拡大・縮小し、縁が発光します。',vhs:'古いビデオ風の色ずれ、走査線、ノイズを加えます.'};
+ $('effectInfo').textContent=text[$('effect').value]||text.none;
+}
+function invalidateOutput(){
+ outputBlob=null;if(outputUrl){URL.revokeObjectURL(outputUrl);outputUrl=null;}
+ $('download').classList.remove('show');$('copy').disabled=true;$('preview').innerHTML='<span class="hint">設定が変更されました。GIFを再作成してください。</span>';
 }
 $('make').addEventListener('click',async()=>{
  if(busy)return;if(!frames.length){status.textContent='先に画像を1枚以上追加してください。';return;}
@@ -107,16 +160,22 @@ $('make').addEventListener('click',async()=>{
   const {GIFEncoder,quantize,applyPalette}=await loadGifEncoder();
   status.textContent='GIFを生成しています…';
   const sequence=frames.slice();if($('reverse').checked)sequence.reverse();if($('pingpong').checked&&sequence.length>1)sequence.push(...sequence.slice(0,-1).reverse());
-  const enc=GIFEncoder();const fit=$('fit').value;const repeat=Number($('repeat').value);
+  const effect=$('effect').value,intensity=Number($('intensity').value),speed=Number($('effectSpeed').value)/100;
+  const enc=GIFEncoder(),fit=$('fit').value,repeat=Number($('repeat').value),loaded=await Promise.all(sequence.map(f=>loadFrameImage(f.url)));
+  const maxSteps=Math.min(8,Math.max(1,Math.floor(120/sequence.length)));
+  const totalSteps=sequence.reduce((n,f)=>n+(effect==='none'?1:Math.min(maxSteps,Math.max(1,Math.floor(f.delay/40)))),0);let done=0;
   for(let i=0;i<sequence.length;i++){
-   status.textContent='フレームを処理中… '+(i+1)+' / '+sequence.length;
-   const image=await drawFrame(sequence[i],w,h,fit);const palette=quantize(image.data,256);const indexed=applyPalette(image.data,palette);
-   enc.writeFrame(indexed,w,h,{palette,delay:Math.max(20,Math.round(sequence[i].delay/10)*10),repeat:i===0?repeat:undefined});
+   const frame=sequence[i],steps=effect==='none'?1:Math.min(maxSteps,Math.max(1,Math.floor(frame.delay/40))),delay=Math.max(20,Math.round((frame.delay/steps)/10)*10);
+   for(let step=0;step<steps;step++){
+    done++;status.textContent='効果フレームを生成中… '+done+' / '+totalSteps;if(done%3===0)await new Promise(resolve=>requestAnimationFrame(resolve));
+    const phase=((step/steps)*speed)%1,image=drawEffectFrame(loaded[i],w,h,fit,effect,phase,intensity),palette=quantize(image.data,256),indexed=applyPalette(image.data,palette);
+    enc.writeFrame(indexed,w,h,{palette,delay,repeat:done===1?repeat:undefined});
+   }
   }
-  enc.finish();const blob=new Blob([enc.bytes()],{type:'image/gif'});
+  enc.finish();const blob=new Blob([enc.bytes()],{type:'image/gif'});outputBlob=blob;
   if(outputUrl)URL.revokeObjectURL(outputUrl);outputUrl=URL.createObjectURL(blob);
   const img=document.createElement('img');img.src=outputUrl;img.alt='作成したGIF';$('preview').replaceChildren(img);
-  $('download').href=outputUrl;$('download').classList.add('show');$('download').textContent='GIFを保存（'+(blob.size/1024).toFixed(1)+' KB）';$('copy').disabled=false;status.textContent='完成しました。 '+w+' × '+h+' px / '+sequence.length+' フレーム';
+  $('download').href=outputUrl;$('download').classList.add('show');$('download').textContent='GIFを保存（'+(blob.size/1024).toFixed(1)+' KB）';$('copy').disabled=false;status.textContent='完成しました。 '+w+' × '+h+' px / '+totalSteps+' フレーム';
  }catch(err){console.error(err);status.textContent='作成に失敗しました：'+(err&&err.message?err.message:'画像形式やメモリ容量を確認してください。');}
  finally{busy=false;$('make').disabled=false;document.body.classList.remove('busy');}
 });
