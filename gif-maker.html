@@ -28,7 +28,7 @@ button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(1120px,1
 <div class="field"><label for="fit">画像の配置</label><select id="fit"><option value="contain">全体を表示（余白あり）</option><option value="cover">枠いっぱいに表示（端を切り取り）</option><option value="stretch">縦横比を無視して引き伸ばす</option></select></div>
 <div class="field"><label for="repeat">ループ</label><select id="repeat"><option value="0">無限ループ</option><option value="1">1回</option><option value="2">2回</option><option value="3">3回</option><option value="5">5回</option></select></div>
 <div class="field"><label for="effect">特殊効果</label><select id="effect">
-<option value="none">なし（通常の画像切替）</option><option value="gaming">ゲーミング（RGBネオン）</option><option value="sparkle">ピカピカ（星と光のきらめき）</option><option value="glitch">グリッチ（画面の乱れ）</option><option value="rainbow">レインボー（色相が循環）</option><option value="pulse">脈動ズーム（拡大・縮小）</option><option value="vhs">レトロTV（走査線・ノイズ）</option>
+<option value="none">なし（通常の画像切替）</option><option value="gaming">ゲーミング（RGBネオン）</option><option value="sparkle">ピカピカ（星と光のきらめき）</option><option value="glitch">グリッチ（画面の乱れ）</option><option value="rainbow">レインボー（色相が循環）</option><option value="pulse">脈動ズーム（拡大・縮小）</option><option value="vhs">レトロTV（走査線・ノイズ）</option><option value="snow">雪・きらきら（雪が舞う）</option><option value="confetti">紙吹雪（カラフルな紙片）</option><option value="bubbles">しゃぼん玉（泡が浮かぶ）</option>
 </select></div>
 <p class="effect-info" id="effectInfo">特殊効果なし。選択した画像を順番に切り替えます。</p>
 <div class="field"><label for="intensity">効果の強さ <output id="intensityOut">70%</output></label><input id="intensity" type="range" min="10" max="100" step="5" value="70"></div>
@@ -140,11 +140,39 @@ function drawEffectFrame(img,w,h,fit,effect,phase,intensity){
  if(effect==='rainbow'){c.filter='hue-rotate('+Math.round(phase*360)+'deg) saturate('+(1.35+p*.8)+')';fitImage(c,img,w,h,fit);c.filter='none';const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(255,0,120,'+(.12*p)+')');g.addColorStop(.32,'rgba(255,220,0,'+(.1*p)+')');g.addColorStop(.65,'rgba(0,220,255,'+(.12*p)+')');g.addColorStop(1,'rgba(150,0,255,'+(.12*p)+')');c.fillStyle=g;c.fillRect(0,0,w,h);}
  if(effect==='pulse'){const wave=(Math.sin(phase*Math.PI*2)+1)/2;c.save();c.shadowColor='rgba(100,130,255,'+(.28*p)+')';c.shadowBlur=12+p*24;fitImage(c,img,w,h,fit,1+wave*.13*p,0,0,Math.sin(phase*Math.PI*2)*.012*p);c.restore();c.strokeStyle='rgba(120,145,255,'+(.18+.28*wave*p)+')';c.lineWidth=1+p*3;c.strokeRect(c.lineWidth/2,c.lineWidth/2,w-c.lineWidth,h-c.lineWidth);}
  if(effect==='vhs'){c.filter='saturate(.82) contrast(1.12)';fitImage(c,img,w,h,fit);c.filter='none';c.save();c.globalCompositeOperation='screen';c.globalAlpha=.13*p;c.filter='hue-rotate(170deg)';fitImage(c,img,w,h,fit,1,-2-p*3,0);c.filter='hue-rotate(300deg)';fitImage(c,img,w,h,fit,1,2+p*3,0);c.restore();scanlines(c,w,h,.2,3);const y=((phase*1.7)%1)*h;c.fillStyle='rgba(190,220,255,'+(.12*p)+')';c.fillRect(0,y,w,2+p*5);c.fillStyle='rgba(255,255,255,'+(.08*p)+')';for(let i=0,n=Math.round(35*p);i<n;i++)c.fillRect(rand(i,Math.floor(phase*50)+7)*w,rand(i,11)*h,1+p*2,1);}
+ if(effect==='snow'){
+  fitImage(c,img,w,h,fit);
+  for(let i=0,n=35+Math.round(p*55);i<n;i++){
+   const depth=.35+rand(i,14)*.9,x=rand(i,1)*w+Math.sin(phase*Math.PI*2*(.7+depth)+i)*w*.025*depth;
+   const y=((rand(i,4)+phase*(.35+depth*.65))%1.12)*h-h*.06;
+   const r=.7+depth*(1.2+p*1.8);
+   c.save();c.globalAlpha=(.25+depth*.55)*p;c.fillStyle='#fff';c.shadowColor='#d9f7ff';c.shadowBlur=2+r*3;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore();
+  }
+ }
+ if(effect==='confetti'){
+  fitImage(c,img,w,h,fit);
+  for(let i=0,n=24+Math.round(p*52);i<n;i++){
+   const depth=.45+rand(i,7)*.9,x=rand(i,2)*w+Math.sin(phase*Math.PI*2+ i)*w*.025;
+   const y=((rand(i,3)+phase*(.55+depth*.55))%1.18)*h-h*.08;
+   const rw=2+rand(i,8)*(3+p*5),rh=2+rand(i,9)*(5+p*7),angle=phase*Math.PI*2*(1+rand(i,10)*2)+i*1.7;
+   c.save();c.translate(x,y);c.rotate(angle);c.globalAlpha=(.45+depth*.45)*p;c.fillStyle='hsl('+Math.round(rand(i,12)*360)+' 95% 62%)';c.shadowColor=c.fillStyle;c.shadowBlur=3*p;c.fillRect(-rw/2,-rh/2,rw,rh);c.restore();
+  }
+ }
+ if(effect==='bubbles'){
+  fitImage(c,img,w,h,fit);
+  for(let i=0,n=14+Math.round(p*22);i<n;i++){
+   const x=rand(i,17)*w+Math.sin(phase*Math.PI*2+i)*w*.012;
+   const y=h-((rand(i,18)+phase*(.32+rand(i,19)*.45))%1.18)*h;
+   const r=2+rand(i,20)*(4+p*10);
+   c.save();c.globalAlpha=(.2+rand(i,21)*.35)*p;c.lineWidth=1+p*.8;c.strokeStyle='#c8fbff';c.fillStyle='rgba(180,240,255,.09)';c.shadowColor='#a9f5ff';c.shadowBlur=4+p*5;
+   c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.stroke();c.globalAlpha*=.9;c.fillStyle='#fff';c.beginPath();c.ellipse(x-r*.3,y-r*.35,Math.max(.7,r*.18),Math.max(.5,r*.32),-.5,0,Math.PI*2);c.fill();c.restore();
+  }
+ }
  return c.getImageData(0,0,w,h);
 }
 function loadFrameImage(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('画像を読み込めませんでした。'));im.src=url;});}
 function updateEffectInfo(){
- const text={none:'特殊効果なし。画像を順番に切り替えます。',gaming:'シアン・マゼンタのRGBずれ、ネオン光、走査線を重ねます。',sparkle:'星形の光がランダムにきらめきます。',glitch:'横方向のズレ、色の分離、ノイズでデジタルな乱れを作ります。',rainbow:'画像の色相が虹のように循環します。',pulse:'画像がリズムに合わせて拡大・縮小し、縁が発光します。',vhs:'古いビデオ風の色ずれ、走査線、ノイズを加えます.'};
+ const text={none:'特殊効果なし。画像を順番に切り替えます。',gaming:'シアン・マゼンタのRGBずれ、ネオン光、走査線を重ねます。',sparkle:'星形の光がランダムにきらめきます。',glitch:'横方向のズレ、色の分離、ノイズでデジタルな乱れを作ります。',rainbow:'画像の色相が虹のように循環します。',pulse:'画像がリズムに合わせて拡大・縮小し、縁が発光します。',vhs:'古いビデオ風の色ずれ、走査線、ノイズを加えます.',snow:'大小の雪が手前と奥で速度を変えながら舞い、淡く光ります。',confetti:'色とりどりの紙片が回転しながら画面を横切ります。',bubbles:'透明感のある泡がゆっくり上昇し、光の反射が揺らめきます。'};
  $('effectInfo').textContent=text[$('effect').value]||text.none;
 }
 function invalidateOutput(){
