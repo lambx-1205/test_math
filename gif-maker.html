@@ -162,13 +162,17 @@ $('make').addEventListener('click',async()=>{
   const sequence=frames.slice();if($('reverse').checked)sequence.reverse();if($('pingpong').checked&&sequence.length>1)sequence.push(...sequence.slice(0,-1).reverse());
   const effect=$('effect').value,intensity=Number($('intensity').value),speed=Number($('effectSpeed').value)/100;
   const enc=GIFEncoder(),fit=$('fit').value,repeat=Number($('repeat').value),loaded=await Promise.all(sequence.map(f=>loadFrameImage(f.url)));
-  const maxSteps=Math.min(8,Math.max(1,Math.floor(120/sequence.length)));
+  const frameBudget=Math.max(1,Math.min(120,Math.floor(60000000/(w*h))));
+  if(sequence.length>frameBudget)throw new Error('画像枚数に対して出力サイズが大きすぎます。幅・高さを小さくするか、画像枚数を減らしてください。');
+  const maxSteps=Math.min(8,Math.max(1,Math.floor(frameBudget/sequence.length)));
   const totalSteps=sequence.reduce((n,f)=>n+(effect==='none'?1:Math.min(maxSteps,Math.max(1,Math.floor(f.delay/40)))),0);let done=0;
   for(let i=0;i<sequence.length;i++){
-   const frame=sequence[i],steps=effect==='none'?1:Math.min(maxSteps,Math.max(1,Math.floor(frame.delay/40))),delay=Math.max(20,Math.round((frame.delay/steps)/10)*10);
+   const frame=sequence[i],steps=effect==='none'?1:Math.min(maxSteps,Math.max(1,Math.floor(frame.delay/40)));
+   const frameDelay=effect==='none'?frame.delay:frame.delay/steps/speed;
+   const delay=Math.max(20,Math.round(frameDelay/10)*10);
    for(let step=0;step<steps;step++){
     done++;status.textContent='効果フレームを生成中… '+done+' / '+totalSteps;if(done%3===0)await new Promise(resolve=>requestAnimationFrame(resolve));
-    const phase=((step/steps)*speed)%1,image=drawEffectFrame(loaded[i],w,h,fit,effect,phase,intensity),palette=quantize(image.data,256),indexed=applyPalette(image.data,palette);
+    const phase=step/steps,image=drawEffectFrame(loaded[i],w,h,fit,effect,phase,intensity),palette=quantize(image.data,256),indexed=applyPalette(image.data,palette);
     enc.writeFrame(indexed,w,h,{palette,delay,repeat:done===1?repeat:undefined});
    }
   }
