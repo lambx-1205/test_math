@@ -17,7 +17,7 @@ button,input,select{font:inherit}button{cursor:pointer}.shell{width:min(1120px,1
 <div class="layout">
 <section class="panel">
 <h1>GIFを作成</h1><p class="sub">画像を1枚以上読み込み、順番と表示時間を調整してGIFに変換します。</p>
-<label class="drop" id="drop"><span><strong>画像を選択 / ここにドロップ</strong><small>PNG・JPEG・WebP など。複数選択できます。</small></span><input id="files" type="file" accept="image/*" multiple></label>
+<label class="drop" id="drop"><span><strong>画像を選択 / ここにドロップ / ペースト</strong><small>PNG・JPEG・WebP など。画像をコピーして、この画面で ⌘V / Ctrl+V でも追加できます。</small></span><input id="files" type="file" accept="image/*" multiple></label>
 <div class="toolbar"><button class="btn" id="add" type="button">画像を追加</button><button class="btn" id="clear" type="button">すべて削除</button></div>
 <div id="frames" class="frames"><div class="empty">画像がまだありません</div></div>
 </section>
@@ -95,6 +95,34 @@ function addFiles(fileList){
  files.value='';
 }
 files.addEventListener('change',e=>addFiles(e.target.files));
+
+window.addEventListener('paste',e=>{
+ const data=e.clipboardData;
+ if(!data)return;
+ const pasted=[];
+ if(data.items&&data.items.length){
+  for(const item of Array.from(data.items)){
+   if(item.kind!=='file'||!item.type.startsWith('image/'))continue;
+   const file=item.getAsFile();
+   if(file)pasted.push(file);
+  }
+ }
+ if(!pasted.length&&data.files&&data.files.length){
+  for(const file of Array.from(data.files)){
+   if(file.type.startsWith('image/'))pasted.push(file);
+  }
+ }
+ if(!pasted.length)return;
+ e.preventDefault();
+ const named=pasted.map((file,index)=>{
+  if(file.name&&file.name!=='image.png'&&file.name!=='image.jpg')return file;
+  const ext=(file.type.split('/')[1]||'png').replace('jpeg','jpg').replace('svg+xml','svg');
+  return new File([file],'pasted-image-'+(Date.now())+'-'+(index+1)+'.'+ext,{type:file.type||'image/png'});
+ });
+ addFiles(named);
+ status.textContent=named.length+'枚の貼り付け画像を読み込んでいます…';
+});
+
 $('height').addEventListener('input',()=>{heightManuallySet=true;});
 $('add').addEventListener('click',()=>files.click());
 function bindRange(id,out,suffix){const el=$(id),label=$(out),fn=()=>{label.textContent=el.value+suffix;invalidateOutput();};el.addEventListener('input',fn);label.textContent=el.value+suffix;}
