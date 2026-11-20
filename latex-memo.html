@@ -1373,6 +1373,7 @@
         <button id="rename-folder-button" type="button" disabled>フォルダ名変更</button>
         <button id="delete-folder-button" type="button" disabled>フォルダ削除</button>
       </div>
+      <p id="library-feedback" class="saved-feedback" role="status" aria-live="polite">フォルダを選ぶと、その中のメモだけを表示します。</p>
       <div class="library-layout">
         <aside class="library-sidebar" aria-label="フォルダ一覧">
           <p class="library-sidebar-title">FOLDERS</p>
@@ -1540,6 +1541,7 @@
       const libraryNoteList = document.getElementById("library-note-list");
       const libraryNoteCount = document.getElementById("library-note-count");
       const libraryVisibleCount = document.getElementById("library-visible-count");
+      const libraryFeedback = document.getElementById("library-feedback");
       const libraryCurrentFolder = document.getElementById("library-current-folder");
       const librarySearchInput = document.getElementById("library-search");
       const createFolderButton = document.getElementById("create-folder-button");
@@ -1725,6 +1727,8 @@
       function updateSavedFeedback(message, isError) {
         savedFeedback.textContent = message;
         savedFeedback.classList.toggle("error", Boolean(isError));
+        libraryFeedback.textContent = message;
+        libraryFeedback.classList.toggle("error", Boolean(isError));
       }
 
       function formatSavedDate(value) {
@@ -1947,9 +1951,10 @@
         const folder = folders.find(function (item) { return item.id === selectedFolderId; });
         if (!folder || folder.id === "inbox") return;
         const movingCount = savedNotes.filter(function (note) { return note.folderId === folder.id; }).length;
+        const inboxName = getFolderName("inbox");
         const confirmed = window.confirm(
           "フォルダ「" + folder.name + "」を削除します。中のメモ " + movingCount +
-          " 件は「未分類」へ移動します。メモ自体は削除されません。"
+          " 件は「" + inboxName + "」へ移動します。メモ自体は削除されません。"
         );
         if (!confirmed) return;
         savedNotes.forEach(function (note) {
@@ -1962,7 +1967,7 @@
         renderSavedNotes();
         updateSavedFeedback(
           notesStored && foldersStored
-            ? "フォルダを削除しました。中のメモは「未分類」へ移動しました。"
+            ? "フォルダを削除しました。中のメモは「" + inboxName + "」へ移動しました。"
             : "フォルダ整理は画面に反映しましたが、保存更新に失敗しました。",
           !(notesStored && foldersStored)
         );
@@ -2130,9 +2135,12 @@
           editButton.textContent = "編集欄に戻す";
           editButton.addEventListener("click", function () {
             closeMemoDrawer(false);
+            selectedFolderId = note.folderId || "inbox";
+            savedFolderFilter.value = selectedFolderId;
             setEditorContent(note.content);
             setEditingNote(note);
             focusEditor();
+            renderSavedNotes();
             document.querySelector(".editor-panel").scrollIntoView({
               behavior: "smooth",
               block: "start"
