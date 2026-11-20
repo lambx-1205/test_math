@@ -1829,10 +1829,12 @@
       renameSaveButton.addEventListener("click", renameCurrentNote);
       copyCurrentButton.addEventListener("click", copyCurrentText);
       sampleButton.addEventListener("click", function () {
+        setEditingNote(null);
         setEditorContent(sample);
         focusEditor();
       });
       clearButton.addEventListener("click", function () {
+        setEditingNote(null);
         setEditorContent("");
         focusEditor();
       });
