@@ -318,3 +318,26 @@ html[data-theme="dark"] .memo-menu-button .memo-menu-count {
   background: #5366df !important;
   border-color: #182335 !important;
 }
+
+
+/* High-specificity fallback for CodeMirror and the LaTeX textarea. */
+html[data-theme="dark"] body .editor-area #source-editor,
+html[data-theme="dark"] body .editor-area #source-editor .cm-editor,
+html[data-theme="dark"] body .editor-area #source-editor .cm-scroller,
+html[data-theme="dark"] body .editor-area #source-editor .cm-content,
+html[data-theme="dark"] body .editor-area #source-editor .cm-line {
+  color: #e3eaf7 !important;
+  background-color: #111c2b !important;
+}
+
+html[data-theme="dark"] body .editor-area #source-editor .cm-gutters,
+html[data-theme="dark"] body .editor-area #source-editor .cm-gutterElement {
+  color: #8493aa !important;
+  background-color: #172438 !important;
+}
+
+html[data-theme="dark"] body .editor-area #source {
+  color: #e3eaf7 !important;
+  background-color: #111c2b !important;
+  border-color: #3a4960 !important;
+}
