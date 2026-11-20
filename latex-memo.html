@@ -187,8 +187,116 @@
 
     .panel-actions {
       display: flex;
-      flex: 0 0 auto;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
       gap: 7px;
+    }
+
+    .panel-actions button {
+      white-space: nowrap;
+    }
+
+    button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .memo-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(18, 27, 45, 0.34);
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .memo-drawer-backdrop.is-visible {
+      opacity: 1;
+    }
+
+    .memo-drawer {
+      position: fixed;
+      z-index: 1001;
+      top: 0;
+      right: 0;
+      display: flex;
+      width: min(460px, 94vw);
+      height: 100vh;
+      height: 100dvh;
+      flex-direction: column;
+      gap: 12px;
+      padding: 19px;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: -18px 0 48px rgba(20, 32, 58, 0.16);
+      transform: translateX(102%);
+      visibility: hidden;
+      transition: transform 240ms ease, visibility 240ms;
+    }
+
+    .memo-drawer.is-open {
+      transform: translateX(0);
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .memo-drawer-header {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .memo-drawer-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .memo-drawer-title h2 {
+      font-size: 16px;
+    }
+
+    .memo-drawer-close {
+      width: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .memo-drawer-description {
+      flex: 0 0 auto;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .memo-drawer-meta {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .memo-drawer .saved-notes {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 1px 3px 12px 1px;
+    }
+
+    body.memo-drawer-open {
+      overflow: hidden;
     }
 
     button {
@@ -781,10 +889,10 @@
     @media (max-width: 430px) {
       .topbar { align-items: flex-start; }
       .version-pill { margin-top: 5px; }
-      .panel-heading { align-items: flex-start; padding: 13px; }
-      .panel-actions { flex-direction: column; }
-      .saved-section { padding: 17px 14px; }
-      .saved-note-actions { flex-direction: column; }
+      .panel-heading { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
+      .panel-actions { width: 100%; justify-content: flex-start; flex-direction: row; }
+      .saved-note-actions { flex-direction: row; flex-wrap: wrap; }
+      .memo-drawer { padding: 15px; }
       .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
       .saved-note-title { max-width: 100%; }
       .saved-note-excerpt { flex-basis: 100%; }
@@ -823,9 +931,11 @@
             </div>
           </div>
           <div class="panel-actions">
+            <button id="memo-drawer-toggle" type="button" aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">☰ メモ</button>
             <button id="save-button" class="primary-button" type="button">保存</button>
-            <button id="overwrite-save-button" type="button" hidden>上書き保存</button>
-            <button id="rename-save-button" type="button" hidden>保存名変更</button>
+            <button id="overwrite-save-button" type="button">上書き保存</button>
+            <button id="rename-save-button" type="button" disabled>保存名変更</button>
+            <button id="copy-current-button" type="button">コピー</button>
             <button id="sample-button" type="button">サンプル</button>
             <button id="clear-button" type="button">クリア</button>
           </div>
@@ -869,21 +979,23 @@
       <output id="current-character-count" class="character-count-value" aria-label="現在の文字数">0 文字</output>
     </section>
 
-    <section class="saved-section" aria-labelledby="saved-title">
-      <div class="saved-section-header">
-        <div class="saved-heading">
+    <div id="memo-drawer-backdrop" class="memo-drawer-backdrop" hidden></div>
+    <aside id="memo-drawer" class="memo-drawer" role="dialog" aria-modal="true"
+      aria-labelledby="saved-title" aria-hidden="true">
+      <div class="memo-drawer-header">
+        <div class="memo-drawer-title">
           <div class="panel-icon" aria-hidden="true">▤</div>
-          <div>
-            <h2 id="saved-title">保存したメモ</h2>
-            
-          </div>
+          <h2 id="saved-title">保存したメモ</h2>
         </div>
+        <button id="close-memo-drawer" class="memo-drawer-close" type="button" aria-label="保存したメモを閉じる">×</button>
+      </div>
+      <p class="memo-drawer-description">過去のメモを参照できます。編集欄に戻さず、内容だけを展開して確認することもできます。</p>
+      <div class="memo-drawer-meta">
         <span id="saved-count" class="saved-count">0 件</span>
       </div>
-      <p class="saved-description">保存したメモはこのブラウザに保存されます。</p>
       <p id="saved-feedback" class="saved-feedback" role="status" aria-live="polite">保存したメモはありません。</p>
       <div id="saved-notes" class="saved-notes"></div>
-    </section>
+    </aside>
 
 
   </main>
@@ -974,6 +1086,11 @@
       const saveButton = document.getElementById("save-button");
       const overwriteSaveButton = document.getElementById("overwrite-save-button");
       const renameSaveButton = document.getElementById("rename-save-button");
+      const copyCurrentButton = document.getElementById("copy-current-button");
+      const memoDrawerToggle = document.getElementById("memo-drawer-toggle");
+      const memoDrawer = document.getElementById("memo-drawer");
+      const memoDrawerBackdrop = document.getElementById("memo-drawer-backdrop");
+      const closeMemoDrawerButton = document.getElementById("close-memo-drawer");
       const savedNotesContainer = document.getElementById("saved-notes");
       const savedCount = document.getElementById("saved-count");
       const savedFeedback = document.getElementById("saved-feedback");
@@ -1055,16 +1172,44 @@
       }
 
       function setEditingNote(note) {
-        editingNoteId = note ? note.id : null;
-        overwriteSaveButton.hidden = !note;
-        renameSaveButton.hidden = !note;
-        if (note) {
-          overwriteSaveButton.title = "「" + note.title + "」の内容を上書き保存";
-          renameSaveButton.title = "「" + note.title + "」の保存名を変更";
+        const existingNote = note && savedNotes.find(function (item) {
+          return item.id === note.id;
+        });
+        editingNoteId = existingNote ? existingNote.id : null;
+        renameSaveButton.disabled = !existingNote;
+        if (existingNote) {
+          overwriteSaveButton.title = "「" + existingNote.title + "」の内容を上書き保存";
+          renameSaveButton.title = "「" + existingNote.title + "」の保存名を変更";
         } else {
-          overwriteSaveButton.removeAttribute("title");
-          renameSaveButton.removeAttribute("title");
+          overwriteSaveButton.title = "現在の内容を新しいメモとして保存";
+          renameSaveButton.title = "保存済みメモを選択すると名前を変更できます";
         }
+      }
+
+      function openMemoDrawer() {
+        memoDrawerBackdrop.hidden = false;
+        requestAnimationFrame(function () {
+          memoDrawerBackdrop.classList.add("is-visible");
+          memoDrawer.classList.add("is-open");
+        });
+        memoDrawer.setAttribute("aria-hidden", "false");
+        memoDrawerToggle.setAttribute("aria-expanded", "true");
+        document.body.classList.add("memo-drawer-open");
+        closeMemoDrawerButton.focus();
+      }
+
+      function closeMemoDrawer(restoreFocus) {
+        memoDrawer.classList.remove("is-open");
+        memoDrawerBackdrop.classList.remove("is-visible");
+        memoDrawer.setAttribute("aria-hidden", "true");
+        memoDrawerToggle.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("memo-drawer-open");
+        window.setTimeout(function () {
+          if (!memoDrawer.classList.contains("is-open")) {
+            memoDrawerBackdrop.hidden = true;
+          }
+        }, 250);
+        if (restoreFocus) memoDrawerToggle.focus();
       }
 
       function persistSavedNotes() {
@@ -1166,6 +1311,7 @@
           editButton.type = "button";
           editButton.textContent = "編集欄に戻す";
           editButton.addEventListener("click", function () {
+            closeMemoDrawer(false);
             setEditorContent(note.content);
             setEditingNote(note);
             focusEditor();
@@ -1174,6 +1320,7 @@
               block: "start"
             });
             updateSavedFeedback("「" + (note.title || "無題のメモ") + "」を編集中です。編集後は「上書き保存」を押してください。", false);
+            setStatus("「" + (note.title || "無題のメモ") + "」を編集中", false);
           });
 
           actions.append(openButton, copyButton, editButton);
@@ -1251,6 +1398,22 @@
         return fallbackCopyText(text);
       }
 
+      function copyCurrentText() {
+        const text = source.value;
+        if (!text) {
+          setStatus("コピーする内容がありません", true);
+          return;
+        }
+        copyTextToClipboard(text)
+          .then(function () {
+            setStatus("入力内容をクリップボードにコピーしました", false);
+          })
+          .catch(function (error) {
+            console.error("Current source copy failed:", error);
+            setStatus("コピーできませんでした。ブラウザのクリップボード利用設定を確認してください", true);
+          });
+      }
+
       function saveCurrentNote() {
         const text = source.value;
         if (!text.trim()) {
@@ -1277,20 +1440,22 @@
         };
 
         savedNotes.unshift(note);
-        setEditingNote(null);
+        setEditingNote(note);
         const stored = persistSavedNotes();
         renderSavedNotes();
 
         if (stored) {
-          updateSavedFeedback("「" + title + "」を保存しました。", false);
+          updateSavedFeedback("「" + title + "」を保存しました。続けて編集し、「上書き保存」で更新できます。", false);
+          setStatus("「" + title + "」を保存しました", false);
         } else {
           updateSavedFeedback("一覧には追加しましたが、ブラウザに永続保存できませんでした。", true);
+          setStatus("ブラウザへの保存に失敗しました", true);
         }
       }
 
       function overwriteCurrentNote() {
         if (!editingNoteId) {
-          updateSavedFeedback("上書きするメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
+          saveCurrentNote();
           return;
         }
         const text = source.value;
@@ -1303,7 +1468,8 @@
         const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
         if (!note) {
           setEditingNote(null);
-          updateSavedFeedback("編集対象のメモが見つかりません。保存一覧を確認してください。", true);
+          updateSavedFeedback("元の保存先が見つからないため、新しいメモとして保存します。", true);
+          saveCurrentNote();
           return;
         }
 
@@ -1315,13 +1481,14 @@
           stored ? "「" + note.title + "」を上書き保存しました。" : "画面上では更新しましたが、ブラウザへの保存に失敗しました。",
           !stored
         );
+        setStatus(
+          stored ? "「" + note.title + "」を上書き保存しました" : "ブラウザへの保存に失敗しました",
+          !stored
+        );
       }
 
       function renameCurrentNote() {
-        if (!editingNoteId) {
-          updateSavedFeedback("名前を変更するメモが選択されていません。先に「編集欄に戻す」を押してください。", true);
-          return;
-        }
+        if (!editingNoteId) return;
 
         const note = savedNotes.find(function (item) { return item.id === editingNoteId; });
         if (!note) {
@@ -1345,6 +1512,10 @@
         renderSavedNotes();
         updateSavedFeedback(
           stored ? "保存名を「" + title + "」に変更しました。" : "画面上では名前を変更しましたが、ブラウザへの保存に失敗しました。",
+          !stored
+        );
+        setStatus(
+          stored ? "保存名を「" + title + "」に変更しました" : "ブラウザへの保存に失敗しました",
           !stored
         );
       }
@@ -1637,9 +1808,26 @@
         }
       }
 
+      memoDrawerToggle.addEventListener("click", function () {
+        if (memoDrawer.classList.contains("is-open")) closeMemoDrawer(false);
+        else openMemoDrawer();
+      });
+      closeMemoDrawerButton.addEventListener("click", function () {
+        closeMemoDrawer(true);
+      });
+      memoDrawerBackdrop.addEventListener("click", function () {
+        closeMemoDrawer(true);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && memoDrawer.classList.contains("is-open")) {
+          closeMemoDrawer(true);
+        }
+      });
+
       saveButton.addEventListener("click", saveCurrentNote);
       overwriteSaveButton.addEventListener("click", overwriteCurrentNote);
       renameSaveButton.addEventListener("click", renameCurrentNote);
+      copyCurrentButton.addEventListener("click", copyCurrentText);
       sampleButton.addEventListener("click", function () {
         setEditorContent(sample);
         focusEditor();
