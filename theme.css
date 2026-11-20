@@ -297,3 +297,24 @@ html[data-theme="dark"] textarea#source:focus {
 html[data-theme="dark"] .editor-hint {
   color: #a6b2c5 !important;
 }
+
+
+/* Keep the memo count as a small corner badge on the compact menu control. */
+.memo-menu-button .memo-menu-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  font-size: 9px;
+  line-height: 1;
+}
+
+html[data-theme="dark"] .memo-menu-button .memo-menu-count {
+  color: #eef0ff !important;
+  background: #5366df !important;
+  border-color: #182335 !important;
+}
