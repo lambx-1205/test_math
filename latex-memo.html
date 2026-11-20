@@ -56,7 +56,7 @@
       display: flex;
       min-width: 0;
       align-items: center;
-      gap: 13px;
+      gap: 15px;
     }
 
     .brand {
@@ -128,20 +128,31 @@
     }
 
     .memo-menu-button {
-      display: inline-flex;
-      min-height: 38px;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 7px 12px;
+      position: relative;
+      display: inline-grid;
+      width: 40px;
+      height: 40px;
+      min-height: 40px;
+      flex: 0 0 40px;
+      place-items: center;
+      padding: 0;
       border: 1px solid #dfe3ff;
       border-radius: 11px;
       background: #fff;
       color: #3e4dc0;
-      box-shadow: 0 4px 12px rgba(70, 88, 216, 0.08);
-      font-size: 12px;
-      font-weight: 750;
+      box-shadow: 0 3px 10px rgba(70, 88, 216, 0.07);
+    }
+
+    .memo-menu-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
       white-space: nowrap;
+      border: 0;
     }
 
     .memo-menu-button:hover {
@@ -150,7 +161,7 @@
     }
 
     .memo-menu-icon {
-      font-size: 18px;
+      font-size: 20px;
       line-height: 1;
     }
 
@@ -1254,7 +1265,7 @@
     @media (max-width: 430px) {
       .topbar { align-items: flex-start; gap: 10px; }
       .topbar-actions { flex-wrap: wrap; gap: 6px; }
-      .memo-menu-button { min-height: 35px; padding: 6px 9px; }
+      .memo-menu-button { width: 36px; height: 36px; min-height: 36px; flex-basis: 36px; }
       .version-pill { margin-top: 1px; }
       .panel-heading { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
       .panel-actions { width: 100%; justify-content: flex-start; flex-direction: row; }
@@ -1286,18 +1297,18 @@
   <main class="app-shell">
     <header class="topbar">
       <div class="topbar-leading">
-        <button id="memo-drawer-toggle" class="memo-menu-button" type="button"
-          aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">
-          <span class="memo-menu-icon" aria-hidden="true">☰</span>
-          <span>メモ</span>
-          <span id="memo-menu-count" class="memo-menu-count" aria-hidden="true">0</span>
-        </button>
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">∑</div>
           <div>
             <h1>LaTeX メモ帳</h1>
           </div>
         </div>
+        <button id="memo-drawer-toggle" class="memo-menu-button" type="button"
+          aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">
+          <span class="memo-menu-icon" aria-hidden="true">☰</span>
+          <span class="memo-menu-label">メモ</span>
+          <span id="memo-menu-count" class="memo-menu-count" aria-hidden="true">0</span>
+        </button>
       </div>
       <div class="topbar-actions">
         <a class="version-pill home-link" href="index.html">← トップページへ戻る</a>
