@@ -1848,7 +1848,7 @@
           title.textContent = note.title || "無題のメモ";
           const excerpt = document.createElement("span");
           excerpt.className = "library-note-excerpt";
-          excerpt.textContent = (note.content || "").trim().replace(/\\s+/g, " ").slice(0, 100);
+          excerpt.textContent = (note.content || "").trim().replace(/\s+/g, " ").slice(0, 100);
           info.append(title, excerpt);
 
           const folderSelect = document.createElement("select");
@@ -2042,7 +2042,7 @@
           titleHeading.className = "saved-note-heading";
           const excerpt = document.createElement("span");
           excerpt.className = "saved-note-excerpt";
-          const openingText = (note.content || "").trim().replace(/\\s+/g, " ");
+          const openingText = (note.content || "").trim().replace(/\s+/g, " ");
           const openingCharacters = Array.from(openingText);
           excerpt.textContent = openingCharacters.length > 64
             ? openingCharacters.slice(0, 64).join("") + "…"
