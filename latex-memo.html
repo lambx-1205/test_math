@@ -112,6 +112,54 @@
       background: #e8ebff;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      flex: 0 0 auto;
+    }
+
+    .memo-menu-button {
+      display: inline-flex;
+      min-height: 38px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid #dfe3ff;
+      border-radius: 11px;
+      background: #fff;
+      color: #3e4dc0;
+      box-shadow: 0 4px 12px rgba(70, 88, 216, 0.08);
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .memo-menu-button:hover {
+      border-color: #aeb8f3;
+      background: #f0f2ff;
+    }
+
+    .memo-menu-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .memo-menu-count {
+      display: inline-grid;
+      min-width: 19px;
+      height: 19px;
+      place-items: center;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
     .intro {
       margin: 0 0 20px;
       color: var(--muted);
@@ -887,8 +935,10 @@
     }
 
     @media (max-width: 430px) {
-      .topbar { align-items: flex-start; }
-      .version-pill { margin-top: 5px; }
+      .topbar { align-items: flex-start; gap: 10px; }
+      .topbar-actions { flex-wrap: wrap; gap: 6px; }
+      .memo-menu-button { min-height: 35px; padding: 6px 9px; }
+      .version-pill { margin-top: 1px; }
       .panel-heading { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
       .panel-actions { width: 100%; justify-content: flex-start; flex-direction: row; }
       .saved-note-actions { flex-direction: row; flex-wrap: wrap; }
@@ -915,7 +965,15 @@
           <h1>LaTeX メモ帳</h1>
         </div>
       </div>
-      <a class="version-pill home-link" href="index.html">← トップページへ戻る</a>
+      <div class="topbar-actions">
+        <button id="memo-drawer-toggle" class="memo-menu-button" type="button"
+          aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">
+          <span class="memo-menu-icon" aria-hidden="true">☰</span>
+          <span>メモ</span>
+          <span id="memo-menu-count" class="memo-menu-count" aria-hidden="true">0</span>
+        </button>
+        <a class="version-pill home-link" href="index.html">← トップページへ戻る</a>
+      </div>
     </header>
 
     <p class="intro">表示数式は <code>\[ ... \]</code>、文中数式は <code>\( ... \)</code> で囲みます。Markdownにも対応しています。</p>
@@ -931,7 +989,6 @@
             </div>
           </div>
           <div class="panel-actions">
-            <button id="memo-drawer-toggle" type="button" aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">☰ メモ</button>
             <button id="save-button" class="primary-button" type="button">保存</button>
             <button id="overwrite-save-button" type="button">上書き保存</button>
             <button id="rename-save-button" type="button" disabled>保存名変更</button>
@@ -1088,6 +1145,7 @@
       const renameSaveButton = document.getElementById("rename-save-button");
       const copyCurrentButton = document.getElementById("copy-current-button");
       const memoDrawerToggle = document.getElementById("memo-drawer-toggle");
+      const memoMenuCount = document.getElementById("memo-menu-count");
       const memoDrawer = document.getElementById("memo-drawer");
       const memoDrawerBackdrop = document.getElementById("memo-drawer-backdrop");
       const closeMemoDrawerButton = document.getElementById("close-memo-drawer");
@@ -1244,6 +1302,8 @@
       function renderSavedNotes() {
         savedNotesContainer.replaceChildren();
         savedCount.textContent = savedNotes.length.toLocaleString("ja-JP") + " 件";
+        memoMenuCount.textContent = savedNotes.length.toLocaleString("ja-JP");
+        memoDrawerToggle.setAttribute("aria-label", "保存したメモを開く（" + savedNotes.length + "件）");
 
         if (savedNotes.length === 0) {
           const empty = document.createElement("div");
