@@ -342,6 +342,62 @@
       gap: 10px;
     }
 
+    .memo-drawer-tools {
+      display: grid;
+      flex: 0 0 auto;
+      gap: 9px;
+    }
+
+    .saved-search-input {
+      width: 100%;
+      min-width: 0;
+      min-height: 41px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      background: #fbfcff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .saved-search-input:focus {
+      border-color: #aeb8f3;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(70, 88, 216, 0.10);
+    }
+
+    .saved-tools-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .saved-sort-select {
+      width: 100%;
+      min-width: 0;
+      min-height: 35px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: #475166;
+      font: inherit;
+      font-size: 11px;
+    }
+
+    .saved-filter-button[aria-pressed="true"] {
+      border-color: #e2c36d;
+      background: #fff8df;
+      color: #77580a;
+    }
+
+    .saved-export-button {
+      white-space: nowrap;
+    }
+
     .memo-drawer .saved-notes {
       min-height: 0;
       flex: 1 1 auto;
@@ -875,6 +931,21 @@
 
     .memo-drawer .saved-note-actions {
       justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .saved-note-favorite {
+      min-width: 34px;
+      padding-inline: 8px;
+      color: #8a6b16;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .saved-note-favorite[aria-pressed="true"] {
+      border-color: #e2c36d;
+      background: #fff8df;
+      color: #9a6b00;
     }
 
     .saved-note-expanded {
@@ -990,6 +1061,8 @@
       .panel-actions { width: 100%; justify-content: flex-start; flex-direction: row; }
       .saved-note-actions { flex-direction: row; flex-wrap: wrap; }
       .memo-drawer { padding: 15px; }
+      .saved-tools-row { grid-template-columns: minmax(0, 1fr) auto; }
+      .saved-export-button { grid-column: 1 / -1; }
       .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
       .saved-note-title { max-width: 100%; }
       .saved-note-excerpt { flex-basis: 100%; }
@@ -1094,7 +1167,24 @@
         </div>
         <button id="close-memo-drawer" class="memo-drawer-close" type="button" aria-label="保存したメモを閉じる">×</button>
       </div>
-      <p class="memo-drawer-description">過去のメモを参照できます。編集欄に戻さず、内容だけを展開して確認することもできます。</p>
+      <p class="memo-drawer-description">過去のメモを検索・整理できます。内容の確認だけなら、編集欄に戻す必要はありません。</p>
+      <div class="memo-drawer-tools">
+        <label class="sr-only" for="saved-search">保存したメモを検索</label>
+        <input id="saved-search" class="saved-search-input" type="search"
+          placeholder="タイトル・本文を検索…" autocomplete="off">
+        <div class="saved-tools-row">
+          <label class="sr-only" for="saved-sort">メモの並び順</label>
+          <select id="saved-sort" class="saved-sort-select" aria-label="メモの並び順">
+            <option value="updated-desc">更新が新しい順</option>
+            <option value="created-asc">保存が古い順</option>
+            <option value="title-asc">タイトル順</option>
+          </select>
+          <button id="saved-favorites-filter" class="saved-filter-button" type="button"
+            aria-pressed="false">☆ お気に入り</button>
+          <button id="saved-export-button" class="saved-export-button" type="button"
+            title="保存したメモをJSON形式でバックアップ">バックアップ</button>
+        </div>
+      </div>
       <div class="memo-drawer-meta">
         <span id="saved-count" class="saved-count">0 件</span>
       </div>
@@ -1200,6 +1290,10 @@
       const savedNotesContainer = document.getElementById("saved-notes");
       const savedCount = document.getElementById("saved-count");
       const savedFeedback = document.getElementById("saved-feedback");
+      const savedSearchInput = document.getElementById("saved-search");
+      const savedSortSelect = document.getElementById("saved-sort");
+      const savedFavoritesFilter = document.getElementById("saved-favorites-filter");
+      const savedExportButton = document.getElementById("saved-export-button");
       const storageKey = "test_math_saved_notes_v1";
 
       const sample = [
@@ -1255,6 +1349,7 @@
       let savedNotes = readSavedNotes();
       let editingNoteId = null;
       let editorView = null;
+      let favoritesOnly = false;
 
       function setEditorContent(value) {
         source.value = value;
@@ -1349,9 +1444,36 @@
 
       function renderSavedNotes() {
         savedNotesContainer.replaceChildren();
-        savedCount.textContent = savedNotes.length.toLocaleString("ja-JP") + " 件";
         memoMenuCount.textContent = savedNotes.length.toLocaleString("ja-JP");
         memoDrawerToggle.setAttribute("aria-label", "保存したメモを開く（" + savedNotes.length + "件）");
+        savedExportButton.disabled = savedNotes.length === 0;
+        savedFavoritesFilter.setAttribute("aria-pressed", String(favoritesOnly));
+        savedFavoritesFilter.textContent = favoritesOnly ? "★ お気に入りのみ" : "☆ お気に入り";
+
+        const query = savedSearchInput.value.trim().toLocaleLowerCase("ja-JP");
+        let visibleNotes = savedNotes.filter(function (note) {
+          const searchableText = (note.title || "") + "\n" + (note.content || "");
+          const matchesQuery = !query || searchableText.toLocaleLowerCase("ja-JP").includes(query);
+          const matchesFavorite = !favoritesOnly || Boolean(note.favorite);
+          return matchesQuery && matchesFavorite;
+        });
+
+        const sortMode = savedSortSelect.value;
+        visibleNotes.sort(function (a, b) {
+          if (sortMode === "title-asc") {
+            return (a.title || "").localeCompare(b.title || "", "ja");
+          }
+          if (sortMode === "created-asc") {
+            return new Date(a.savedAt || 0).getTime() - new Date(b.savedAt || 0).getTime();
+          }
+          return new Date(b.updatedAt || b.savedAt || 0).getTime()
+            - new Date(a.updatedAt || a.savedAt || 0).getTime();
+        });
+
+        const isFiltered = Boolean(query) || favoritesOnly;
+        savedCount.textContent = isFiltered
+          ? visibleNotes.length.toLocaleString("ja-JP") + " / " + savedNotes.length.toLocaleString("ja-JP") + " 件"
+          : savedNotes.length.toLocaleString("ja-JP") + " 件";
 
         if (savedNotes.length === 0) {
           const empty = document.createElement("div");
@@ -1361,7 +1483,17 @@
           return;
         }
 
-        savedNotes.forEach(function (note) {
+        if (visibleNotes.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "saved-empty";
+          empty.textContent = favoritesOnly && !query
+            ? "お気に入りに登録したメモはありません。各メモの☆ボタンで登録できます。"
+            : "検索条件に一致するメモはありません。キーワードやお気に入り条件を変更してください。";
+          savedNotesContainer.appendChild(empty);
+          return;
+        }
+
+        visibleNotes.forEach(function (note) {
           const article = document.createElement("article");
           article.className = "saved-note";
 
@@ -1376,7 +1508,7 @@
           titleHeading.className = "saved-note-heading";
           const excerpt = document.createElement("span");
           excerpt.className = "saved-note-excerpt";
-          const openingText = (note.content || "").trim().replace(/\s+/g, " ");
+          const openingText = (note.content || "").trim().replace(/\\s+/g, " ");
           const openingCharacters = Array.from(openingText);
           excerpt.textContent = openingCharacters.length > 64
             ? openingCharacters.slice(0, 64).join("") + "…"
@@ -1386,6 +1518,25 @@
 
           const actions = document.createElement("div");
           actions.className = "saved-note-actions";
+
+          const favoriteButton = document.createElement("button");
+          favoriteButton.type = "button";
+          favoriteButton.className = "saved-note-favorite";
+          favoriteButton.textContent = note.favorite ? "★" : "☆";
+          favoriteButton.title = note.favorite ? "お気に入りから外す" : "お気に入りに登録";
+          favoriteButton.setAttribute("aria-label", favoriteButton.title);
+          favoriteButton.setAttribute("aria-pressed", String(Boolean(note.favorite)));
+          favoriteButton.addEventListener("click", function () {
+            note.favorite = !Boolean(note.favorite);
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored
+                ? "「" + (note.title || "無題のメモ") + "」を" + (note.favorite ? "お気に入りに追加" : "お気に入りから解除") + "しました。"
+                : "お気に入り状態を変更しましたが、ブラウザへの保存に失敗しました。",
+              !stored
+            );
+          });
 
           const body = document.createElement("div");
           body.className = "saved-note-expanded";
@@ -1415,6 +1566,35 @@
               });
           });
 
+          const duplicateButton = document.createElement("button");
+          duplicateButton.type = "button";
+          duplicateButton.textContent = "複製";
+          duplicateButton.addEventListener("click", function () {
+            const baseTitle = note.title || "無題のメモ";
+            let duplicateTitle = baseTitle + "（コピー）";
+            let suffix = 2;
+            while (savedNotes.some(function (item) { return item.title === duplicateTitle; })) {
+              duplicateTitle = baseTitle + "（コピー " + suffix + "）";
+              suffix += 1;
+            }
+            const now = new Date().toISOString();
+            const duplicate = {
+              id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
+              title: duplicateTitle,
+              content: note.content || "",
+              savedAt: now,
+              updatedAt: now,
+              favorite: false
+            };
+            savedNotes.unshift(duplicate);
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored ? "「" + duplicateTitle + "」を作成しました。" : "複製を一覧に追加しましたが、ブラウザへの保存に失敗しました。",
+              !stored
+            );
+          });
+
           const editButton = document.createElement("button");
           editButton.type = "button";
           editButton.textContent = "編集欄に戻す";
@@ -1431,19 +1611,19 @@
             setStatus("「" + (note.title || "無題のメモ") + "」を編集中", false);
           });
 
-          actions.append(openButton, copyButton, editButton);
+          actions.append(favoriteButton, openButton, copyButton, duplicateButton, editButton);
           header.append(titleHeading, actions);
 
           const renderedContent = document.createElement("div");
           renderedContent.className = "saved-note-content saved-note-rendered";
-          renderMathContent(renderedContent, note.content);
+          renderMathContent(renderedContent, note.content || "");
 
           const detailFooter = document.createElement("div");
           detailFooter.className = "saved-note-detail-footer";
 
           const date = document.createElement("time");
           date.className = "saved-note-date";
-          date.dateTime = note.updatedAt || note.savedAt;
+          date.dateTime = note.updatedAt || note.savedAt || "";
           date.textContent = (note.updatedAt && note.updatedAt !== note.savedAt)
             ? "最終更新： " + formatSavedDate(note.updatedAt)
             : "保存日時： " + formatSavedDate(note.savedAt);
@@ -1470,6 +1650,32 @@
           article.append(header, body);
           savedNotesContainer.appendChild(article);
         });
+      }
+
+      function exportSavedNotes() {
+        if (!savedNotes.length) {
+          updateSavedFeedback("バックアップするメモがありません。", true);
+          return;
+        }
+        const backup = {
+          format: "latex-memo-backup",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          notes: savedNotes
+        };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], {
+          type: "application/json;charset=utf-8"
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 10);
+        link.href = url;
+        link.download = "latex-memo-backup-" + stamp + ".json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        updateSavedFeedback("保存したメモ " + savedNotes.length + " 件をJSON形式でバックアップしました。", false);
       }
 
       function fallbackCopyText(text) {
@@ -1920,6 +2126,13 @@
         if (memoDrawer.classList.contains("is-open")) closeMemoDrawer(false);
         else openMemoDrawer();
       });
+      savedSearchInput.addEventListener("input", renderSavedNotes);
+      savedSortSelect.addEventListener("change", renderSavedNotes);
+      savedFavoritesFilter.addEventListener("click", function () {
+        favoritesOnly = !favoritesOnly;
+        renderSavedNotes();
+      });
+      savedExportButton.addEventListener("click", exportSavedNotes);
       closeMemoDrawerButton.addEventListener("click", function () {
         closeMemoDrawer(true);
       });
@@ -1929,6 +2142,16 @@
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && memoDrawer.classList.contains("is-open")) {
           closeMemoDrawer(true);
+          return;
+        }
+        const target = event.target;
+        const isTyping = target && (
+          target.matches("input, textarea, select") || target.isContentEditable
+        );
+        if (event.key === "/" && memoDrawer.classList.contains("is-open") &&
+            !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          event.preventDefault();
+          savedSearchInput.focus();
         }
       });
 
