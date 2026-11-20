@@ -229,3 +229,71 @@ html[data-theme="dark"] .theme-toggle:hover {
     font-size: 10px;
   }
 }
+
+
+/* CodeMirror paints its own editor surface, so theme it explicitly. */
+html[data-theme="dark"] .source-editor {
+  background: #111c2b !important;
+  border-color: #3a4960 !important;
+}
+
+html[data-theme="dark"] .source-editor:focus-within {
+  background: #111c2b !important;
+  border-color: #8190ee !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-editor {
+  color: #e3eaf7 !important;
+  background: #111c2b !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-scroller {
+  color: #e3eaf7 !important;
+  background: #111c2b !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-content {
+  color: #e3eaf7 !important;
+  caret-color: #aab5ff !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-line {
+  color: #e3eaf7 !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-gutters {
+  color: #8493aa !important;
+  background: #172438 !important;
+  border-right-color: #34445c !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-gutterElement {
+  color: #8493aa !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-activeLine,
+html[data-theme="dark"] .source-editor .cm-activeLineGutter {
+  background: rgba(119, 139, 205, 0.13) !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-cursor {
+  border-left-color: #aab5ff !important;
+}
+
+html[data-theme="dark"] .source-editor .cm-selectionBackground,
+html[data-theme="dark"] .source-editor .cm-content ::selection {
+  background: rgba(120, 143, 255, 0.32) !important;
+}
+
+html[data-theme="dark"] #source,
+html[data-theme="dark"] textarea#source,
+html[data-theme="dark"] textarea#source:focus {
+  color: #e3eaf7 !important;
+  background: #111c2b !important;
+  border-color: #3a4960 !important;
+}
+
+html[data-theme="dark"] .editor-hint {
+  color: #a6b2c5 !important;
+}
