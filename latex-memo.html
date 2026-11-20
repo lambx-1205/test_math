@@ -52,6 +52,13 @@
       margin-bottom: 24px;
     }
 
+    .topbar-leading {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 13px;
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -830,6 +837,46 @@
       gap: 7px;
     }
 
+    /* In the side drawer, give memo titles a full line instead of squeezing
+       them beside the excerpt and action buttons. Long titles are ellipsized. */
+    .memo-drawer .saved-note-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      gap: 8px;
+    }
+
+    .memo-drawer .saved-note-heading {
+      display: flex;
+      width: 100%;
+      min-width: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+    }
+
+    .memo-drawer .saved-note-title {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      flex: 0 1 auto;
+      overflow: hidden;
+      overflow-wrap: normal;
+      word-break: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .memo-drawer .saved-note-excerpt {
+      width: 100%;
+      flex: 0 1 auto;
+    }
+
+    .memo-drawer .saved-note-actions {
+      justify-content: flex-end;
+    }
+
     .saved-note-expanded {
       margin-top: 13px;
       padding-top: 13px;
@@ -958,20 +1005,21 @@
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">∑</div>
-        <div>
-          
-          <h1>LaTeX メモ帳</h1>
-        </div>
-      </div>
-      <div class="topbar-actions">
+      <div class="topbar-leading">
         <button id="memo-drawer-toggle" class="memo-menu-button" type="button"
           aria-controls="memo-drawer" aria-expanded="false" aria-label="保存したメモを開く">
           <span class="memo-menu-icon" aria-hidden="true">☰</span>
           <span>メモ</span>
           <span id="memo-menu-count" class="memo-menu-count" aria-hidden="true">0</span>
         </button>
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">∑</div>
+          <div>
+            <h1>LaTeX メモ帳</h1>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-actions">
         <a class="version-pill home-link" href="index.html">← トップページへ戻る</a>
       </div>
     </header>
