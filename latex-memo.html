@@ -770,6 +770,203 @@
       white-space: nowrap;
     }
 
+    .library-section {
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .library-section-header,
+    .library-main-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .library-section-header h2 {
+      font-size: 17px;
+    }
+
+    .library-description {
+      margin: 7px 0 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .library-management {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .library-layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 17px;
+      align-items: start;
+    }
+
+    .library-sidebar {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafbfe;
+    }
+
+    .library-sidebar-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .library-folder-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .library-folder-button {
+      display: flex;
+      width: 100%;
+      min-height: 37px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-color: transparent;
+      background: transparent;
+      text-align: left;
+    }
+
+    .library-folder-button.is-active {
+      border-color: #dfe3ff;
+      background: #eef0ff;
+      color: #3545b8;
+    }
+
+    .library-folder-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .library-folder-count {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .library-main {
+      min-width: 0;
+    }
+
+    .library-main-header {
+      margin-bottom: 10px;
+    }
+
+    .library-main-header h3 {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .library-search {
+      width: 100%;
+      min-height: 39px;
+      margin-bottom: 10px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: none;
+      background: #fbfcff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .library-search:focus {
+      border-color: #aeb8f3;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(70, 88, 216, 0.10);
+    }
+
+    .library-note-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .library-note-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(125px, 170px) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fcfdff;
+    }
+
+    .library-note-info {
+      display: grid;
+      min-width: 0;
+      gap: 3px;
+    }
+
+    .library-note-title {
+      overflow: hidden;
+      color: #273347;
+      font-size: 13px;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .library-note-excerpt {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .library-note-folder {
+      width: 100%;
+      min-width: 0;
+      min-height: 34px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #475166;
+      font: inherit;
+      font-size: 11px;
+    }
+
+    .library-note-row button {
+      white-space: nowrap;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .saved-section {
       margin-top: 22px;
       padding: 21px 22px;
@@ -1050,6 +1247,8 @@
       .source-editor { min-height: 330px; }
       .source-editor .cm-editor { min-height: 330px; }
       .preview-wrap { min-height: 350px; }
+      .library-layout { grid-template-columns: minmax(0, 1fr); }
+      .library-folder-list { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
     }
 
     @media (max-width: 430px) {
@@ -1061,6 +1260,12 @@
       .panel-actions { width: 100%; justify-content: flex-start; flex-direction: row; }
       .saved-note-actions { flex-direction: row; flex-wrap: wrap; }
       .memo-drawer { padding: 15px; }
+      .library-section { padding: 15px; }
+      .library-note-row { grid-template-columns: minmax(0, 1fr) auto; }
+      .library-note-info { grid-column: 1 / -1; }
+      .library-note-folder { grid-column: 1; }
+      .library-note-row button { grid-column: 2; }
+      .library-management button { flex: 1 1 auto; }
       .saved-tools-row { grid-template-columns: minmax(0, 1fr) auto; }
       .saved-export-button { grid-column: 1 / -1; }
       .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
@@ -1157,6 +1362,37 @@
       <output id="current-character-count" class="character-count-value" aria-label="現在の文字数">0 文字</output>
     </section>
 
+    <section class="library-section" aria-labelledby="library-title">
+      <div class="library-section-header">
+        <h2 id="library-title">メモライブラリ</h2>
+        <span id="library-note-count" class="saved-count">0 件</span>
+      </div>
+      <p class="library-description">保存したメモをフォルダごとに整理できます。ここでのフォルダ移動は、ハンバーガーメニュー側の一覧にもすぐ反映されます。</p>
+      <div class="library-management">
+        <button id="create-folder-button" class="primary-button" type="button">＋ フォルダ作成</button>
+        <button id="rename-folder-button" type="button" disabled>フォルダ名変更</button>
+        <button id="delete-folder-button" type="button" disabled>フォルダ削除</button>
+      </div>
+      <div class="library-layout">
+        <aside class="library-sidebar" aria-label="フォルダ一覧">
+          <p class="library-sidebar-title">FOLDERS</p>
+          <nav id="library-folder-list" class="library-folder-list"></nav>
+        </aside>
+        <div class="library-main">
+          <div class="library-main-header">
+            <h3 id="library-current-folder">すべてのメモ</h3>
+            <span id="library-visible-count" class="saved-note-date">0 件</span>
+          </div>
+          <label class="sr-only" for="library-search">メモを検索</label>
+          <input id="library-search" class="library-search" type="search"
+            placeholder="タイトル・本文を検索…" autocomplete="off">
+          <div id="library-note-list" class="library-note-list">
+            <div class="saved-empty">保存したメモはここに表示されます。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div id="memo-drawer-backdrop" class="memo-drawer-backdrop" hidden></div>
     <aside id="memo-drawer" class="memo-drawer" role="dialog" aria-modal="true"
       aria-labelledby="saved-title" aria-hidden="true">
@@ -1172,6 +1408,11 @@
         <label class="sr-only" for="saved-search">保存したメモを検索</label>
         <input id="saved-search" class="saved-search-input" type="search"
           placeholder="タイトル・本文を検索…" autocomplete="off">
+        <label class="sr-only" for="saved-folder-filter">フォルダで絞り込む</label>
+        <select id="saved-folder-filter" class="saved-sort-select" aria-label="フォルダで絞り込む">
+          <option value="__all__">すべてのフォルダ</option>
+          <option value="inbox">未分類</option>
+        </select>
         <div class="saved-tools-row">
           <label class="sr-only" for="saved-sort">メモの並び順</label>
           <select id="saved-sort" class="saved-sort-select" aria-label="メモの並び順">
@@ -1294,7 +1535,18 @@
       const savedSortSelect = document.getElementById("saved-sort");
       const savedFavoritesFilter = document.getElementById("saved-favorites-filter");
       const savedExportButton = document.getElementById("saved-export-button");
+      const savedFolderFilter = document.getElementById("saved-folder-filter");
+      const libraryFolderList = document.getElementById("library-folder-list");
+      const libraryNoteList = document.getElementById("library-note-list");
+      const libraryNoteCount = document.getElementById("library-note-count");
+      const libraryVisibleCount = document.getElementById("library-visible-count");
+      const libraryCurrentFolder = document.getElementById("library-current-folder");
+      const librarySearchInput = document.getElementById("library-search");
+      const createFolderButton = document.getElementById("create-folder-button");
+      const renameFolderButton = document.getElementById("rename-folder-button");
+      const deleteFolderButton = document.getElementById("delete-folder-button");
       const storageKey = "test_math_saved_notes_v1";
+      const folderStorageKey = "test_math_saved_folders_v1";
 
       const sample = [
         "インライン数式は $a^2+b^2=c^2$ のように文章中に置けます。",
@@ -1316,6 +1568,31 @@
         "A\\cap B = \\{x\\mid x\\in A,\\ x\\in B\\}",
         "\\]"
       ].join("\n");
+
+      function readSavedFolders() {
+        const fallback = [{ id: "inbox", name: "未分類" }];
+        try {
+          const stored = localStorage.getItem(folderStorageKey);
+          if (!stored) return fallback;
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) return fallback;
+          const clean = parsed
+            .filter(function (folder) {
+              return folder && typeof folder.id === "string" &&
+                typeof folder.name === "string" && folder.name.trim();
+            })
+            .map(function (folder) {
+              return { id: folder.id, name: folder.name.trim() };
+            });
+          if (!clean.some(function (folder) { return folder.id === "inbox"; })) {
+            clean.unshift({ id: "inbox", name: "未分類" });
+          }
+          return clean.length ? clean : fallback;
+        } catch (error) {
+          console.warn("Saved folders could not be read:", error);
+          return fallback;
+        }
+      }
 
       function readSavedNotes() {
         try {
@@ -1346,10 +1623,19 @@
         }
       }
 
+      let folders = readSavedFolders();
       let savedNotes = readSavedNotes();
+      let folderMigrationNeeded = false;
+      savedNotes.forEach(function (note) {
+        if (!note.folderId || !folders.some(function (folder) { return folder.id === note.folderId; })) {
+          note.folderId = "inbox";
+          folderMigrationNeeded = true;
+        }
+      });
       let editingNoteId = null;
       let editorView = null;
       let favoritesOnly = false;
+      let selectedFolderId = "__all__";
 
       function setEditorContent(value) {
         source.value = value;
@@ -1413,6 +1699,17 @@
         if (restoreFocus) memoDrawerToggle.focus();
       }
 
+      function persistSavedFolders() {
+        try {
+          localStorage.setItem(folderStorageKey, JSON.stringify(folders));
+          return true;
+        } catch (error) {
+          console.error("Saved folders could not be stored:", error);
+          updateSavedFeedback("フォルダの保存に失敗しました。ブラウザの保存設定を確認してください。", true);
+          return false;
+        }
+      }
+
       function persistSavedNotes() {
         try {
           localStorage.setItem(storageKey, JSON.stringify(savedNotes));
@@ -1442,6 +1739,235 @@
         });
       }
 
+      function getFolderName(folderId) {
+        const folder = folders.find(function (item) { return item.id === folderId; });
+        return folder ? folder.name : "未分類";
+      }
+
+      function renderFolderManager() {
+        libraryFolderList.replaceChildren();
+        const allCount = savedNotes.length;
+        const allButton = document.createElement("button");
+        allButton.type = "button";
+        allButton.className = "library-folder-button" + (selectedFolderId === "__all__" ? " is-active" : "");
+        const allName = document.createElement("span");
+        allName.className = "library-folder-name";
+        allName.textContent = "すべてのメモ";
+        const allTotal = document.createElement("span");
+        allTotal.className = "library-folder-count";
+        allTotal.textContent = allCount.toLocaleString("ja-JP");
+        allButton.append(allName, allTotal);
+        allButton.addEventListener("click", function () {
+          selectedFolderId = "__all__";
+          savedFolderFilter.value = selectedFolderId;
+          renderSavedNotes();
+        });
+        libraryFolderList.appendChild(allButton);
+
+        folders.forEach(function (folder) {
+          const count = savedNotes.filter(function (note) {
+            return note.folderId === folder.id;
+          }).length;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "library-folder-button" + (selectedFolderId === folder.id ? " is-active" : "");
+          const name = document.createElement("span");
+          name.className = "library-folder-name";
+          name.textContent = "▰ " + folder.name;
+          const total = document.createElement("span");
+          total.className = "library-folder-count";
+          total.textContent = count.toLocaleString("ja-JP");
+          button.append(name, total);
+          button.addEventListener("click", function () {
+            selectedFolderId = folder.id;
+            savedFolderFilter.value = selectedFolderId;
+            renderSavedNotes();
+          });
+          libraryFolderList.appendChild(button);
+        });
+
+        savedFolderFilter.replaceChildren();
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "すべてのフォルダ";
+        savedFolderFilter.appendChild(allOption);
+        folders.forEach(function (folder) {
+          const option = document.createElement("option");
+          option.value = folder.id;
+          option.textContent = folder.name;
+          savedFolderFilter.appendChild(option);
+        });
+        if (!folders.some(function (folder) { return folder.id === selectedFolderId; }) &&
+            selectedFolderId !== "__all__") {
+          selectedFolderId = "__all__";
+        }
+        savedFolderFilter.value = selectedFolderId;
+
+        const selectedFolder = folders.find(function (folder) {
+          return folder.id === selectedFolderId;
+        });
+        libraryCurrentFolder.textContent = selectedFolder
+          ? selectedFolder.name
+          : "すべてのメモ";
+        renameFolderButton.disabled = !selectedFolder;
+        deleteFolderButton.disabled = !selectedFolder || selectedFolder.id === "inbox";
+      }
+
+      function renderLibraryNotes(notes) {
+        libraryNoteList.replaceChildren();
+        libraryNoteCount.textContent = savedNotes.length.toLocaleString("ja-JP") + " 件";
+        libraryVisibleCount.textContent = notes.length.toLocaleString("ja-JP") + " 件";
+
+        if (!savedNotes.length) {
+          const empty = document.createElement("div");
+          empty.className = "saved-empty";
+          empty.textContent = "まだメモがありません。入力欄の「保存」からメモを作成できます。";
+          libraryNoteList.appendChild(empty);
+          return;
+        }
+        if (!notes.length) {
+          const empty = document.createElement("div");
+          empty.className = "saved-empty";
+          empty.textContent = "この条件に一致するメモはありません。別のフォルダや検索語を選んでください。";
+          libraryNoteList.appendChild(empty);
+          return;
+        }
+
+        notes.forEach(function (note) {
+          const row = document.createElement("div");
+          row.className = "library-note-row";
+
+          const info = document.createElement("div");
+          info.className = "library-note-info";
+          const title = document.createElement("span");
+          title.className = "library-note-title";
+          title.textContent = note.title || "無題のメモ";
+          const excerpt = document.createElement("span");
+          excerpt.className = "library-note-excerpt";
+          excerpt.textContent = (note.content || "").trim().replace(/\\s+/g, " ").slice(0, 100);
+          info.append(title, excerpt);
+
+          const folderSelect = document.createElement("select");
+          folderSelect.className = "library-note-folder";
+          folderSelect.setAttribute("aria-label", "「" + (note.title || "無題のメモ") + "」の保存フォルダ");
+          folders.forEach(function (folder) {
+            const option = document.createElement("option");
+            option.value = folder.id;
+            option.textContent = folder.name;
+            folderSelect.appendChild(option);
+          });
+          folderSelect.value = folders.some(function (folder) { return folder.id === note.folderId; })
+            ? note.folderId
+            : "inbox";
+          folderSelect.addEventListener("change", function () {
+            note.folderId = folderSelect.value;
+            note.updatedAt = new Date().toISOString();
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored ? "「" + (note.title || "無題のメモ") + "」を「" + getFolderName(note.folderId) + "」へ移動しました。" : "フォルダを変更しましたが、保存に失敗しました。",
+              !stored
+            );
+          });
+
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.textContent = "編集";
+          editButton.addEventListener("click", function () {
+            selectedFolderId = note.folderId || "inbox";
+            savedFolderFilter.value = selectedFolderId;
+            setEditorContent(note.content || "");
+            setEditingNote(note);
+            focusEditor();
+            document.querySelector(".editor-panel").scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+            renderSavedNotes();
+            updateSavedFeedback("「" + (note.title || "無題のメモ") + "」を編集中です。編集後は「上書き保存」を押してください。", false);
+            setStatus("「" + (note.title || "無題のメモ") + "」を編集中", false);
+          });
+          row.append(info, folderSelect, editButton);
+          libraryNoteList.appendChild(row);
+        });
+      }
+
+      function createFolder() {
+        const enteredName = window.prompt("新しいフォルダ名を入力してください。", "");
+        if (enteredName === null) return;
+        const name = enteredName.trim();
+        if (!name) {
+          updateSavedFeedback("フォルダ名が空欄のため、作成しませんでした。", true);
+          return;
+        }
+        if (folders.some(function (folder) { return folder.name.toLocaleLowerCase("ja-JP") === name.toLocaleLowerCase("ja-JP"); })) {
+          updateSavedFeedback("同じ名前のフォルダが既にあります。", true);
+          return;
+        }
+        const folder = {
+          id: "folder-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7),
+          name: name
+        };
+        folders.push(folder);
+        selectedFolderId = folder.id;
+        const stored = persistSavedFolders();
+        renderSavedNotes();
+        updateSavedFeedback(
+          stored ? "フォルダ「" + name + "」を作成しました。選択中のフォルダへ新しいメモを保存できます。" : "フォルダを作成しましたが、保存に失敗しました。",
+          !stored
+        );
+      }
+
+      function renameSelectedFolder() {
+        const folder = folders.find(function (item) { return item.id === selectedFolderId; });
+        if (!folder) return;
+        const enteredName = window.prompt("新しいフォルダ名を入力してください。", folder.name);
+        if (enteredName === null) return;
+        const name = enteredName.trim();
+        if (!name) {
+          updateSavedFeedback("フォルダ名が空欄のため、変更しませんでした。", true);
+          return;
+        }
+        if (folders.some(function (item) {
+          return item.id !== folder.id && item.name.toLocaleLowerCase("ja-JP") === name.toLocaleLowerCase("ja-JP");
+        })) {
+          updateSavedFeedback("同じ名前のフォルダが既にあります。", true);
+          return;
+        }
+        folder.name = name;
+        const stored = persistSavedFolders();
+        renderSavedNotes();
+        updateSavedFeedback(
+          stored ? "フォルダ名を「" + name + "」に変更しました。" : "名前を変更しましたが、保存に失敗しました。",
+          !stored
+        );
+      }
+
+      function deleteSelectedFolder() {
+        const folder = folders.find(function (item) { return item.id === selectedFolderId; });
+        if (!folder || folder.id === "inbox") return;
+        const movingCount = savedNotes.filter(function (note) { return note.folderId === folder.id; }).length;
+        const confirmed = window.confirm(
+          "フォルダ「" + folder.name + "」を削除します。中のメモ " + movingCount +
+          " 件は「未分類」へ移動します。メモ自体は削除されません。"
+        );
+        if (!confirmed) return;
+        savedNotes.forEach(function (note) {
+          if (note.folderId === folder.id) note.folderId = "inbox";
+        });
+        folders = folders.filter(function (item) { return item.id !== folder.id; });
+        selectedFolderId = "__all__";
+        const notesStored = persistSavedNotes();
+        const foldersStored = persistSavedFolders();
+        renderSavedNotes();
+        updateSavedFeedback(
+          notesStored && foldersStored
+            ? "フォルダを削除しました。中のメモは「未分類」へ移動しました。"
+            : "フォルダ整理は画面に反映しましたが、保存更新に失敗しました。",
+          !(notesStored && foldersStored)
+        );
+      }
+
       function renderSavedNotes() {
         savedNotesContainer.replaceChildren();
         memoMenuCount.textContent = savedNotes.length.toLocaleString("ja-JP");
@@ -1449,13 +1975,15 @@
         savedExportButton.disabled = savedNotes.length === 0;
         savedFavoritesFilter.setAttribute("aria-pressed", String(favoritesOnly));
         savedFavoritesFilter.textContent = favoritesOnly ? "★ お気に入りのみ" : "☆ お気に入り";
+        renderFolderManager();
 
         const query = savedSearchInput.value.trim().toLocaleLowerCase("ja-JP");
         let visibleNotes = savedNotes.filter(function (note) {
           const searchableText = (note.title || "") + "\n" + (note.content || "");
           const matchesQuery = !query || searchableText.toLocaleLowerCase("ja-JP").includes(query);
           const matchesFavorite = !favoritesOnly || Boolean(note.favorite);
-          return matchesQuery && matchesFavorite;
+          const matchesFolder = selectedFolderId === "__all__" || note.folderId === selectedFolderId;
+          return matchesQuery && matchesFavorite && matchesFolder;
         });
 
         const sortMode = savedSortSelect.value;
@@ -1470,10 +1998,11 @@
             - new Date(a.updatedAt || a.savedAt || 0).getTime();
         });
 
-        const isFiltered = Boolean(query) || favoritesOnly;
+        const isFiltered = Boolean(query) || favoritesOnly || selectedFolderId !== "__all__";
         savedCount.textContent = isFiltered
           ? visibleNotes.length.toLocaleString("ja-JP") + " / " + savedNotes.length.toLocaleString("ja-JP") + " 件"
           : savedNotes.length.toLocaleString("ja-JP") + " 件";
+        renderLibraryNotes(visibleNotes);
 
         if (savedNotes.length === 0) {
           const empty = document.createElement("div");
@@ -1486,9 +2015,9 @@
         if (visibleNotes.length === 0) {
           const empty = document.createElement("div");
           empty.className = "saved-empty";
-          empty.textContent = favoritesOnly && !query
+          empty.textContent = favoritesOnly && !query && selectedFolderId === "__all__"
             ? "お気に入りに登録したメモはありません。各メモの☆ボタンで登録できます。"
-            : "検索条件に一致するメモはありません。キーワードやお気に入り条件を変更してください。";
+            : "検索条件に一致するメモはありません。キーワードやフォルダを変更してください。";
           savedNotesContainer.appendChild(empty);
           return;
         }
@@ -1584,7 +2113,8 @@
               content: note.content || "",
               savedAt: now,
               updatedAt: now,
-              favorite: false
+              favorite: false,
+              folderId: note.folderId || "inbox"
             };
             savedNotes.unshift(duplicate);
             const stored = persistSavedNotes();
@@ -1661,6 +2191,7 @@
           format: "latex-memo-backup",
           version: 1,
           exportedAt: new Date().toISOString(),
+          folders: folders,
           notes: savedNotes
         };
         const blob = new Blob([JSON.stringify(backup, null, 2)], {
@@ -1750,7 +2281,8 @@
           title: title,
           content: text,
           savedAt: now,
-          updatedAt: now
+          updatedAt: now,
+          folderId: selectedFolderId === "__all__" ? "inbox" : selectedFolderId
         };
 
         savedNotes.unshift(note);
@@ -2126,13 +2658,27 @@
         if (memoDrawer.classList.contains("is-open")) closeMemoDrawer(false);
         else openMemoDrawer();
       });
-      savedSearchInput.addEventListener("input", renderSavedNotes);
+      savedSearchInput.addEventListener("input", function () {
+        librarySearchInput.value = savedSearchInput.value;
+        renderSavedNotes();
+      });
+      librarySearchInput.addEventListener("input", function () {
+        savedSearchInput.value = librarySearchInput.value;
+        renderSavedNotes();
+      });
+      savedFolderFilter.addEventListener("change", function () {
+        selectedFolderId = savedFolderFilter.value;
+        renderSavedNotes();
+      });
       savedSortSelect.addEventListener("change", renderSavedNotes);
       savedFavoritesFilter.addEventListener("click", function () {
         favoritesOnly = !favoritesOnly;
         renderSavedNotes();
       });
       savedExportButton.addEventListener("click", exportSavedNotes);
+      createFolderButton.addEventListener("click", createFolder);
+      renameFolderButton.addEventListener("click", renameSelectedFolder);
+      deleteFolderButton.addEventListener("click", deleteSelectedFolder);
       closeMemoDrawerButton.addEventListener("click", function () {
         closeMemoDrawer(true);
       });
@@ -2173,6 +2719,8 @@
       source.value = sample;
       preview.textContent = sample;
       setEditingNote(null);
+      persistSavedFolders();
+      if (folderMigrationNeeded) persistSavedNotes();
       renderSavedNotes();
       setStatus("KaTeXを読み込み中…", false);
 
