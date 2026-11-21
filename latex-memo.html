@@ -890,6 +890,27 @@
       font-size: 13px;
     }
 
+    .library-main-tools {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .library-sort-select {
+      width: auto;
+      min-width: 150px;
+      min-height: 35px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: #475166;
+      font: inherit;
+      font-size: 11px;
+    }
+
     .library-search {
       width: 100%;
       min-height: 39px;
@@ -962,8 +983,25 @@
       font-size: 11px;
     }
 
-    .library-note-row button {
+    .library-note-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .library-note-actions button {
+      min-height: 32px;
+      padding: 6px 8px;
+      font-size: 11px;
       white-space: nowrap;
+    }
+
+    .library-note-actions .library-favorite-button[aria-pressed="true"] {
+      border-color: #e2c36d;
+      background: #fff8df;
+      color: #77580a;
     }
 
     .sr-only {
@@ -1272,10 +1310,13 @@
       .saved-note-actions { flex-direction: row; flex-wrap: wrap; }
       .memo-drawer { padding: 15px; }
       .library-section { padding: 15px; }
+      .library-main-header { align-items: flex-start; flex-wrap: wrap; }
+      .library-main-tools { width: 100%; justify-content: space-between; }
+      .library-sort-select { flex: 1 1 auto; min-width: 0; }
       .library-note-row { grid-template-columns: minmax(0, 1fr) auto; }
       .library-note-info { grid-column: 1 / -1; }
-      .library-note-folder { grid-column: 1; }
-      .library-note-row button { grid-column: 2; }
+      .library-note-folder { grid-column: 1 / -1; }
+      .library-note-actions { grid-column: 1 / -1; justify-content: flex-start; }
       .library-management button { flex: 1 1 auto; }
       .saved-tools-row { grid-template-columns: minmax(0, 1fr) auto; }
       .saved-export-button { grid-column: 1 / -1; }
@@ -1395,7 +1436,20 @@
         <div class="library-main">
           <div class="library-main-header">
             <h3 id="library-current-folder">すべてのメモ</h3>
-            <span id="library-visible-count" class="saved-note-date">0 件</span>
+            <div class="library-main-tools">
+              <span id="library-visible-count" class="saved-note-date">0 件</span>
+              <label class="sr-only" for="library-sort">ライブラリの並び順</label>
+              <select id="library-sort" class="library-sort-select" aria-label="ライブラリの並び順">
+                <option value="updated-desc">更新が新しい順</option>
+                <option value="updated-asc">更新が古い順</option>
+                <option value="created-desc">保存が新しい順</option>
+                <option value="created-asc">保存が古い順</option>
+                <option value="title-asc">タイトル A→Z</option>
+                <option value="title-desc">タイトル Z→A</option>
+                <option value="length-desc">文字数が多い順</option>
+                <option value="length-asc">文字数が少ない順</option>
+              </select>
+            </div>
           </div>
           <label class="sr-only" for="library-search">メモを検索</label>
           <input id="library-search" class="library-search" type="search"
@@ -1431,8 +1485,13 @@
           <label class="sr-only" for="saved-sort">メモの並び順</label>
           <select id="saved-sort" class="saved-sort-select" aria-label="メモの並び順">
             <option value="updated-desc">更新が新しい順</option>
+            <option value="updated-asc">更新が古い順</option>
+            <option value="created-desc">保存が新しい順</option>
             <option value="created-asc">保存が古い順</option>
-            <option value="title-asc">タイトル順</option>
+            <option value="title-asc">タイトル A→Z</option>
+            <option value="title-desc">タイトル Z→A</option>
+            <option value="length-desc">文字数が多い順</option>
+            <option value="length-asc">文字数が少ない順</option>
           </select>
           <button id="saved-favorites-filter" class="saved-filter-button" type="button"
             aria-pressed="false">☆ お気に入り</button>
@@ -1554,6 +1613,7 @@
       const libraryNoteList = document.getElementById("library-note-list");
       const libraryNoteCount = document.getElementById("library-note-count");
       const libraryVisibleCount = document.getElementById("library-visible-count");
+      const librarySortSelect = document.getElementById("library-sort");
       const libraryFeedback = document.getElementById("library-feedback");
       const libraryCurrentFolder = document.getElementById("library-current-folder");
       const librarySearchInput = document.getElementById("library-search");
@@ -1562,6 +1622,20 @@
       const deleteFolderButton = document.getElementById("delete-folder-button");
       const storageKey = "test_math_saved_notes_v1";
       const folderStorageKey = "test_math_saved_folders_v1";
+      const sortStorageKey = "test_math_saved_sort_v1";
+      const validSortModes = [
+        "updated-desc", "updated-asc", "created-desc", "created-asc",
+        "title-asc", "title-desc", "length-desc", "length-asc"
+      ];
+      let initialSortMode = "updated-desc";
+      try {
+        const storedSortMode = localStorage.getItem(sortStorageKey);
+        if (validSortModes.includes(storedSortMode)) initialSortMode = storedSortMode;
+      } catch (error) {
+        console.warn("Could not read the saved sort preference:", error);
+      }
+      savedSortSelect.value = initialSortMode;
+      librarySortSelect.value = initialSortMode;
 
       const sample = [
         "インライン数式は $a^2+b^2=c^2$ のように文章中に置けます。",
@@ -1887,6 +1961,72 @@
             );
           });
 
+          const actions = document.createElement("div");
+          actions.className = "library-note-actions";
+
+          const favoriteButton = document.createElement("button");
+          favoriteButton.type = "button";
+          favoriteButton.className = "library-favorite-button";
+          favoriteButton.textContent = note.favorite ? "★" : "☆";
+          favoriteButton.title = note.favorite ? "お気に入りから外す" : "お気に入りに登録";
+          favoriteButton.setAttribute("aria-label", favoriteButton.title);
+          favoriteButton.setAttribute("aria-pressed", String(Boolean(note.favorite)));
+          favoriteButton.addEventListener("click", function () {
+            note.favorite = !Boolean(note.favorite);
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored
+                ? "「" + (note.title || "無題のメモ") + "」を" + (note.favorite ? "お気に入りに追加" : "お気に入りから解除") + "しました。"
+                : "お気に入り状態を変更しましたが、ブラウザへの保存に失敗しました。",
+              !stored
+            );
+          });
+
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.textContent = "コピー";
+          copyButton.addEventListener("click", function () {
+            copyTextToClipboard(note.content || "")
+              .then(function () {
+                updateSavedFeedback("「" + (note.title || "無題のメモ") + "」の内容をコピーしました。", false);
+              })
+              .catch(function (error) {
+                console.error("Library note copy failed:", error);
+                updateSavedFeedback("コピーできませんでした。ブラウザのクリップボード利用設定を確認してください。", true);
+              });
+          });
+
+          const duplicateButton = document.createElement("button");
+          duplicateButton.type = "button";
+          duplicateButton.textContent = "複製";
+          duplicateButton.addEventListener("click", function () {
+            const baseTitle = note.title || "無題のメモ";
+            let duplicateTitle = baseTitle + "（コピー）";
+            let suffix = 2;
+            while (savedNotes.some(function (item) { return item.title === duplicateTitle; })) {
+              duplicateTitle = baseTitle + "（コピー " + suffix + "）";
+              suffix += 1;
+            }
+            const now = new Date().toISOString();
+            const duplicate = {
+              id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
+              title: duplicateTitle,
+              content: note.content || "",
+              savedAt: now,
+              updatedAt: now,
+              favorite: false,
+              folderId: note.folderId || "inbox"
+            };
+            savedNotes.unshift(duplicate);
+            const stored = persistSavedNotes();
+            renderSavedNotes();
+            updateSavedFeedback(
+              stored ? "「" + duplicateTitle + "」を作成しました。" : "複製を一覧に追加しましたが、ブラウザへの保存に失敗しました。",
+              !stored
+            );
+          });
+
           const editButton = document.createElement("button");
           editButton.type = "button";
           editButton.textContent = "編集";
@@ -1904,7 +2044,9 @@
             updateSavedFeedback("「" + (note.title || "無題のメモ") + "」を編集中です。編集後は「上書き保存」を押してください。", false);
             setStatus("「" + (note.title || "無題のメモ") + "」を編集中", false);
           });
-          row.append(info, folderSelect, editButton);
+
+          actions.append(favoriteButton, copyButton, duplicateButton, editButton);
+          row.append(info, folderSelect, actions);
           libraryNoteList.appendChild(row);
         });
       }
@@ -1986,6 +2128,56 @@
         );
       }
 
+      function noteTimestamp(note, field) {
+        const value = field === "created" ? note.savedAt : (note.updatedAt || note.savedAt);
+        const timestamp = new Date(value || 0).getTime();
+        return Number.isFinite(timestamp) ? timestamp : 0;
+      }
+
+      function sortSavedNotes(notes, mode) {
+        const collator = new Intl.Collator("ja", { numeric: true, sensitivity: "base" });
+        return notes.slice().sort(function (a, b) {
+          const titleA = a.title || "";
+          const titleB = b.title || "";
+          const lengthA = Array.from(a.content || "").length;
+          const lengthB = Array.from(b.content || "").length;
+
+          switch (mode) {
+            case "updated-asc":
+              return noteTimestamp(a, "updated") - noteTimestamp(b, "updated");
+            case "created-desc":
+              return noteTimestamp(b, "created") - noteTimestamp(a, "created");
+            case "created-asc":
+              return noteTimestamp(a, "created") - noteTimestamp(b, "created");
+            case "title-desc":
+              return collator.compare(titleB, titleA);
+            case "title-asc":
+              return collator.compare(titleA, titleB);
+            case "length-desc":
+              return lengthB - lengthA;
+            case "length-asc":
+              return lengthA - lengthB;
+            case "updated-desc":
+            default:
+              return noteTimestamp(b, "updated") - noteTimestamp(a, "updated");
+          }
+        });
+      }
+
+      function handleSortChange(changedSelect) {
+        const mode = validSortModes.includes(changedSelect.value)
+          ? changedSelect.value
+          : "updated-desc";
+        savedSortSelect.value = mode;
+        librarySortSelect.value = mode;
+        try {
+          localStorage.setItem(sortStorageKey, mode);
+        } catch (error) {
+          console.warn("Could not save the sort preference:", error);
+        }
+        renderSavedNotes();
+      }
+
       function renderSavedNotes() {
         savedNotesContainer.replaceChildren();
         memoMenuCount.textContent = savedNotes.length.toLocaleString("ja-JP");
@@ -2004,17 +2196,7 @@
           return matchesQuery && matchesFavorite && matchesFolder;
         });
 
-        const sortMode = savedSortSelect.value;
-        visibleNotes.sort(function (a, b) {
-          if (sortMode === "title-asc") {
-            return (a.title || "").localeCompare(b.title || "", "ja");
-          }
-          if (sortMode === "created-asc") {
-            return new Date(a.savedAt || 0).getTime() - new Date(b.savedAt || 0).getTime();
-          }
-          return new Date(b.updatedAt || b.savedAt || 0).getTime()
-            - new Date(a.updatedAt || a.savedAt || 0).getTime();
-        });
+        visibleNotes = sortSavedNotes(visibleNotes, savedSortSelect.value);
 
         const isFiltered = Boolean(query) || favoritesOnly || selectedFolderId !== "__all__";
         savedCount.textContent = isFiltered
@@ -2691,7 +2873,12 @@
         selectedFolderId = savedFolderFilter.value;
         renderSavedNotes();
       });
-      savedSortSelect.addEventListener("change", renderSavedNotes);
+      savedSortSelect.addEventListener("change", function () {
+        handleSortChange(savedSortSelect);
+      });
+      librarySortSelect.addEventListener("change", function () {
+        handleSortChange(librarySortSelect);
+      });
       savedFavoritesFilter.addEventListener("click", function () {
         favoritesOnly = !favoritesOnly;
         renderSavedNotes();
