@@ -341,3 +341,129 @@ html[data-theme="dark"] body .editor-area #source {
   background-color: #111c2b !important;
   border-color: #3a4960 !important;
 }
+
+
+/* Contrast audit: replace leftover light surfaces in dark mode.
+   background-color alone does not remove gradients or images from background shorthand. */
+html[data-theme="dark"] body {
+  background: var(--canvas) !important;
+}
+
+/* High-contrast result surfaces and cards across all tools. */
+html[data-theme="dark"] :is(
+  .result-box, .deviation-result, .convert-result, .guide,
+  .notice, .effect-info, .pdf-control-block, .file-row,
+  .empty, .empty-message, .history-item, .saved-empty
+) {
+  color: var(--ink) !important;
+  background: #172337 !important;
+  border-color: var(--line) !important;
+}
+
+/* The home screen's featured tool cards use a light gradient in their page CSS. */
+html[data-theme="dark"] .featured {
+  color: var(--ink) !important;
+  background: #172337 !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="dark"] .featured p,
+html[data-theme="dark"] .featured h2,
+html[data-theme="dark"] .featured h3 {
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] .featured .open-label,
+html[data-theme="dark"] .featured .tool-label {
+  color: var(--accent) !important;
+}
+
+/* Calculator result values were explicitly colored for the light gradient. */
+html[data-theme="dark"] :is(#result, #deviation-value, .history-result, .convert-result) {
+  color: #e8edf7 !important;
+}
+html[data-theme="dark"] :is(#result, #deviation-value).error {
+  color: #ffaaa5 !important;
+}
+
+/* Image/GIF transparency previews keep a checkerboard, but use dark squares. */
+html[data-theme="dark"] :is(.preview-wrap, .preview) {
+  color: var(--ink) !important;
+  background: repeating-conic-gradient(#263349 0% 25%, #172337 0% 50%) 50% / 18px 18px !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="dark"] :is(.preview-wrap.empty, .preview-wrap.empty .empty-message) {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] :is(.drop, .drop.drag, .drop.is-dragging, .dropzone) {
+  color: var(--ink) !important;
+  background: #172337 !important;
+  border-color: #52627e !important;
+}
+html[data-theme="dark"] :is(.drop.drag, .drop.is-dragging, .dropzone.drag) {
+  background: #202d4b !important;
+  border-color: var(--accent) !important;
+}
+
+/* Labels and compact controls that used fixed dark-gray text in light mode. */
+html[data-theme="dark"] :is(
+  .slider-row label, .range-row label, .checkline, .wave-legend,
+  .pdf-control-title, .page-counter, .pdf-page-label,
+  .library-note-info, .library-note-folder, .deviation-meta,
+  .deviation-formula, .empty-message, .empty, .effect-info,
+  .notice, .pdf-meta, .status, .saved-feedback
+) {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] :is(
+  .group, .pdf-control-block, .file-row, .library-note-row,
+  .library-sidebar, .library-section, .saved-section
+) {
+  border-color: var(--line) !important;
+}
+html[data-theme="dark"] :is(.pdf-control-block, .file-row) {
+  background: #172337 !important;
+}
+html[data-theme="dark"] .viewer-stage {
+  background: #101a29 !important;
+}
+html[data-theme="dark"] .pdf-page-frame {
+  background: #172337 !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="dark"] .pdf-page-label {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] .progress {
+  background: #2a3850 !important;
+}
+html[data-theme="dark"] .progress > span {
+  background: var(--accent) !important;
+}
+html[data-theme="dark"] .frame img {
+  background: #263349 !important;
+}
+
+/* Preserve a clear selected state for navigation and library filters. */
+html[data-theme="dark"] .tab.active {
+  color: #e5e9ff !important;
+  background: #2c3965 !important;
+  border-bottom-color: var(--accent) !important;
+}
+html[data-theme="dark"] .library-folder-button.is-active {
+  color: #e5e9ff !important;
+  background: #2c3965 !important;
+  border-color: #5366a8 !important;
+}
+html[data-theme="dark"] :is(
+  .saved-filter-button[aria-pressed="true"],
+  .library-favorite-button[aria-pressed="true"]
+) {
+  color: #ffe6a3 !important;
+  background: #3b3424 !important;
+  border-color: #79663b !important;
+}
+
+/* Native form controls, including option menus, follow the selected scheme. */
+html[data-theme="dark"] select,
+html[data-theme="dark"] option {
+  color-scheme: dark;
+}
