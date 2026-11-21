@@ -467,3 +467,37 @@ html[data-theme="dark"] select,
 html[data-theme="dark"] option {
   color-scheme: dark;
 }
+
+
+/* Final page-specific fixes found in the LaTeX memo and tool headers. */
+html[data-theme="dark"] :is(.brand-mark, .mark) {
+  color: #fff !important;
+  background: #5366df !important;
+}
+html[data-theme="dark"] .panel-icon {
+  color: #c7d1e6 !important;
+  background: #26354b !important;
+}
+html[data-theme="dark"] .output-panel .panel-icon {
+  color: #d7ddff !important;
+  background: #2c3965 !important;
+}
+html[data-theme="dark"] :is(.saved-note-content, .saved-note-rendered) {
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] .saved-note-favorite {
+  color: #d9c27d !important;
+  background: #202d42 !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="dark"] .saved-note-favorite[aria-pressed="true"] {
+  color: #ffe6a3 !important;
+  background: #3b3424 !important;
+  border-color: #79663b !important;
+}
+html[data-theme="dark"] .footer-meta strong {
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] :is(#preview .katex-error, .saved-note-rendered .katex-error) {
+  color: #ffaaa5 !important;
+}
