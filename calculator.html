@@ -80,6 +80,26 @@
     .field label { color:var(--muted); font-size:10px; font-weight:750; }
     .field input, .field select { width:100%; min-height:38px; padding:8px 10px; border:1px solid #dfe5ef; border-radius:8px; outline:none; background:#fff; color:var(--ink); font-size:12px; }
     .field input:focus, .field select:focus { border-color:#aeb8f3; box-shadow:0 0 0 3px rgba(70,88,216,.08); }
+    .deviation-form { display:grid; gap:11px; }
+    .deviation-inputs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+    .deviation-field { display:grid; min-width:0; gap:5px; }
+    .deviation-field label { color:var(--muted); font-size:10px; font-weight:750; }
+    .deviation-field input {
+      width:100%; min-width:0; min-height:40px; padding:8px 9px;
+      border:1px solid #dfe5ef; border-radius:8px; outline:none;
+      background:#fff; color:var(--ink); font-size:13px; font-variant-numeric:tabular-nums;
+    }
+    .deviation-field input:focus { border-color:#aeb8f3; box-shadow:0 0 0 3px rgba(70,88,216,.08); }
+    .deviation-result {
+      display:grid; gap:4px; padding:13px 14px; border:1px solid #dfe3ff;
+      border-radius:11px; background:linear-gradient(120deg,#f8f9ff,#fff);
+    }
+    .deviation-result-label { color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.08em; }
+    #deviation-value { color:#25346d; font:780 clamp(27px,4vw,36px)/1.25 ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums; }
+    #deviation-value.error { color:#b42318; font:600 13px/1.6 inherit; }
+    .deviation-formula { margin:0; color:var(--muted); font-size:10px; line-height:1.65; }
+    .deviation-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:7px; }
+    .deviation-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 10px; color:var(--muted); font-size:10px; }
     .unit-row { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:end; gap:8px; }
     .swap-button { min-height:38px; padding:6px 9px; border:1px solid var(--line); border-radius:8px; background:#f7f8fc; color:#536078; }
     .convert-result { min-height:48px; padding:10px 12px; border:1px solid #dfe3ff; border-radius:9px; background:#f8f9ff; color:#26346b; font:700 16px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
@@ -100,6 +120,8 @@
       .panel-heading { padding:14px; }
       .key { min-height:41px; }
       .guide-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .deviation-inputs { grid-template-columns:minmax(0,1fr); }
+      .deviation-field input { min-height:42px; }
       .topbar { align-items:flex-start; }
       .home-link { font-size:10px; }
     }
@@ -259,6 +281,41 @@
             </div>
             <button id="convert-button" class="small-button" type="button">変換する</button>
             <output id="convert-result" class="convert-result" aria-live="polite">1 m</output>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="deviation-heading">
+          <div class="panel-heading">
+            <div>
+              <h2 id="deviation-heading">偏差値測定</h2>
+              <p class="panel-subtitle">平均点・標準偏差・自分の点数から計算</p>
+            </div>
+          </div>
+          <div class="panel-body deviation-form">
+            <div class="deviation-inputs">
+              <div class="deviation-field">
+                <label for="deviation-mean">平均点</label>
+                <input id="deviation-mean" type="number" step="any" inputmode="decimal" placeholder="例：60">
+              </div>
+              <div class="deviation-field">
+                <label for="deviation-sd">標準偏差</label>
+                <input id="deviation-sd" type="number" min="0" step="any" inputmode="decimal" placeholder="例：15">
+              </div>
+              <div class="deviation-field">
+                <label for="deviation-score">自分の点数</label>
+                <input id="deviation-score" type="number" step="any" inputmode="decimal" placeholder="例：75">
+              </div>
+            </div>
+            <div class="deviation-result" aria-live="polite">
+              <span class="deviation-result-label">DEVIATION SCORE</span>
+              <output id="deviation-value">---</output>
+              <div id="deviation-meta" class="deviation-meta">3項目を入力すると自動で計算します。</div>
+            </div>
+            <p class="deviation-formula">偏差値 = 50 + 10 × (自分の点数 − 平均点) ÷ 標準偏差</p>
+            <div class="deviation-actions">
+              <button id="deviation-clear" class="utility-button" type="button">入力をクリア</button>
+              <button id="deviation-copy" class="small-button" type="button" disabled>偏差値をコピー</button>
+            </div>
           </div>
         </section>
 
@@ -598,6 +655,78 @@
         }
         return fallbackCopy(text);
       }
+
+      const deviationMean = document.getElementById("deviation-mean");
+      const deviationSd = document.getElementById("deviation-sd");
+      const deviationScore = document.getElementById("deviation-score");
+      const deviationValue = document.getElementById("deviation-value");
+      const deviationMeta = document.getElementById("deviation-meta");
+      const deviationCopy = document.getElementById("deviation-copy");
+
+      function calculateDeviation() {
+        const rawValues = [deviationMean.value, deviationSd.value, deviationScore.value];
+        if (rawValues.some(function (value) { return value.trim() === ""; })) {
+          deviationValue.textContent = "---";
+          deviationValue.classList.remove("error");
+          deviationMeta.textContent = "3項目を入力すると自動で計算します。";
+          deviationCopy.disabled = true;
+          return;
+        }
+
+        const mean = Number(deviationMean.value);
+        const sd = Number(deviationSd.value);
+        const score = Number(deviationScore.value);
+        if (![mean, sd, score].every(Number.isFinite)) {
+          showDeviationError("有限の数値を入力してください。");
+          return;
+        }
+        if (sd <= 0) {
+          showDeviationError("標準偏差は0より大きい値にしてください。");
+          return;
+        }
+
+        const zScore = (score - mean) / sd;
+        const deviation = 50 + 10 * zScore;
+        if (!Number.isFinite(deviation)) {
+          showDeviationError("この入力値では計算できません。");
+          return;
+        }
+        const rounded = Math.round((deviation + Number.EPSILON) * 10) / 10;
+        deviationValue.textContent = rounded.toFixed(1);
+        deviationValue.classList.remove("error");
+        deviationMeta.textContent = "平均との差 " +
+          (score - mean >= 0 ? "+" : "") + (score - mean).toLocaleString("ja-JP") +
+          " 点 ／ z = " + zScore.toFixed(3);
+        deviationCopy.disabled = false;
+      }
+
+      function showDeviationError(message) {
+        deviationValue.textContent = "入力エラー";
+        deviationValue.classList.add("error");
+        deviationMeta.textContent = message;
+        deviationCopy.disabled = true;
+      }
+
+      [deviationMean, deviationSd, deviationScore].forEach(function (input) {
+        input.addEventListener("input", calculateDeviation);
+      });
+
+      document.getElementById("deviation-clear").addEventListener("click", function () {
+        deviationMean.value = "";
+        deviationSd.value = "";
+        deviationScore.value = "";
+        calculateDeviation();
+        deviationMean.focus();
+      });
+
+      deviationCopy.addEventListener("click", function () {
+        if (deviationCopy.disabled) return;
+        copyText("偏差値 " + deviationValue.textContent).then(function () {
+          deviationMeta.textContent = "偏差値をクリップボードにコピーしました。";
+        }).catch(function () {
+          deviationMeta.textContent = "コピーできませんでした。";
+        });
+      });
 
       const units = {
         length: [
