@@ -222,9 +222,9 @@
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit">＋ アラームを追加</button>
-            <button class="button" type="button" id="test-sound">♫ 緊迫アラーム曲を試聴</button>
+            <button class="button" type="button" id="test-sound">◉ サイレンを試聴</button>
           </div>
-          <p class="form-hint">オリジナルの短い緊迫系アラーム曲です。高い旋律、低音の拍、短い和音を重ねます。音量は端末側で調整してください。</p>
+          <p class="form-hint">音程が連続して上がり、下がるサイレン音です。ページ上で試聴して音量を確認してください。</p>
           <div class="status-line" id="form-status" role="status"></div>
         </form>
       </section>
@@ -483,89 +483,105 @@
         }
       }
 
-      function playAlarmVoice(frequency, duration, waveform, peak, detune) {
-        if (!audioContext || audioContext.state !== "running") return;
-        try {
-          const oscillator = audioContext.createOscillator();
-          const gain = audioContext.createGain();
-          const start = audioContext.currentTime;
-          oscillator.type = waveform;
-          oscillator.frequency.setValueAtTime(frequency, start);
-          if (detune) oscillator.detune.setValueAtTime(detune, start);
-          gain.gain.setValueAtTime(0.0001, start);
-          gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
-          gain.gain.setTargetAtTime(0.0001, start + duration * 0.68, 0.035);
-          oscillator.connect(gain);
-          gain.connect(audioContext.destination);
-          oscillator.start(start);
-          oscillator.stop(start + duration + 0.055);
-        } catch (error) {
-          // Audio output may be blocked by the browser or device.
-        }
-      }
+      let sirenOscillators = [];
+      let sirenGainNodes = [];
+      let sirenNextStart = 0;
+      let previewStopTimer = null;
 
-      // Original urgent motif in A minor: rapid rising lead, low pulse and short chords.
-      const alarmMelody = [
-        659.25, 783.99, 880.00, 1046.50,
-        1174.66, 1046.50, 988.00, 1318.51,
-        1174.66, 1567.98, 1318.51, 1760.00,
-        1567.98, 1318.51, 1174.66, 1760.00
-      ];
-      const alarmChords = [
-        [220.00, 261.63, 329.63],   // Am
-        [174.61, 220.00, 261.63],   // F
-        [146.83, 174.61, 220.00],   // Dm
-        [164.81, 207.65, 246.94]    // E
-      ];
-      const alarmBass = [55.00, 43.65, 36.71, 41.20];
+      function scheduleSirenSweep(startAt) {
+        if (!audioContext || sirenOscillators.length === 0) return;
+        const start = Math.max(startAt, audioContext.currentTime + 0.025);
+        const end = start + 1.9;
 
-      function playAlarmMusicStep(step) {
-        const index = step % alarmMelody.length;
-        const beat = Math.floor(index / 4);
-        playAlarmVoice(alarmMelody[index], 0.19, "sawtooth", 0.105, 0);
-        playAlarmVoice(alarmMelody[index] * 0.5, 0.16, "triangle", 0.035, -4);
-
-        if (index % 4 === 0) {
-          const chord = alarmChords[beat];
-          chord.forEach(function (frequency, chordIndex) {
-            playAlarmVoice(frequency, 0.52, "square", 0.027, chordIndex === 2 ? 3 : 0);
-          });
-          playAlarmVoice(alarmBass[beat], 0.48, "sine", 0.13, 0);
-        }
-
-        // A short upper accent at the end of each four-step phrase.
-        if (index === 3 || index === 7 || index === 11 || index === 15) {
-          playAlarmVoice(alarmMelody[index] * 2, 0.12, "square", 0.045, 0);
-        }
+        sirenOscillators.forEach(function (oscillator, index) {
+          const low = index === 0 ? 620 : 310;
+          const high = index === 0 ? 1080 : 540;
+          const frequency = oscillator.frequency;
+          frequency.cancelScheduledValues(start);
+          frequency.setValueAtTime(low, start);
+          frequency.linearRampToValueAtTime(high, start + 0.95);
+          frequency.linearRampToValueAtTime(low, end);
+        });
+        sirenNextStart = end;
       }
 
       function startBuzzer() {
-        if (buzzerTimer) return;
+        if (buzzerTimer || sirenOscillators.length > 0) return;
         unlockAudio();
         if (!audioContext) return;
 
-        const beginMusic = function () {
-          if (buzzerTimer || !audioContext || audioContext.state !== "running") return;
-          toneIndex = 0;
-          playAlarmMusicStep(toneIndex);
-          toneIndex += 1;
-          buzzerTimer = window.setInterval(function () {
-            playAlarmMusicStep(toneIndex);
-            toneIndex += 1;
-          }, 200);
+        const beginSiren = function () {
+          if (buzzerTimer || sirenOscillators.length > 0 ||
+              !audioContext || audioContext.state !== "running") return;
+
+          try {
+            const now = audioContext.currentTime;
+            const mainOscillator = audioContext.createOscillator();
+            const mainGain = audioContext.createGain();
+            mainOscillator.type = "triangle";
+            mainGain.gain.setValueAtTime(0.19, now);
+            mainOscillator.connect(mainGain);
+            mainGain.connect(audioContext.destination);
+            mainOscillator.start(now);
+
+            const bodyOscillator = audioContext.createOscillator();
+            const bodyGain = audioContext.createGain();
+            bodyOscillator.type = "sine";
+            bodyGain.gain.setValueAtTime(0.055, now);
+            bodyOscillator.connect(bodyGain);
+            bodyGain.connect(audioContext.destination);
+            bodyOscillator.start(now);
+
+            sirenOscillators = [mainOscillator, bodyOscillator];
+            sirenGainNodes = [mainGain, bodyGain];
+            scheduleSirenSweep(now + 0.04);
+
+            // Schedule each next sweep slightly ahead for a seamless repeating wail.
+            buzzerTimer = window.setInterval(function () {
+              scheduleSirenSweep(sirenNextStart);
+            }, 1700);
+          } catch (error) {
+            sirenOscillators = [];
+            sirenGainNodes = [];
+          }
         };
 
         if (audioContext.state === "suspended") {
-          audioContext.resume().then(beginMusic).catch(function () {});
+          audioContext.resume().then(beginSiren).catch(function () {});
         } else {
-          beginMusic();
+          beginSiren();
         }
       }
 
-      function stopBuzzerIfIdle() {
-        if (ringingIds.size === 0 && buzzerTimer) {
+      function stopSiren() {
+        if (buzzerTimer) {
           window.clearInterval(buzzerTimer);
           buzzerTimer = null;
+        }
+        if (previewStopTimer) {
+          window.clearTimeout(previewStopTimer);
+          previewStopTimer = null;
+        }
+        const now = audioContext ? audioContext.currentTime : 0;
+        sirenGainNodes.forEach(function (gain) {
+          try {
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setTargetAtTime(0.0001, now, 0.035);
+          } catch (error) {}
+        });
+        sirenOscillators.forEach(function (oscillator) {
+          try {
+            oscillator.stop(now + 0.16);
+          } catch (error) {}
+        });
+        sirenOscillators = [];
+        sirenGainNodes = [];
+        sirenNextStart = 0;
+      }
+
+      function stopBuzzerIfIdle() {
+        if (ringingIds.size === 0 && (buzzerTimer || sirenOscillators.length > 0 || previewStopTimer)) {
+          stopSiren();
         }
       }
 
@@ -655,18 +671,13 @@
             setStatus("音声を開始できませんでした。ブラウザの音声設定を確認してください。");
             return;
           }
-          let previewStep = 0;
-          playAlarmMusicStep(previewStep);
-          previewStep += 1;
-          const previewTimer = window.setInterval(function () {
-            if (previewStep >= 32) {
-              window.clearInterval(previewTimer);
-              return;
-            }
-            playAlarmMusicStep(previewStep);
-            previewStep += 1;
-          }, 200);
-          setStatus("緊迫系アラーム曲を約6秒間試聴しています。音量は端末側で調整してください。");
+          startBuzzer();
+          if (previewStopTimer) window.clearTimeout(previewStopTimer);
+          previewStopTimer = window.setTimeout(function () {
+            previewStopTimer = null;
+            if (ringingIds.size === 0) stopSiren();
+          }, 5700);
+          setStatus("上下にうなるサイレン音を約6秒間試聴しています。音量は端末側で調整してください。");
         };
 
         if (audioContext.state === "suspended") {
@@ -757,7 +768,7 @@
         if (!document.hidden) checkAlarms();
       });
       window.addEventListener("pagehide", function () {
-        if (buzzerTimer) window.clearInterval(buzzerTimer);
+        stopSiren();
       });
       saveAlarms();
     })();
