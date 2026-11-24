@@ -239,7 +239,7 @@
         <section class="panel side-card">
           <h3>保存と動作条件</h3>
           <p>登録した設定は、このブラウザのローカルストレージに保存します。別の端末やブラウザとは同期しません。</p>
-          <p><strong>重要：</strong>アラームを鳴らすには、このページを開いたままにしてください。ブラウザ終了中や端末のスリープ中の動作は保証できません。</p>
+          <p><strong>重要：</strong>アラームを鳴らすには、このページを開いたままにし、ブラウザと端末がバックグラウンド実行・音声出力を許可している必要があります。非表示タブでは省電力制御により遅れる場合があり、ブラウザ終了中や端末のスリープ中の動作は保証できません。</p>
         </section>
       </aside>
     </div>
@@ -257,7 +257,7 @@
     </section>
 
     <div class="notice">
-      <strong>動作上の注意：</strong>この機能はWebページ上で動く簡易アラームです。ページを閉じる、ブラウザを終了する、端末がスリープするなどの状況では、指定時刻に鳴らないことがあります。確実な起床・服薬・重要な予定には、端末標準の時計アプリなども併用してください。
+      <strong>動作上の注意：</strong>この機能はWebページ上で動く簡易アラームです。ページを閉じる、ブラウザを終了する、端末がスリープする、バックグラウンド実行が制限されるなどの状況では、指定時刻に鳴らない、または遅れることがあります。確実な起床・服薬・重要な予定には、端末標準の時計アプリなども併用してください。
     </div>
 
     <footer>
@@ -677,7 +677,7 @@
       }
 
       updateClock();
-      window.setInterval(updateClock, 250);
+      window.setInterval(updateClock, 1000);
       alarms.forEach(function (alarm) {
         if (alarm.enabled && !alarm.nextAt) {
           alarm.nextAt = nextOccurrence(alarm.time, alarm.days, Date.now());
