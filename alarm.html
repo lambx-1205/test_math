@@ -222,9 +222,9 @@
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit">＋ アラームを追加</button>
-            <button class="button" type="button" id="test-sound">♪ 音をテスト</button>
+            <button class="button" type="button" id="test-sound">♪ 大きめの音をテスト</button>
           </div>
-          <p class="form-hint">音量は端末側で調整してください。音のテストはボタンを押したときに再生されます。</p>
+          <p class="form-hint">高低を切り替える連続音で知らせます。音量は端末側で調整してください。</p>
           <div class="status-line" id="form-status" role="status"></div>
         </form>
       </section>
@@ -493,15 +493,16 @@
             const oscillator = audioContext.createOscillator();
             const gain = audioContext.createGain();
             const start = audioContext.currentTime;
-            oscillator.type = "sine";
+            oscillator.type = "triangle";
             oscillator.frequency.setValueAtTime(frequency, start);
             gain.gain.setValueAtTime(0.0001, start);
-            gain.gain.exponentialRampToValueAtTime(0.16, start + 0.025);
-            gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+            // A stronger but still capped level: device volume remains in control.
+            gain.gain.exponentialRampToValueAtTime(0.30, start + 0.018);
+            gain.gain.setTargetAtTime(0.0001, start + duration - 0.035, 0.018);
             oscillator.connect(gain);
             gain.connect(audioContext.destination);
             oscillator.start(start);
-            oscillator.stop(start + duration + 0.02);
+            oscillator.stop(start + duration + 0.06);
           } catch (error) {
             // Audio output may be blocked by the browser or device.
           }
@@ -517,12 +518,13 @@
       function startBuzzer() {
         if (buzzerTimer) return;
         toneIndex = 0;
-        playTone(880, 0.38);
+        const frequencies = [1046, 784, 1175, 880, 1318, 988, 1175, 880];
+        playTone(frequencies[toneIndex % frequencies.length], 0.34);
+        toneIndex += 1;
         buzzerTimer = window.setInterval(function () {
-          const frequencies = [880, 660, 880, 990];
-          playTone(frequencies[toneIndex % frequencies.length], 0.38);
+          playTone(frequencies[toneIndex % frequencies.length], 0.34);
           toneIndex += 1;
-        }, 650);
+        }, 410);
       }
 
       function stopBuzzerIfIdle() {
@@ -608,9 +610,13 @@
 
       document.getElementById("test-sound").addEventListener("click", function () {
         unlockAudio();
-        playTone(880, 0.28);
-        window.setTimeout(function () { playTone(660, 0.28); }, 350);
-        setStatus("音を再生しました。聞こえない場合は端末の音量やブラウザの設定を確認してください。");
+        const testFrequencies = [1046, 784, 1175, 880, 1318, 988, 1175, 880];
+        testFrequencies.forEach(function (frequency, index) {
+          window.setTimeout(function () {
+            playTone(frequency, 0.34);
+          }, index * 410);
+        });
+        setStatus("大きめの連続アラーム音をテスト再生しています。音量は端末側で調整してください。");
       });
 
       document.getElementById("notification-button").addEventListener("click", function () {
