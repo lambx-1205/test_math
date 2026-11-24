@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>UTILITY HUB | アラーム</title>
+  <meta name="description" content="複数のアラームを登録し、曜日指定やスヌーズを設定できるブラウザアラームです。">
+  <link rel="stylesheet" href="theme.css?v=20261124-alarm1">
+  <script src="theme.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #182230;
+      --muted: #657187;
+      --line: #e1e7f0;
+      --panel: #ffffff;
+      --canvas: #f5f7fb;
+      --accent: #4658d8;
+      --accent-soft: #eef0ff;
+      --shadow: 0 12px 34px rgba(28,43,77,.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-width: 320px; min-height: 100vh; color: var(--ink);
+      background: radial-gradient(ellipse at 8% 0%, rgba(70,88,216,.07), transparent 34rem), var(--canvas);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(980px,100%); margin: 0 auto; padding: 27px 24px 38px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:22px; }
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .brand-mark { display:grid; width:42px; height:42px; flex:0 0 42px; place-items:center; border-radius:13px; background:var(--accent); color:#fff; font-size:21px; font-weight:800; }
+    .eyebrow { margin:0 0 3px; color:var(--muted); font-size:10px; font-weight:800; letter-spacing:.14em; }
+    h1 { margin:0; font-size:clamp(20px,2.5vw,27px); font-weight:800; letter-spacing:-.04em; }
+    .topbar-actions { display:flex; align-items:center; gap:8px; }
+    .home-link { padding:8px 11px; border:1px solid #dfe3ff; border-radius:999px; background:#f0f2ff; color:#3e4dc0; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; }
+    .hero { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr); gap:16px; margin-bottom:17px; }
+    .panel { min-width:0; border:1px solid var(--line); border-radius:17px; background:var(--panel); box-shadow:var(--shadow); overflow:hidden; }
+    .clock-panel { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:23px 25px; }
+    .clock-label { color:var(--muted); font-size:11px; font-weight:750; }
+    .clock { margin-top:4px; font:750 clamp(38px,7vw,60px)/1.15 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:-.065em; font-variant-numeric:tabular-nums; }
+    .today { margin-top:7px; color:var(--muted); font-size:12px; }
+    .clock-symbol { display:grid; width:76px; height:76px; flex:0 0 76px; place-items:center; border-radius:23px; background:var(--accent-soft); color:var(--accent); font-size:36px; }
+    .summary-panel { display:flex; flex-direction:column; justify-content:center; padding:20px 22px; }
+    .summary-number { font:800 32px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--accent); }
+    .summary-caption { margin-top:7px; color:var(--muted); font-size:11px; line-height:1.7; }
+    .section-heading { display:flex; align-items:end; justify-content:space-between; gap:12px; margin:25px 2px 12px; }
+    .section-heading h2 { margin:0; font-size:15px; font-weight:800; }
+    .section-heading p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+    .alarm-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(270px,.78fr); align-items:start; gap:16px; }
+    .panel-heading { padding:16px 18px; border-bottom:1px solid var(--line); }
+    .panel-heading h2 { margin:0; font-size:14px; font-weight:800; }
+    .panel-heading p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+    .panel-body { padding:17px 18px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .field { display:grid; gap:6px; min-width:0; }
+    .field label, .field-title { color:var(--muted); font-size:10px; font-weight:800; }
+    .field input {
+      width:100%; min-height:43px; padding:8px 11px; border:1px solid var(--line); border-radius:9px;
+      outline:none; background:var(--panel); color:var(--ink); font-size:14px;
+    }
+    .field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(70,88,216,.1); }
+    input[type="time"] { font:700 20px ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums; }
+    .repeat-section { margin-top:15px; }
+    .repeat-days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-top:8px; }
+    .day-option { position:relative; display:block; }
+    .day-option input { position:absolute; opacity:0; pointer-events:none; }
+    .day-option span {
+      display:grid; min-height:36px; place-items:center; border:1px solid var(--line); border-radius:8px;
+      background:var(--panel); color:var(--muted); font-size:11px; font-weight:750; cursor:pointer;
+    }
+    .day-option input:checked + span { color:var(--accent); background:var(--accent-soft); border-color:#aeb8f3; }
+    .day-option input:focus-visible + span { outline:3px solid rgba(130,146,255,.35); outline-offset:2px; }
+    .form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:17px; }
+    .button { min-height:39px; padding:9px 13px; border:1px solid var(--line); border-radius:9px; background:var(--panel); color:var(--ink); font-size:11px; font-weight:750; }
+    .button.primary { border-color:var(--accent); background:var(--accent); color:#fff; }
+    .button:hover { filter:brightness(.97); }
+    .button:disabled { cursor:not-allowed; opacity:.5; }
+    .form-hint { margin:11px 0 0; color:var(--muted); font-size:10px; line-height:1.65; }
+    .alarm-list { display:grid; gap:9px; }
+    .alarm-empty { padding:27px 15px; border:1px dashed var(--line); border-radius:13px; color:var(--muted); text-align:center; font-size:12px; line-height:1.8; }
+    .alarm-card { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; padding:14px 15px; border:1px solid var(--line); border-radius:13px; background:var(--panel); }
+    .alarm-card.is-off { opacity:.62; }
+    .alarm-time { font:750 27px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+    .alarm-label { overflow:hidden; margin-top:4px; color:var(--ink); font-size:12px; font-weight:750; text-overflow:ellipsis; white-space:nowrap; }
+    .alarm-detail { margin-top:5px; color:var(--muted); font-size:10px; line-height:1.6; }
+    .alarm-controls { display:flex; align-items:center; gap:7px; }
+    .toggle-button { min-width:58px; padding:8px 10px; border:1px solid #c7ceef; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:10px; font-weight:800; }
+    .toggle-button[aria-pressed="false"] { border-color:var(--line); background:transparent; color:var(--muted); }
+    .delete-button { width:32px; height:32px; border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--muted); font-size:15px; }
+    .side-stack { display:grid; gap:12px; }
+    .side-card { padding:16px; }
+    .side-card h3 { margin:0; font-size:12px; }
+    .side-card p { margin:7px 0 0; color:var(--muted); font-size:10px; line-height:1.75; }
+    .ring-panel { margin:0 0 16px; padding:17px; border:1px solid #e9a3a0; border-radius:14px; background:#fff4f2; color:#772b26; }
+    .ring-panel[hidden] { display:none; }
+    .ring-panel h2 { margin:0; font-size:15px; }
+    .ring-panel p { margin:5px 0 12px; font-size:11px; }
+    .ring-entry { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid rgba(160,60,50,.18); }
+    .ring-entry strong { font-size:12px; }
+    .ring-actions { display:flex; gap:6px; }
+    .ring-actions button { padding:7px 9px; border:1px solid #d99b96; border-radius:8px; background:#fff; color:#772b26; font-size:10px; font-weight:800; }
+    .ring-actions .snooze { background:#772b26; border-color:#772b26; color:#fff; }
+    .notice { margin-top:16px; padding:13px 15px; border:1px solid var(--line); border-radius:11px; background:rgba(255,255,255,.55); color:var(--muted); font-size:10px; line-height:1.8; }
+    .notice strong { color:var(--ink); }
+    .status-line { min-height:17px; margin-top:8px; color:var(--muted); font-size:10px; }
+    footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 14px; margin-top:22px; padding-top:13px; border-top:1px solid var(--line); color:var(--muted); font-size:10px; }
+    @media(max-width:760px) {
+      .hero { grid-template-columns:1fr; }
+      .summary-panel { min-height:95px; }
+      .alarm-layout { grid-template-columns:1fr; }
+    }
+    @media(max-width:520px) {
+      .shell { padding:19px 13px 28px; }
+      .topbar { align-items:flex-start; }
+      .brand-mark { width:38px; height:38px; flex-basis:38px; }
+      .home-link { padding:7px 9px; font-size:10px; }
+      .clock-panel { padding:19px; }
+      .clock-symbol { width:58px; height:58px; flex-basis:58px; border-radius:18px; font-size:28px; }
+      .panel-body { padding:14px; }
+      .form-grid { grid-template-columns:1fr; }
+      .alarm-time { font-size:24px; }
+      .alarm-card { padding:12px; }
+      .alarm-controls { gap:5px; }
+      .toggle-button { min-width:52px; padding:7px 8px; }
+    }
+    @media(max-width:360px) {
+      .topbar { flex-wrap:wrap; }
+      .repeat-days { gap:3px; }
+      .day-option span { min-height:33px; font-size:10px; }
+      .ring-entry { align-items:flex-start; flex-direction:column; }
+    }
+    html[data-theme="dark"] body { background:var(--canvas) !important; }
+    html[data-theme="dark"] .clock-panel,
+    html[data-theme="dark"] .summary-panel,
+    html[data-theme="dark"] .alarm-card,
+    html[data-theme="dark"] .side-card { background:#172337 !important; border-color:var(--line) !important; color:var(--ink) !important; }
+    html[data-theme="dark"] .clock,
+    html[data-theme="dark"] .alarm-time,
+    html[data-theme="dark"] .alarm-label,
+    html[data-theme="dark"] .side-card h3 { color:var(--ink) !important; }
+    html[data-theme="dark"] .clock-symbol { background:#2c3965 !important; color:#d7ddff !important; }
+    html[data-theme="dark"] .day-option span,
+    html[data-theme="dark"] .button,
+    html[data-theme="dark"] .delete-button { background:#202d42; border-color:var(--line); color:var(--ink); }
+    html[data-theme="dark"] .day-option input:checked + span { background:#2c3965; border-color:#5366a8; color:#e5e9ff; }
+    html[data-theme="dark"] .button.primary { background:#5366df !important; border-color:#6878ef !important; color:#fff !important; }
+    html[data-theme="dark"] .ring-panel { color:#ffd9d5; background:#38201f; border-color:#87514d; }
+    html[data-theme="dark"] .ring-entry { border-color:#70433f; }
+    html[data-theme="dark"] .ring-actions button { color:#ffd9d5; background:#4b2927; border-color:#87514d; }
+    html[data-theme="dark"] .ring-actions .snooze { color:#fff; background:#a64d46; border-color:#a64d46; }
+    html[data-theme="dark"] .notice { background:#172337; border-color:var(--line); }
+    html[data-theme="dark"] .notice strong { color:var(--ink); }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">◷</div>
+        <div>
+          <p class="eyebrow">UTILITY HUB</p>
+          <h1>アラーム</h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <a class="home-link" href="index.html">← ホーム</a>
+      </div>
+    </header>
+
+    <section class="hero" aria-label="現在時刻とアラームの概要">
+      <div class="panel clock-panel">
+        <div>
+          <div class="clock-label">現在時刻</div>
+          <div class="clock" id="clock">--:--:--</div>
+          <div class="today" id="today">日付を読み込み中</div>
+        </div>
+        <div class="clock-symbol" aria-hidden="true">◷</div>
+      </div>
+      <div class="panel summary-panel">
+        <div class="summary-number" id="enabled-count">0</div>
+        <div class="summary-caption">有効なアラーム<br>複数の時刻を登録して管理できる</div>
+      </div>
+    </section>
+
+    <section class="ring-panel" id="ring-panel" aria-live="assertive" hidden>
+      <h2>アラーム鳴動中</h2>
+      <p>停止するか、5分後にもう一度知らせるか選択してください。</p>
+      <div id="ring-list"></div>
+    </section>
+
+    <div class="alarm-layout">
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>アラームを追加</h2>
+          <p>時刻と繰り返す曜日を設定</p>
+        </div>
+        <form class="panel-body" id="alarm-form">
+          <div class="form-grid">
+            <div class="field">
+              <label for="alarm-time">時刻</label>
+              <input id="alarm-time" type="time" value="07:00" required>
+            </div>
+            <div class="field">
+              <label for="alarm-label">ラベル</label>
+              <input id="alarm-label" type="text" maxlength="40" placeholder="例：起床、出発">
+            </div>
+          </div>
+          <div class="repeat-section">
+            <div class="field-title">繰り返し（選択しない場合は次の1回のみ）</div>
+            <div class="repeat-days" role="group" aria-label="繰り返す曜日">
+              <label class="day-option"><input type="checkbox" value="1"><span>月</span></label>
+              <label class="day-option"><input type="checkbox" value="2"><span>火</span></label>
+              <label class="day-option"><input type="checkbox" value="3"><span>水</span></label>
+              <label class="day-option"><input type="checkbox" value="4"><span>木</span></label>
+              <label class="day-option"><input type="checkbox" value="5"><span>金</span></label>
+              <label class="day-option"><input type="checkbox" value="6"><span>土</span></label>
+              <label class="day-option"><input type="checkbox" value="0"><span>日</span></label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="button primary" type="submit">＋ アラームを追加</button>
+            <button class="button" type="button" id="test-sound">♪ 音をテスト</button>
+          </div>
+          <p class="form-hint">音量は端末側で調整してください。音のテストはボタンを押したときに再生されます。</p>
+          <div class="status-line" id="form-status" role="status"></div>
+        </form>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel side-card">
+          <h3>通知について</h3>
+          <p>ブラウザ通知を許可すると、ページが背面にあるときに通知を出せる場合があります。通知はアラーム音の代わりではありません。</p>
+          <button class="button" type="button" id="notification-button" style="margin-top:12px">通知を許可する</button>
+          <p id="notification-status" role="status"></p>
+        </section>
+        <section class="panel side-card">
+          <h3>保存と動作条件</h3>
+          <p>登録した設定は、このブラウザのローカルストレージに保存します。別の端末やブラウザとは同期しません。</p>
+          <p><strong>重要：</strong>アラームを鳴らすには、このページを開いたままにしてください。ブラウザ終了中や端末のスリープ中の動作は保証できません。</p>
+        </section>
+      </aside>
+    </div>
+
+    <section>
+      <div class="section-heading">
+        <div>
+          <h2>登録済みアラーム</h2>
+          <p>オン・オフの切り替え、削除ができます</p>
+        </div>
+      </div>
+      <div class="alarm-list" id="alarm-list">
+        <div class="alarm-empty">アラームはまだ登録されていません。</div>
+      </div>
+    </section>
+
+    <div class="notice">
+      <strong>動作上の注意：</strong>この機能はWebページ上で動く簡易アラームです。ページを閉じる、ブラウザを終了する、端末がスリープするなどの状況では、指定時刻に鳴らないことがあります。確実な起床・服薬・重要な予定には、端末標準の時計アプリなども併用してください。
+    </div>
+
+    <footer>
+      <span>UTILITY HUB · アラーム</span>
+      <span>設定はこのブラウザ内に保存されます</span>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "utility-hub-alarms-v1";
+      const LATE_GRACE_MS = 2 * 60 * 1000;
+      const SNOOZE_MS = 5 * 60 * 1000;
+      const alarms = loadAlarms();
+      const ringingIds = new Set();
+      let audioContext = null;
+      let buzzerTimer = null;
+      let toneIndex = 0;
+
+      const clockElement = document.getElementById("clock");
+      const todayElement = document.getElementById("today");
+      const countElement = document.getElementById("enabled-count");
+      const alarmListElement = document.getElementById("alarm-list");
+      const ringPanel = document.getElementById("ring-panel");
+      const ringListElement = document.getElementById("ring-list");
+      const statusElement = document.getElementById("form-status");
+
+      function loadAlarms() {
+        try {
+          const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+          if (!Array.isArray(value)) return [];
+          return value.filter(function (alarm) {
+            return alarm && typeof alarm.id === "string" &&
+              /^\d{2}:\d{2}$/.test(alarm.time) &&
+              Array.isArray(alarm.days);
+          }).map(function (alarm) {
+            return {
+              id: alarm.id,
+              time: alarm.time,
+              label: String(alarm.label || "アラーム").slice(0, 40),
+              days: alarm.days.map(Number).filter(function (day) { return day >= 0 && day <= 6; }),
+              enabled: Boolean(alarm.enabled),
+              nextAt: Number.isFinite(Number(alarm.nextAt)) ? Number(alarm.nextAt) : null,
+              snoozeUntil: Number.isFinite(Number(alarm.snoozeUntil)) ? Number(alarm.snoozeUntil) : null
+            };
+          });
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function saveAlarms() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(alarms));
+        } catch (error) {
+          setStatus("保存できませんでした。ブラウザの保存容量やプライベート設定を確認してください。");
+        }
+      }
+
+      function setStatus(message) {
+        statusElement.textContent = message || "";
+      }
+
+      function nextOccurrence(time, days, afterTime) {
+        const parts = time.split(":").map(Number);
+        const hour = parts[0];
+        const minute = parts[1];
+        const base = new Date(afterTime);
+        for (let offset = 0; offset <= 7; offset += 1) {
+          const candidate = new Date(base);
+          candidate.setDate(base.getDate() + offset);
+          candidate.setHours(hour, minute, 0, 0);
+          const dayAllowed = days.length === 0 || days.indexOf(candidate.getDay()) !== -1;
+          if (dayAllowed && candidate.getTime() > afterTime) {
+            return candidate.getTime();
+          }
+        }
+        return null;
+      }
+
+      function updateClock() {
+        const now = new Date();
+        clockElement.textContent = now.toLocaleTimeString("ja-JP", {
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        });
+        todayElement.textContent = now.toLocaleDateString("ja-JP", {
+          year: "numeric", month: "long", day: "numeric", weekday: "long"
+        });
+      }
+
+      function formatNext(timestamp) {
+        if (!timestamp) return "次回時刻は未設定";
+        return "次回 " + new Date(timestamp).toLocaleString("ja-JP", {
+          month: "numeric", day: "numeric", weekday: "short",
+          hour: "2-digit", minute: "2-digit", hour12: false
+        });
+      }
+
+      function repeatText(days) {
+        if (!days || days.length === 0) return "1回のみ";
+        const labels = ["日", "月", "火", "水", "木", "金", "土"];
+        return days.slice().sort(function (a, b) {
+          return [1, 2, 3, 4, 5, 6, 0].indexOf(a) - [1, 2, 3, 4, 5, 6, 0].indexOf(b);
+        }).map(function (day) { return labels[day]; }).join("・") + "曜日";
+      }
+
+      function makeElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+
+      function renderAlarms() {
+        alarmListElement.textContent = "";
+        const enabledCount = alarms.filter(function (alarm) { return alarm.enabled; }).length;
+        countElement.textContent = String(enabledCount);
+
+        if (alarms.length === 0) {
+          alarmListElement.appendChild(makeElement("div", "alarm-empty",
+            "アラームはまだ登録されていません。上のフォームから追加できます。"));
+          return;
+        }
+
+        alarms.slice().sort(function (a, b) {
+          return a.time.localeCompare(b.time);
+        }).forEach(function (alarm) {
+          const card = makeElement("article", "alarm-card" + (alarm.enabled ? "" : " is-off"));
+          const info = makeElement("div", "alarm-info");
+          info.appendChild(makeElement("div", "alarm-time", alarm.time));
+          info.appendChild(makeElement("div", "alarm-label", alarm.label || "アラーム"));
+          let detailText = repeatText(alarm.days);
+          if (alarm.snoozeUntil) {
+            detailText += " · スヌーズ " + formatNext(alarm.snoozeUntil).replace("次回 ", "");
+          } else if (alarm.enabled) {
+            detailText += " · " + formatNext(alarm.nextAt);
+          }
+          info.appendChild(makeElement("div", "alarm-detail", detailText));
+
+          const controls = makeElement("div", "alarm-controls");
+          const toggle = makeElement("button", "toggle-button", alarm.enabled ? "オン" : "オフ");
+          toggle.type = "button";
+          toggle.setAttribute("aria-pressed", String(alarm.enabled));
+          toggle.setAttribute("aria-label", alarm.label + "を" + (alarm.enabled ? "オフ" : "オン") + "にする");
+          toggle.addEventListener("click", function () {
+            alarm.enabled = !alarm.enabled;
+            alarm.snoozeUntil = null;
+            ringingIds.delete(alarm.id);
+            if (alarm.enabled) {
+              alarm.nextAt = nextOccurrence(alarm.time, alarm.days, Date.now());
+              unlockAudio();
+            } else {
+              alarm.nextAt = null;
+            }
+            stopBuzzerIfIdle();
+            saveAlarms();
+            renderAlarms();
+            renderRinging();
+          });
+
+          const remove = makeElement("button", "delete-button", "×");
+          remove.type = "button";
+          remove.setAttribute("aria-label", alarm.label + "を削除");
+          remove.addEventListener("click", function () {
+            const index = alarms.findIndex(function (item) { return item.id === alarm.id; });
+            if (index !== -1) alarms.splice(index, 1);
+            ringingIds.delete(alarm.id);
+            stopBuzzerIfIdle();
+            saveAlarms();
+            renderAlarms();
+            renderRinging();
+          });
+          controls.append(toggle, remove);
+          card.append(info, controls);
+          alarmListElement.appendChild(card);
+        });
+      }
+
+      function renderRinging() {
+        ringListElement.textContent = "";
+        const active = alarms.filter(function (alarm) { return ringingIds.has(alarm.id); });
+        ringPanel.hidden = active.length === 0;
+        active.forEach(function (alarm) {
+          const row = makeElement("div", "ring-entry");
+          row.appendChild(makeElement("strong", "", alarm.time + " · " + alarm.label));
+          const actions = makeElement("div", "ring-actions");
+          const snooze = makeElement("button", "snooze", "5分スヌーズ");
+          snooze.type = "button";
+          snooze.addEventListener("click", function () {
+            alarm.snoozeUntil = Date.now() + SNOOZE_MS;
+            ringingIds.delete(alarm.id);
+            stopBuzzerIfIdle();
+            saveAlarms();
+            renderAlarms();
+            renderRinging();
+          });
+          const dismiss = makeElement("button", "", "停止");
+          dismiss.type = "button";
+          dismiss.addEventListener("click", function () {
+            ringingIds.delete(alarm.id);
+            alarm.snoozeUntil = null;
+            stopBuzzerIfIdle();
+            saveAlarms();
+            renderAlarms();
+            renderRinging();
+          });
+          actions.append(snooze, dismiss);
+          row.appendChild(actions);
+          ringListElement.appendChild(row);
+        });
+      }
+
+      function unlockAudio() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        try {
+          if (!audioContext) audioContext = new AudioContextClass();
+          if (audioContext.state === "suspended") audioContext.resume().catch(function () {});
+        } catch (error) {
+          // Audio can be unavailable in some browser configurations.
+        }
+      }
+
+      function playTone(frequency, duration) {
+        unlockAudio();
+        if (!audioContext || audioContext.state !== "running") return;
+        try {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const start = audioContext.currentTime;
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(frequency, start);
+          gain.gain.setValueAtTime(0.0001, start);
+          gain.gain.exponentialRampToValueAtTime(0.16, start + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(start);
+          oscillator.stop(start + duration + 0.02);
+        } catch (error) {
+          // Audio output may be blocked by the browser or device.
+        }
+      }
+
+      function startBuzzer() {
+        if (buzzerTimer) return;
+        toneIndex = 0;
+        playTone(880, 0.38);
+        buzzerTimer = window.setInterval(function () {
+          const frequencies = [880, 660, 880, 990];
+          playTone(frequencies[toneIndex % frequencies.length], 0.38);
+          toneIndex += 1;
+        }, 650);
+      }
+
+      function stopBuzzerIfIdle() {
+        if (ringingIds.size === 0 && buzzerTimer) {
+          window.clearInterval(buzzerTimer);
+          buzzerTimer = null;
+        }
+      }
+
+      function announceAlarm(alarm) {
+        startBuzzer();
+        if ("Notification" in window && Notification.permission === "granted") {
+          try {
+            new Notification("アラーム", {
+              body: alarm.time + " · " + alarm.label,
+              tag: "utility-hub-alarm-" + alarm.id
+            });
+          } catch (error) {
+            // Notifications are optional; the in-page alarm remains available.
+          }
+        }
+      }
+
+      function checkAlarms() {
+        const now = Date.now();
+        let changed = false;
+        alarms.forEach(function (alarm) {
+          if (alarm.snoozeUntil && now >= alarm.snoozeUntil) {
+            alarm.snoozeUntil = null;
+            ringingIds.add(alarm.id);
+            announceAlarm(alarm);
+            changed = true;
+            return;
+          }
+          if (!alarm.enabled || !alarm.nextAt || now < alarm.nextAt) return;
+
+          const lateness = now - alarm.nextAt;
+          if (lateness <= LATE_GRACE_MS) {
+            ringingIds.add(alarm.id);
+            announceAlarm(alarm);
+          }
+          if (alarm.days.length > 0) {
+            alarm.nextAt = nextOccurrence(alarm.time, alarm.days, now);
+          } else {
+            alarm.enabled = false;
+            alarm.nextAt = null;
+          }
+          changed = true;
+        });
+        if (changed) {
+          saveAlarms();
+          renderAlarms();
+          renderRinging();
+        }
+      }
+
+      document.getElementById("alarm-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const time = document.getElementById("alarm-time").value;
+        const label = document.getElementById("alarm-label").value.trim() || "アラーム";
+        const days = Array.from(document.querySelectorAll(".repeat-days input:checked"))
+          .map(function (input) { return Number(input.value); });
+        if (!/^\d{2}:\d{2}$/.test(time)) {
+          setStatus("時刻を入力してください。");
+          return;
+        }
+        const alarm = {
+          id: String(Date.now()) + "-" + Math.random().toString(36).slice(2, 8),
+          time: time,
+          label: label,
+          days: days,
+          enabled: true,
+          nextAt: nextOccurrence(time, days, Date.now()),
+          snoozeUntil: null
+        };
+        alarms.push(alarm);
+        unlockAudio();
+        saveAlarms();
+        renderAlarms();
+        setStatus("「" + label + "」を登録しました。");
+        document.getElementById("alarm-label").value = "";
+      });
+
+      document.getElementById("test-sound").addEventListener("click", function () {
+        unlockAudio();
+        playTone(880, 0.28);
+        window.setTimeout(function () { playTone(660, 0.28); }, 350);
+        setStatus("音を再生しました。聞こえない場合は端末の音量やブラウザの設定を確認してください。");
+      });
+
+      document.getElementById("notification-button").addEventListener("click", function () {
+        const status = document.getElementById("notification-status");
+        if (!("Notification" in window)) {
+          status.textContent = "このブラウザは通知に対応していません。";
+          return;
+        }
+        Notification.requestPermission().then(function (permission) {
+          status.textContent = permission === "granted"
+            ? "通知が許可されました。"
+            : "通知は許可されませんでした。";
+          updateNotificationButton();
+        }).catch(function () {
+          status.textContent = "通知の許可を取得できませんでした。";
+        });
+      });
+
+      function updateNotificationButton() {
+        const button = document.getElementById("notification-button");
+        const status = document.getElementById("notification-status");
+        if (!("Notification" in window)) {
+          button.textContent = "通知に非対応";
+          button.disabled = true;
+          status.textContent = "ブラウザ通知は利用できません。";
+        } else if (Notification.permission === "granted") {
+          button.textContent = "通知は許可済み";
+          button.disabled = true;
+          status.textContent = "アラーム時に通知を表示します。";
+        } else if (Notification.permission === "denied") {
+          button.textContent = "通知がブロックされています";
+          button.disabled = true;
+          status.textContent = "通知を使うにはブラウザのサイト設定から変更してください。";
+        }
+      }
+
+      function recoverMissedAlarms() {
+        const now = Date.now();
+        let changed = false;
+        alarms.forEach(function (alarm) {
+          if (alarm.snoozeUntil && alarm.snoozeUntil <= now) {
+            if (now - alarm.snoozeUntil <= LATE_GRACE_MS) {
+              ringingIds.add(alarm.id);
+              announceAlarm(alarm);
+            }
+            alarm.snoozeUntil = null;
+            changed = true;
+          }
+          if (alarm.enabled && alarm.nextAt && alarm.nextAt <= now) {
+            if (now - alarm.nextAt <= LATE_GRACE_MS) {
+              ringingIds.add(alarm.id);
+              announceAlarm(alarm);
+            }
+            if (alarm.days.length > 0) {
+              alarm.nextAt = nextOccurrence(alarm.time, alarm.days, now);
+            } else {
+              alarm.enabled = false;
+              alarm.nextAt = null;
+            }
+            changed = true;
+          }
+        });
+        if (changed) saveAlarms();
+      }
+
+      updateClock();
+      window.setInterval(updateClock, 250);
+      alarms.forEach(function (alarm) {
+        if (alarm.enabled && !alarm.nextAt) {
+          alarm.nextAt = nextOccurrence(alarm.time, alarm.days, Date.now());
+        }
+      });
+      recoverMissedAlarms();
+      renderAlarms();
+      renderRinging();
+      updateNotificationButton();
+      window.setInterval(checkAlarms, 1000);
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) checkAlarms();
+      });
+      window.addEventListener("pagehide", function () {
+        if (buzzerTimer) window.clearInterval(buzzerTimer);
+      });
+      saveAlarms();
+    })();
+  </script>
+</body>
+</html>
