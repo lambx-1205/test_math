@@ -222,9 +222,9 @@
           </div>
           <div class="form-actions">
             <button class="button primary" type="submit">＋ アラームを追加</button>
-            <button class="button" type="button" id="test-sound">♪ 大きめの音をテスト</button>
+            <button class="button" type="button" id="test-sound">♫ 緊迫アラーム曲を試聴</button>
           </div>
-          <p class="form-hint">高低を切り替える連続音で知らせます。音量は端末側で調整してください。</p>
+          <p class="form-hint">オリジナルの短い緊迫系アラーム曲です。高い旋律、低音の拍、短い和音を重ねます。音量は端末側で調整してください。</p>
           <div class="status-line" id="form-status" role="status"></div>
         </form>
       </section>
@@ -483,48 +483,83 @@
         }
       }
 
-      function playTone(frequency, duration) {
-        unlockAudio();
-        if (!audioContext) return;
+      function playAlarmVoice(frequency, duration, waveform, peak, detune) {
+        if (!audioContext || audioContext.state !== "running") return;
+        try {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const start = audioContext.currentTime;
+          oscillator.type = waveform;
+          oscillator.frequency.setValueAtTime(frequency, start);
+          if (detune) oscillator.detune.setValueAtTime(detune, start);
+          gain.gain.setValueAtTime(0.0001, start);
+          gain.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+          gain.gain.setTargetAtTime(0.0001, start + duration * 0.68, 0.035);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(start);
+          oscillator.stop(start + duration + 0.055);
+        } catch (error) {
+          // Audio output may be blocked by the browser or device.
+        }
+      }
 
-        function playWhenReady() {
-          if (!audioContext || audioContext.state !== "running") return;
-          try {
-            const oscillator = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            const start = audioContext.currentTime;
-            oscillator.type = "triangle";
-            oscillator.frequency.setValueAtTime(frequency, start);
-            gain.gain.setValueAtTime(0.0001, start);
-            // A stronger but still capped level: device volume remains in control.
-            gain.gain.exponentialRampToValueAtTime(0.30, start + 0.018);
-            gain.gain.setTargetAtTime(0.0001, start + duration - 0.035, 0.018);
-            oscillator.connect(gain);
-            gain.connect(audioContext.destination);
-            oscillator.start(start);
-            oscillator.stop(start + duration + 0.06);
-          } catch (error) {
-            // Audio output may be blocked by the browser or device.
-          }
+      // Original urgent motif in A minor: rapid rising lead, low pulse and short chords.
+      const alarmMelody = [
+        659.25, 783.99, 880.00, 1046.50,
+        1174.66, 1046.50, 988.00, 1318.51,
+        1174.66, 1567.98, 1318.51, 1760.00,
+        1567.98, 1318.51, 1174.66, 1760.00
+      ];
+      const alarmChords = [
+        [220.00, 261.63, 329.63],   // Am
+        [174.61, 220.00, 261.63],   // F
+        [146.83, 174.61, 220.00],   // Dm
+        [164.81, 207.65, 246.94]    // E
+      ];
+      const alarmBass = [55.00, 43.65, 36.71, 41.20];
+
+      function playAlarmMusicStep(step) {
+        const index = step % alarmMelody.length;
+        const beat = Math.floor(index / 4);
+        playAlarmVoice(alarmMelody[index], 0.19, "sawtooth", 0.105, 0);
+        playAlarmVoice(alarmMelody[index] * 0.5, 0.16, "triangle", 0.035, -4);
+
+        if (index % 4 === 0) {
+          const chord = alarmChords[beat];
+          chord.forEach(function (frequency, chordIndex) {
+            playAlarmVoice(frequency, 0.52, "square", 0.027, chordIndex === 2 ? 3 : 0);
+          });
+          playAlarmVoice(alarmBass[beat], 0.48, "sine", 0.13, 0);
         }
 
-        if (audioContext.state === "suspended") {
-          audioContext.resume().then(playWhenReady).catch(function () {});
-        } else {
-          playWhenReady();
+        // A short upper accent at the end of each four-step phrase.
+        if (index === 3 || index === 7 || index === 11 || index === 15) {
+          playAlarmVoice(alarmMelody[index] * 2, 0.12, "square", 0.045, 0);
         }
       }
 
       function startBuzzer() {
         if (buzzerTimer) return;
-        toneIndex = 0;
-        const frequencies = [1046, 784, 1175, 880, 1318, 988, 1175, 880];
-        playTone(frequencies[toneIndex % frequencies.length], 0.34);
-        toneIndex += 1;
-        buzzerTimer = window.setInterval(function () {
-          playTone(frequencies[toneIndex % frequencies.length], 0.34);
+        unlockAudio();
+        if (!audioContext) return;
+
+        const beginMusic = function () {
+          if (buzzerTimer || !audioContext || audioContext.state !== "running") return;
+          toneIndex = 0;
+          playAlarmMusicStep(toneIndex);
           toneIndex += 1;
-        }, 410);
+          buzzerTimer = window.setInterval(function () {
+            playAlarmMusicStep(toneIndex);
+            toneIndex += 1;
+          }, 200);
+        };
+
+        if (audioContext.state === "suspended") {
+          audioContext.resume().then(beginMusic).catch(function () {});
+        } else {
+          beginMusic();
+        }
       }
 
       function stopBuzzerIfIdle() {
@@ -610,13 +645,37 @@
 
       document.getElementById("test-sound").addEventListener("click", function () {
         unlockAudio();
-        const testFrequencies = [1046, 784, 1175, 880, 1318, 988, 1175, 880];
-        testFrequencies.forEach(function (frequency, index) {
-          window.setTimeout(function () {
-            playTone(frequency, 0.34);
-          }, index * 410);
-        });
-        setStatus("大きめの連続アラーム音をテスト再生しています。音量は端末側で調整してください。");
+        if (!audioContext) {
+          setStatus("このブラウザでは音声を再生できません。");
+          return;
+        }
+
+        const runPreview = function () {
+          if (audioContext.state !== "running") {
+            setStatus("音声を開始できませんでした。ブラウザの音声設定を確認してください。");
+            return;
+          }
+          let previewStep = 0;
+          playAlarmMusicStep(previewStep);
+          previewStep += 1;
+          const previewTimer = window.setInterval(function () {
+            if (previewStep >= 32) {
+              window.clearInterval(previewTimer);
+              return;
+            }
+            playAlarmMusicStep(previewStep);
+            previewStep += 1;
+          }, 200);
+          setStatus("緊迫系アラーム曲を約6秒間試聴しています。音量は端末側で調整してください。");
+        };
+
+        if (audioContext.state === "suspended") {
+          audioContext.resume().then(runPreview).catch(function () {
+            setStatus("音声を開始できませんでした。もう一度ボタンを押してください。");
+          });
+        } else {
+          runPreview();
+        }
       });
 
       document.getElementById("notification-button").addEventListener("click", function () {
