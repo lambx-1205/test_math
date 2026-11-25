@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f5f7fb">
-<title>ファイル / PDF編集 | UTILITY HUB</title>
+<title>ファイル変換 / PDF編集 | UTILITY HUB</title>
 <style>
 :root{color-scheme:light;--ink:#182230;--muted:#657187;--line:#e1e7f0;--panel:#fff;--canvas:#f5f7fb;--accent:#4658d8;--soft:#eef0ff;--shadow:0 12px 34px rgba(28,43,77,.06)}
 *{box-sizing:border-box}body{margin:0;min-width:320px;background:radial-gradient(ellipse at 8% 0%,rgba(70,88,216,.08),transparent 34rem),var(--canvas);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
@@ -69,6 +69,29 @@ body.pdf-active #panel-pdf:not([hidden]){display:flex;flex:1 1 auto;min-height:0
  .pdf-control-grid{grid-template-columns:1fr 1fr}
 }
 
+
+/* HEIC / HEIF to PNG converter */
+.heic-layout{grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr)}
+.heic-drop{padding:25px 16px}
+.heic-file-list{display:grid;gap:9px;margin-top:12px}
+.heic-item{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;gap:11px;padding:10px;border:1px solid #e7ebf2;border-radius:11px;background:var(--panel)}
+.heic-thumb{width:72px;height:72px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:#f1f3f7;color:#7b8799;font-size:10px}
+.heic-thumb img{width:100%;height:100%;object-fit:contain}
+.heic-file-name{overflow-wrap:anywhere;font-size:11px;font-weight:800}
+.heic-file-meta,.heic-file-state{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.55}
+.heic-file-state.is-error{color:#b42332}
+.heic-item-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.heic-progress{height:7px;margin-top:10px;overflow:hidden;border-radius:99px;background:#edf0f6}
+.heic-progress>span{display:block;width:0;height:100%;background:var(--accent);transition:width .15s}
+.heic-small{font-size:10px!important}
+.heic-results-count{font-size:10px;color:var(--muted)}
+#panel-heic[hidden]{display:none}
+html[data-theme="dark"] .heic-item{background:#172337;border-color:var(--line)}
+html[data-theme="dark"] .heic-thumb{background:#202d42;border-color:var(--line);color:var(--muted)}
+html[data-theme="dark"] .heic-progress{background:#2a3850}
+@media(max-width:850px){.heic-layout{grid-template-columns:1fr}}
+@media(max-width:560px){.heic-item{grid-template-columns:56px minmax(0,1fr)}.heic-thumb{width:56px;height:56px}.heic-item-actions{grid-column:2;justify-content:flex-start}}
+
 </style>
   <link rel="stylesheet" href="theme.css?v=20261122-contrastfix3">
   <script src="theme.js"></script>
@@ -77,7 +100,7 @@ body.pdf-active #panel-pdf:not([hidden]){display:flex;flex:1 1 auto;min-height:0
 <main class="shell">
 <header class="topbar"><a class="brand" href="index.html"><span class="mark">U</span><span><p class="brand-name">ファイル / PDF編集</p></span></a><a class="back" href="index.html">← ツール一覧へ</a></header>
 
-<nav class="tabs" aria-label="機能切り替え"><button class="tab active" id="tab-pdf" type="button">PDFビューワー・編集</button><button class="tab" id="tab-files" type="button">ファイル圧縮</button></nav>
+<nav class="tabs" aria-label="機能切り替え"><button class="tab active" id="tab-pdf" type="button">PDFビューワー・編集</button><button class="tab" id="tab-files" type="button">ファイル圧縮</button><button class="tab" id="tab-heic" type="button">HEIC→PNG</button></nav>
 <section class="tab-panel" id="panel-pdf">
 <div class="pdf-workspace">
  <section class="panel pdf-viewer-panel">
@@ -147,6 +170,42 @@ body.pdf-active #panel-pdf:not([hidden]){display:flex;flex:1 1 auto;min-height:0
 </div>
 </section>
 
+<section class="tab-panel" id="panel-heic" hidden>
+<div class="layout heic-layout">
+ <section class="panel">
+  <div class="panel-head"><h2>HEIC / HEIF画像</h2><span class="sub">複数選択可</span></div>
+  <div class="drop heic-drop" id="heic-drop">
+   <strong>HEIC / HEIFファイルを追加</strong>
+   <p>iPhoneなどで撮影した .heic / .heif 画像に対応</p>
+   <button class="btn primary" id="heic-choose" type="button">画像を選択</button>
+   <input class="file-input" id="heic-input" type="file" accept=".heic,.heif,image/heic,image/heif" multiple>
+  </div>
+  <div class="heic-file-list" id="heic-list"><div class="empty">変換したいHEIC画像を追加してください。</div></div>
+  <div class="status" id="heic-status" role="status" aria-live="polite"></div>
+ </section>
+ <aside class="panel">
+  <div class="panel-head"><h2>PNGに変換</h2><span class="sub">ブラウザ内処理</span></div>
+  <div class="group">
+   <p class="sub">選択したHEIC / HEIF画像をPNG形式に変換します。ファイルはサーバーへアップロードせず、このブラウザ内で処理します。</p>
+   <div class="actions" style="margin-top:12px">
+    <button class="btn primary" id="heic-convert" type="button" disabled>選択画像をPNGに変換</button>
+   </div>
+   <div class="heic-progress"><span id="heic-progress-bar"></span></div>
+   <div class="status" id="heic-progress-label">待機中</div>
+  </div>
+  <div class="group">
+   <div class="group-title">変換結果</div>
+   <div class="heic-results-count" id="heic-results-count">0 / 0 件 完了</div>
+   <div class="actions" style="margin-top:10px">
+    <button class="btn" id="heic-zip" type="button" disabled>PNGをまとめてZIP保存</button>
+    <button class="btn" id="heic-clear" type="button" disabled>一覧をクリア</button>
+   </div>
+  </div>
+  <div class="notice">変換にはインターネット接続が必要です。変換後のPNGには、元画像のEXIFなど一部メタデータが引き継がれない場合があります。</div>
+ </aside>
+</div>
+</section>
+
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -155,8 +214,8 @@ body.pdf-active #panel-pdf:not([hidden]){display:flex;flex:1 1 auto;min-height:0
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-function switchTab(which){var pdf=which==="pdf";$("tab-pdf").classList.toggle("active",pdf);$("tab-files").classList.toggle("active",!pdf);$("panel-pdf").hidden=!pdf;$("panel-files").hidden=pdf;document.body.classList.toggle("pdf-active",pdf);}
-$("tab-pdf").addEventListener("click",function(){switchTab("pdf");});$("tab-files").addEventListener("click",function(){switchTab("files");});
+function switchTab(which){var pdf=which==="pdf",files=which==="files",heic=which==="heic";$("tab-pdf").classList.toggle("active",pdf);$("tab-files").classList.toggle("active",files);$("tab-heic").classList.toggle("active",heic);$("panel-pdf").hidden=!pdf;$("panel-files").hidden=!files;$("panel-heic").hidden=!heic;document.body.classList.toggle("pdf-active",pdf);}
+$("tab-pdf").addEventListener("click",function(){switchTab("pdf");});$("tab-files").addEventListener("click",function(){switchTab("files");});$("tab-heic").addEventListener("click",function(){switchTab("heic");});
 function bytesText(bytes){if(bytes<1024)return bytes+" B";if(bytes<1048576)return (bytes/1024).toFixed(1)+" KB";return (bytes/1048576).toFixed(2)+" MB";}
 function fileSafe(name){return (name||"file").replace(/[\\/:*?"<>|]/g,"_").slice(0,120)||"file";}
 function downloadBlob(blob,name){var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fileSafe(name);document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
@@ -279,6 +338,143 @@ $("zip-btn").addEventListener("click",async function(){if(!selectedFiles.length)
 $("gzip-btn").addEventListener("click",async function(){if(!selectedFiles.length)return;if(!("CompressionStream" in window)){$("file-status").textContent="このブラウザはGZIP圧縮に対応していません。";return;}
  try{var f=selectedFiles[0],stream=f.stream().pipeThrough(new CompressionStream("gzip")),blob=await new Response(stream).blob();downloadBlob(blob,f.name+".gz");$("file-status").textContent="GZIPファイルを作成しました（"+bytesText(blob.size)+"）。";}catch(e){$("file-status").textContent="GZIP圧縮に失敗しました: "+e.message;}
 });
+
+/* HEIC / HEIF conversion */
+var heicItems=[],heicLibraryPromise=null,heicConverting=false;
+function loadHeicLibrary(){
+ if(window.HeicTo)return Promise.resolve(window.HeicTo);
+ if(heicLibraryPromise)return heicLibraryPromise;
+ heicLibraryPromise=new Promise(function(resolve,reject){
+  var script=document.createElement("script");
+  script.src="https://cdn.jsdelivr.net/npm/heic-to@1.6.7/dist/iife/heic-to.js";
+  script.async=true;
+  script.onload=function(){if(window.HeicTo)resolve(window.HeicTo);else reject(new Error("HEIC変換ライブラリを初期化できませんでした。"));};
+  script.onerror=function(){heicLibraryPromise=null;reject(new Error("HEIC変換ライブラリを読み込めませんでした。ネットワーク接続を確認してください。"));};
+  document.head.appendChild(script);
+ });
+ return heicLibraryPromise;
+}
+function isHeicFile(file){
+ return /\.(heic|heif)$/i.test(file.name)||/^image\/(heic|heif|heic-sequence|heif-sequence)$/i.test(file.type||"");
+}
+function pngNameFor(item){
+ var base=item.file.name.replace(/\.(heic|heif)$/i,"").replace(/[\\/:*?"<>|]/g,"_")||"converted";
+ var index=heicItems.indexOf(item),same=0;
+ for(var i=0;i<index;i++){
+  var previous=heicItems[i].file.name.replace(/\.(heic|heif)$/i,"");
+  if(previous.toLowerCase()===base.toLowerCase())same++;
+ }
+ return base+(same?" ("+(same+1)+")":"")+".png";
+}
+function revokeHeicUrls(){
+ heicItems.forEach(function(item){if(item.url)URL.revokeObjectURL(item.url);});
+}
+function updateHeicControls(){
+ var hasItems=heicItems.length>0,done=heicItems.filter(function(item){return !!item.output;}).length;
+ $("heic-convert").disabled=!hasItems||heicConverting||done===heicItems.length;
+ $("heic-zip").disabled=done===0||heicConverting;
+ $("heic-clear").disabled=!hasItems||heicConverting;
+ $("heic-results-count").textContent=done+" / "+heicItems.length+" 件 完了";
+}
+function renderHeicItems(){
+ var list=$("heic-list");list.textContent="";
+ if(!heicItems.length){list.innerHTML='<div class="empty">変換したいHEIC画像を追加してください。</div>';updateHeicControls();return;}
+ heicItems.forEach(function(item,index){
+  var row=document.createElement("div");row.className="heic-item";
+  var thumb=document.createElement("div");thumb.className="heic-thumb";
+  if(item.url){var image=document.createElement("img");image.src=item.url;image.alt=item.file.name+" のPNGプレビュー";thumb.appendChild(image);}
+  else thumb.textContent="HEIC";
+  var info=document.createElement("div"),name=document.createElement("div"),meta=document.createElement("div"),state=document.createElement("div");
+  name.className="heic-file-name";name.textContent=item.file.name;
+  meta.className="heic-file-meta";meta.textContent=bytesText(item.file.size)+(item.output?" → "+bytesText(item.output.size):"");
+  state.className="heic-file-state"+(item.error?" is-error":"");state.textContent=item.error||item.status;
+  info.append(name,meta,state);
+  var actions=document.createElement("div");actions.className="heic-item-actions";
+  if(item.output){
+   var download=document.createElement("button");download.type="button";download.className="btn heic-small";download.textContent="PNGを保存";
+   download.addEventListener("click",function(){downloadBlob(item.output,item.outputName);});
+   actions.appendChild(download);
+  }else if(item.error){
+   var retry=document.createElement("button");retry.type="button";retry.className="btn heic-small";retry.textContent="再試行";
+   retry.addEventListener("click",function(){convertHeicItems([item]);});actions.appendChild(retry);
+  }
+  var remove=document.createElement("button");remove.type="button";remove.className="btn heic-small";remove.textContent="削除";
+  remove.disabled=heicConverting;
+  remove.addEventListener("click",function(){if(item.url)URL.revokeObjectURL(item.url);heicItems.splice(index,1);renderHeicItems();});
+  actions.appendChild(remove);
+  row.append(thumb,info,actions);list.appendChild(row);
+ });
+ updateHeicControls();
+}
+function addHeicFiles(files){
+ var added=0,rejected=0;
+ Array.prototype.forEach.call(files,function(file){
+  if(!isHeicFile(file)){rejected++;return;}
+  if(heicItems.some(function(item){return item.file.name===file.name&&item.file.size===file.size&&item.file.lastModified===file.lastModified;}))return;
+  heicItems.push({file:file,status:"待機中",output:null,outputName:"",url:null,error:""});
+  added++;
+ });
+ renderHeicItems();
+ $("heic-status").textContent=(added?added+" 個のHEIC画像を追加しました。":"追加された画像はありません。")+(rejected?" HEIC / HEIF以外の"+rejected+"ファイルは除外しました。":"");
+}
+async function convertHeicItems(items){
+ if(heicConverting)return;
+ if(!items||!items.length)return;
+ heicConverting=true;updateHeicControls();
+ var targets=items.filter(function(item){return !item.output;});
+ var completedBefore=heicItems.filter(function(item){return !!item.output;}).length;
+ var converted=0,failed=0;
+ $("heic-progress-bar").style.width="0%";
+ try{
+  var converter=await loadHeicLibrary();
+  for(var i=0;i<targets.length;i++){
+   var item=targets[i];item.status="変換中…";item.error="";renderHeicItems();
+   try{
+    if(converter.isHeic&&!await converter.isHeic(item.file))throw new Error("HEIC / HEIF画像として認識できませんでした。");
+    var result=await converter({blob:item.file,type:"image/png"});
+    if(!(result instanceof Blob))throw new Error("PNGデータを取得できませんでした。");
+    item.output=new Blob([result],{type:"image/png"});
+    item.outputName=pngNameFor(item);
+    item.url=URL.createObjectURL(item.output);
+    item.status="変換完了";converted++;
+   }catch(error){item.status="変換失敗";item.error=error&&error.message?error.message:"変換に失敗しました。";failed++;}
+   $("heic-progress-bar").style.width=Math.round((i+1)/targets.length*100)+"%";
+   $("heic-progress-label").textContent=(i+1)+" / "+targets.length+" 件 処理済み";
+   renderHeicItems();
+  }
+  $("heic-status").textContent=converted+" 件をPNGに変換しました。"+(failed?" "+failed+" 件は変換できませんでした。":"");
+ }catch(error){
+  $("heic-status").textContent=error.message||"HEIC変換ライブラリを読み込めませんでした。";
+  targets.forEach(function(item){if(item.status==="変換中…")item.status="待機中";});
+ }finally{
+  heicConverting=false;
+  $("heic-progress-label").textContent="処理完了";
+  renderHeicItems();
+ }
+}
+$("heic-choose").addEventListener("click",function(){$("heic-input").click();});
+$("heic-input").addEventListener("change",function(event){addHeicFiles(event.target.files);event.target.value="";});
+var heicDrop=$("heic-drop");
+heicDrop.addEventListener("dragover",function(event){event.preventDefault();heicDrop.classList.add("drag");});
+heicDrop.addEventListener("dragleave",function(){heicDrop.classList.remove("drag");});
+heicDrop.addEventListener("drop",function(event){event.preventDefault();heicDrop.classList.remove("drag");addHeicFiles(event.dataTransfer.files);});
+$("heic-convert").addEventListener("click",function(){convertHeicItems(heicItems);});
+$("heic-clear").addEventListener("click",function(){
+ if(heicConverting)return;revokeHeicUrls();heicItems=[];$("heic-progress-bar").style.width="0%";$("heic-progress-label").textContent="待機中";$("heic-status").textContent="一覧をクリアしました。";renderHeicItems();
+});
+$("heic-zip").addEventListener("click",async function(){
+ var outputs=heicItems.filter(function(item){return !!item.output;});
+ if(!outputs.length)return;
+ if(!window.JSZip){$("heic-status").textContent="ZIPライブラリを読み込めませんでした。PNGを個別に保存してください。";return;}
+ var button=$("heic-zip");button.disabled=true;
+ try{
+  var zip=new JSZip();outputs.forEach(function(item){zip.file(item.outputName,item.output);});
+  var blob=await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:4}},function(meta){$("heic-progress-bar").style.width=meta.percent.toFixed(0)+"%";$("heic-progress-label").textContent="ZIP作成中 "+meta.percent.toFixed(0)+"%";});
+  downloadBlob(blob,"converted-png-images.zip");$("heic-status").textContent=outputs.length+" 件のPNGをZIPにまとめました。";
+ }catch(error){$("heic-status").textContent="ZIPを作成できませんでした: "+error.message;}
+ finally{updateHeicControls();}
+});
+renderHeicItems();
 })();
 </script>
 </body>
