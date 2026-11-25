@@ -348,7 +348,7 @@ function loadHeicLibrary(){
   var script=document.createElement("script");
   script.src="https://cdn.jsdelivr.net/npm/heic-to@1.6.7/dist/iife/heic-to.js";
   script.async=true;
-  script.onload=function(){if(window.HeicTo)resolve(window.HeicTo);else reject(new Error("HEIC変換ライブラリを初期化できませんでした。"));};
+  script.onload=function(){if(window.HeicTo)resolve(window.HeicTo);else{heicLibraryPromise=null;reject(new Error("HEIC変換ライブラリを初期化できませんでした。"));}};
   script.onerror=function(){heicLibraryPromise=null;reject(new Error("HEIC変換ライブラリを読み込めませんでした。ネットワーク接続を確認してください。"));};
   document.head.appendChild(script);
  });
