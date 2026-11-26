@@ -1331,6 +1331,175 @@
       .source-editor .cm-line { padding: 0 12px; }
       .preview-wrap { padding: 19px 15px; }
     }
+
+    /* PDF export dialog */
+    .preview-header-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pdf-export-button { white-space: nowrap; }
+    .pdf-print-heading { display: none; }
+    .pdf-export-dialog {
+      width: min(460px, calc(100vw - 28px));
+      max-width: none;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--panel);
+      color: var(--ink);
+      box-shadow: 0 24px 70px rgba(15, 25, 45, .24);
+    }
+    .pdf-export-dialog::backdrop { background: rgba(12, 20, 35, .48); }
+    .pdf-export-dialog form { padding: 22px; }
+    .pdf-dialog-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .pdf-dialog-heading .eyebrow { margin-bottom: 5px; }
+    .pdf-dialog-heading h2 { font-size: 18px; }
+    .pdf-dialog-close {
+      width: 34px; min-width: 34px; min-height: 34px;
+      padding: 0; font-size: 21px;
+    }
+    .pdf-dialog-description, .pdf-dialog-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+    .pdf-dialog-description { margin: 12px 0 17px; }
+    .pdf-dialog-fields { display: grid; gap: 12px; }
+    .pdf-dialog-field { display: grid; gap: 6px; }
+    .pdf-dialog-field span { color: var(--muted); font-size: 11px; font-weight: 750; }
+    .pdf-dialog-field input, .pdf-dialog-field select {
+      width: 100%; min-height: 40px; padding: 8px 10px;
+      border: 1px solid var(--line); border-radius: 8px;
+      background: var(--panel); color: var(--ink); font: inherit; font-size: 12px;
+    }
+    .pdf-dialog-note {
+      margin-top: 14px; padding: 10px 11px;
+      border-radius: 9px; background: var(--canvas);
+    }
+    .pdf-dialog-actions {
+      display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;
+    }
+    html[data-theme="dark"] .pdf-export-dialog {
+      background: #182335; color: #e8edf7; border-color: #344257;
+    }
+    html[data-theme="dark"] .pdf-dialog-note { background: #111c2b; }
+
+    @page { size: A4 portrait; margin: 16mm; }
+    @media print {
+      html, body {
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #111 !important;
+      }
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .app-shell {
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .topbar, .intro, .editor-panel, .character-count-panel,
+      .library-section, .memo-drawer, .memo-drawer-backdrop,
+      .pdf-export-dialog {
+        display: none !important;
+      }
+      .workbench {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .workbench > .output-panel {
+        display: block !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        color: #111 !important;
+      }
+      .output-panel > .panel-heading { display: none !important; }
+      .pdf-print-heading {
+        display: block !important;
+        margin: 0 0 10mm !important;
+        padding: 0 0 5mm !important;
+        border-bottom: .5pt solid #c8cdd5 !important;
+        color: #111 !important;
+      }
+      .pdf-print-heading h1 {
+        margin: 0 0 3mm !important;
+        color: #111 !important;
+        font-size: 19pt !important;
+        line-height: 1.25 !important;
+        letter-spacing: 0 !important;
+        overflow-wrap: anywhere;
+      }
+      .pdf-print-heading p {
+        margin: 0 !important;
+        color: #666 !important;
+        font-size: 8.5pt !important;
+      }
+      .output-panel > .preview-wrap {
+        display: block !important;
+        overflow: visible !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+      }
+      #preview {
+        min-height: 0 !important;
+        overflow: visible !important;
+        color: #111 !important;
+        background: #fff !important;
+        font-size: 10.5pt !important;
+        line-height: 1.7 !important;
+        overflow-wrap: break-word !important;
+      }
+      #preview.markdown-rendered { white-space: normal !important; }
+      #preview p { orphans: 3; widows: 3; }
+      #preview h1, #preview h2, #preview h3, #preview h4 {
+        break-after: avoid-page;
+        page-break-after: avoid;
+        color: #111 !important;
+      }
+      #preview .math-display-wrapper,
+      #preview .katex-display,
+      #preview blockquote,
+      #preview pre,
+      #preview table {
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+      #preview .katex-display {
+        max-width: 100% !important;
+        overflow: visible !important;
+        color: #111 !important;
+      }
+      #preview .katex,
+      #preview .katex * { color: #111 !important; }
+      #preview a { color: #111 !important; text-decoration: underline; }
+      #preview pre, #preview code {
+        background: #f5f6f8 !important;
+        color: #111 !important;
+        border-color: #d8dce3 !important;
+      }
+      #preview th { background: #f0f2f5 !important; }
+    }
+
   </style>
   <link rel="stylesheet" href="theme.css?v=20261122-contrastfix3">
   <script src="theme.js"></script>
@@ -1398,10 +1567,17 @@
               
             </div>
           </div>
-          <div id="status" class="status" role="status" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span id="status-text">準備中</span>
+          <div class="preview-header-tools">
+            <div id="status" class="status" role="status" aria-live="polite">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span id="status-text">準備中</span>
+            </div>
+            <button id="pdf-export-open" class="primary-button pdf-export-button" type="button">PDF出力</button>
           </div>
+        </div>
+        <div class="pdf-print-heading" aria-hidden="true">
+          <h1 id="pdf-print-title">LaTeXメモ</h1>
+          <p id="pdf-print-date"></p>
         </div>
         <div class="preview-wrap">
           <div id="preview" aria-label="数式のプレビュー"></div>
@@ -1510,6 +1686,46 @@
 
   </main>
 
+
+  <dialog id="pdf-export-dialog" class="pdf-export-dialog" aria-labelledby="pdf-export-dialog-title">
+    <form id="pdf-export-form">
+      <div class="pdf-dialog-heading">
+        <div>
+          <p class="eyebrow">PDF EXPORT</p>
+          <h2 id="pdf-export-dialog-title">プレビューをPDF化</h2>
+        </div>
+        <button class="pdf-dialog-close" id="pdf-export-cancel-x" type="button" aria-label="閉じる">×</button>
+      </div>
+      <p class="pdf-dialog-description">現在のプレビューを印刷画面へ送ります。「PDFとして保存」を選ぶとPDFファイルになります。</p>
+      <div class="pdf-dialog-fields">
+        <label class="pdf-dialog-field">
+          <span>タイトル</span>
+          <input id="pdf-export-title" type="text" maxlength="80" value="LaTeXメモ" autocomplete="off">
+        </label>
+        <label class="pdf-dialog-field">
+          <span>用紙の向き</span>
+          <select id="pdf-export-orientation">
+            <option value="portrait">A4・縦</option>
+            <option value="landscape">A4・横</option>
+          </select>
+        </label>
+        <label class="pdf-dialog-field">
+          <span>余白</span>
+          <select id="pdf-export-margin">
+            <option value="16mm">標準（16 mm）</option>
+            <option value="10mm">狭い（10 mm）</option>
+            <option value="22mm">広い（22 mm）</option>
+          </select>
+        </label>
+      </div>
+      <div class="pdf-dialog-note">数式はプレビューと同じKaTeX表示で印刷します。ページ数は内容に応じて自動調整されます。</div>
+      <div class="pdf-dialog-actions">
+        <button id="pdf-export-cancel" type="button">キャンセル</button>
+        <button class="primary-button" type="submit">印刷画面へ進む</button>
+      </div>
+    </form>
+  </dialog>
+
   <script>
     function loadKatex() {
       const sources = [
@@ -1597,6 +1813,18 @@
       const overwriteSaveButton = document.getElementById("overwrite-save-button");
       const renameSaveButton = document.getElementById("rename-save-button");
       const copyCurrentButton = document.getElementById("copy-current-button");
+      const pdfExportOpenButton = document.getElementById("pdf-export-open");
+      const pdfExportDialog = document.getElementById("pdf-export-dialog");
+      const pdfExportForm = document.getElementById("pdf-export-form");
+      const pdfExportTitleInput = document.getElementById("pdf-export-title");
+      const pdfExportOrientation = document.getElementById("pdf-export-orientation");
+      const pdfExportMargin = document.getElementById("pdf-export-margin");
+      const pdfPrintTitle = document.getElementById("pdf-print-title");
+      const pdfPrintDate = document.getElementById("pdf-print-date");
+      let originalDocumentTitle = null;
+      const pdfPageStyle = document.createElement("style");
+      pdfPageStyle.id = "pdf-page-style";
+      document.head.appendChild(pdfPageStyle);
       const memoDrawerToggle = document.getElementById("memo-drawer-toggle");
       const memoMenuCount = document.getElementById("memo-menu-count");
       const memoDrawer = document.getElementById("memo-drawer");
@@ -2909,6 +3137,78 @@
           savedSearchInput.focus();
         }
       });
+
+      function openPdfExportDialog() {
+        if (!source.value.trim()) {
+          setStatus("PDF化する内容がありません", true);
+          focusEditor();
+          return;
+        }
+        const currentNote = savedNotes.find(function (note) { return note.id === editingNoteId; });
+        pdfExportTitleInput.value = currentNote && currentNote.title
+          ? currentNote.title
+          : "LaTeXメモ";
+        if (typeof pdfExportDialog.showModal === "function") {
+          pdfExportDialog.showModal();
+          pdfExportTitleInput.focus();
+          pdfExportTitleInput.select();
+        } else {
+          setStatus("このブラウザではPDF出力ダイアログを利用できません", true);
+        }
+      }
+
+      function startPdfPrint() {
+        const title = pdfExportTitleInput.value.trim() || "LaTeXメモ";
+        const orientation = pdfExportOrientation.value === "landscape" ? "landscape" : "portrait";
+        const marginValues = ["10mm", "16mm", "22mm"];
+        const margin = marginValues.includes(pdfExportMargin.value) ? pdfExportMargin.value : "16mm";
+        pdfPrintTitle.textContent = title;
+        pdfPrintDate.textContent = "作成日時：" + new Date().toLocaleString("ja-JP");
+        pdfPageStyle.textContent = "@page { size: A4 " + orientation + "; margin: " + margin + "; }";
+
+        if (originalDocumentTitle === null) originalDocumentTitle = document.title;
+        document.title = title.replace(/[\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
+
+        const printAfterFonts = function () {
+          window.setTimeout(function () {
+            try {
+              window.print();
+            } catch (error) {
+              setStatus("印刷画面を開けませんでした: " + (error.message || error), true);
+              restorePdfDocumentTitle();
+            }
+          }, 100);
+        };
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(printAfterFonts, printAfterFonts);
+        } else {
+          printAfterFonts();
+        }
+      }
+
+      function restorePdfDocumentTitle() {
+        if (originalDocumentTitle !== null) {
+          document.title = originalDocumentTitle;
+          originalDocumentTitle = null;
+        }
+      }
+
+      pdfExportOpenButton.addEventListener("click", openPdfExportDialog);
+      document.getElementById("pdf-export-cancel").addEventListener("click", function () {
+        pdfExportDialog.close();
+      });
+      document.getElementById("pdf-export-cancel-x").addEventListener("click", function () {
+        pdfExportDialog.close();
+      });
+      pdfExportDialog.addEventListener("click", function (event) {
+        if (event.target === pdfExportDialog) pdfExportDialog.close();
+      });
+      pdfExportForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        pdfExportDialog.close();
+        startPdfPrint();
+      });
+      window.addEventListener("afterprint", restorePdfDocumentTitle);
 
       saveButton.addEventListener("click", saveCurrentNote);
       overwriteSaveButton.addEventListener("click", overwriteCurrentNote);
