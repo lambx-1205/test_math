@@ -1870,6 +1870,8 @@
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
       let originalDocumentTitle = null;
+      let originalPrintTheme = null;
+      let printThemeWasChanged = false;
       let renderingLibrariesReady = null;
       const pdfPageStyle = document.createElement("style");
       pdfPageStyle.id = "pdf-page-style";
@@ -3277,6 +3279,21 @@
           document.title = title.replace(/[\\\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
 
           await waitForKatexAssets();
+
+          // The shared dark theme styles .panel with a high-specificity
+          // !important background. Temporarily disable dark mode so that
+          // the print stylesheet can produce a genuinely white page.
+          originalPrintTheme = document.documentElement.getAttribute("data-theme");
+          printThemeWasChanged = originalPrintTheme === "dark";
+          if (printThemeWasChanged) {
+            document.documentElement.setAttribute("data-theme", "light");
+            await new Promise(function (resolve) {
+              window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(resolve);
+              });
+            });
+          }
+
           setStatus("印刷画面を開きます", false);
           window.print();
         } catch (error) {
@@ -3289,6 +3306,15 @@
         if (originalDocumentTitle !== null) {
           document.title = originalDocumentTitle;
           originalDocumentTitle = null;
+        }
+        if (printThemeWasChanged) {
+          if (originalPrintTheme === null) {
+            document.documentElement.removeAttribute("data-theme");
+          } else {
+            document.documentElement.setAttribute("data-theme", originalPrintTheme);
+          }
+          originalPrintTheme = null;
+          printThemeWasChanged = false;
         }
       }
 
