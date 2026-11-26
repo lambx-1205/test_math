@@ -1870,8 +1870,6 @@
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
       let originalDocumentTitle = null;
-      let originalPrintTheme = null;
-      let printThemeWasChanged = false;
       let renderingLibrariesReady = null;
       const pdfPageStyle = document.createElement("style");
       pdfPageStyle.id = "pdf-page-style";
@@ -3273,26 +3271,15 @@
               "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; font-family: 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Noto Serif JP', 'Noto Serif CJK JP', 'IPAexMincho', serif !important; }" +
               "#preview, #preview * { color: #000 !important; -webkit-text-fill-color: #000 !important; }" +
               "#preview .katex, #preview .katex * { background-color: transparent !important; }" +
+              "html[data-theme='dark'] body .app-shell .workbench > .output-panel { background-color: #fff !important; background-image: none !important; box-shadow: none !important; border-color: transparent !important; color: #000 !important; }" +
+              "html[data-theme='dark'] body .app-shell .workbench > .output-panel > .preview-wrap { background-color: #fff !important; background-image: none !important; box-shadow: none !important; border-color: transparent !important; color: #000 !important; }" +
+              "html[data-theme='dark'] body .app-shell .workbench > .output-panel > .preview-wrap > #preview { background-color: #fff !important; background-image: none !important; box-shadow: none !important; color: #000 !important; }" +
             "}";
 
           if (originalDocumentTitle === null) originalDocumentTitle = document.title;
           document.title = title.replace(/[\\\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
 
           await waitForKatexAssets();
-
-          // The shared dark theme styles .panel with a high-specificity
-          // !important background. Temporarily disable dark mode so that
-          // the print stylesheet can produce a genuinely white page.
-          originalPrintTheme = document.documentElement.getAttribute("data-theme");
-          printThemeWasChanged = originalPrintTheme === "dark";
-          if (printThemeWasChanged) {
-            document.documentElement.setAttribute("data-theme", "light");
-            await new Promise(function (resolve) {
-              window.requestAnimationFrame(function () {
-                window.requestAnimationFrame(resolve);
-              });
-            });
-          }
 
           setStatus("印刷画面を開きます", false);
           window.print();
@@ -3306,15 +3293,6 @@
         if (originalDocumentTitle !== null) {
           document.title = originalDocumentTitle;
           originalDocumentTitle = null;
-        }
-        if (printThemeWasChanged) {
-          if (originalPrintTheme === null) {
-            document.documentElement.removeAttribute("data-theme");
-          } else {
-            document.documentElement.setAttribute("data-theme", originalPrintTheme);
-          }
-          originalPrintTheme = null;
-          printThemeWasChanged = false;
         }
       }
 
