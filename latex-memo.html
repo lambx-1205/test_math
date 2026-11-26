@@ -1457,23 +1457,23 @@
       }
       .output-panel > .panel-heading { display: none !important; }
 
-      /* A vector hairline, separated from the text by 9 mm. */
-      .pdf-print-rule {
+      /* A plain horizontal rule. No SVG scaling or filled rectangle. */
+      hr.pdf-print-rule {
+        -webkit-appearance: none !important;
+        appearance: none !important;
         display: block !important;
         width: 100% !important;
-        height: 1px !important;
+        height: 0 !important;
+        min-height: 0 !important;
         margin: 0 0 9mm !important;
         padding: 0 !important;
-        overflow: visible !important;
         border: 0 !important;
+        border-top: .35pt solid #333 !important;
         background: transparent !important;
+        background-image: none !important;
         box-shadow: none !important;
+        text-shadow: none !important;
         filter: none !important;
-      }
-      .pdf-print-rule line {
-        stroke: #222 !important;
-        stroke-width: .18 !important;
-        vector-effect: non-scaling-stroke;
       }
 
       .output-panel > .preview-wrap {
@@ -1492,6 +1492,12 @@
         font-size: 10.5pt !important;
         line-height: 1.7 !important;
         overflow-wrap: break-word !important;
+        font-family: "Yu Mincho", "YuMincho", "Hiragino Mincho ProN", "Noto Serif JP", "Noto Serif CJK JP", "IPAexMincho", serif !important;
+      }
+      #preview .katex,
+      #preview .katex * {
+        font-family: KaTeX_Main, "Times New Roman", serif !important;
+        background-color: transparent !important;
       }
       #preview, #preview * {
         color: #000 !important;
@@ -1611,7 +1617,7 @@
             <button id="pdf-export-open" class="primary-button pdf-export-button" type="button">PDF出力</button>
           </div>
         </div>
-        <svg class="pdf-print-rule" aria-hidden="true" viewBox="0 0 1000 1" preserveAspectRatio="none"><line x1="0" y1="0.5" x2="1000" y2="0.5"></line></svg>
+        <hr class="pdf-print-rule" aria-hidden="true">
         <div class="preview-wrap">
           <div id="preview" aria-label="数式のプレビュー"></div>
         </div>
@@ -3263,7 +3269,7 @@
           pdfPageStyle.textContent =
             "@page { size: A4 " + orientation + "; margin: " + margin + "; }" +
             "@media print {" +
-              "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; }" +
+              "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; font-family: 'Yu Mincho', 'YuMincho', 'Hiragino Mincho ProN', 'Noto Serif JP', 'Noto Serif CJK JP', 'IPAexMincho', serif !important; }" +
               "#preview, #preview * { color: #000 !important; -webkit-text-fill-color: #000 !important; }" +
               "#preview .katex, #preview .katex * { background-color: transparent !important; }" +
             "}";
