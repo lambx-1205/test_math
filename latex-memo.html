@@ -602,8 +602,9 @@
 
     #preview.markdown-rendered,
     .saved-note-rendered.markdown-rendered {
+      /* Marked converts single source newlines to <br>; keep the same rhythm as the editor. */
       white-space: normal;
-      line-height: 1.5;
+      line-height: 1.85;
     }
 
     #preview.markdown-rendered p,
@@ -2658,7 +2659,7 @@
           return placeholder;
         });
 
-        const html = window.marked.parse(protectedText, { gfm: true, breaks: false });
+        const html = window.marked.parse(protectedText, { gfm: true, breaks: true });
         target.innerHTML = window.DOMPurify.sanitize(html, {
           USE_PROFILES: { html: true }
         });
