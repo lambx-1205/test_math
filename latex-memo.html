@@ -1401,7 +1401,7 @@
         margin: 0 !important;
         padding: 0 !important;
         background: #fff !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       html, body, body * {
         print-color-adjust: exact !important;
@@ -1415,7 +1415,7 @@
         margin: 0 !important;
         padding: 0 !important;
         background: #fff !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       .topbar, .intro, .editor-panel, .character-count-panel,
       .library-section, .memo-drawer, .memo-drawer-backdrop,
@@ -1439,7 +1439,7 @@
         border-radius: 0 !important;
         background: #fff !important;
         box-shadow: none !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       .output-panel > .panel-heading { display: none !important; }
 
@@ -1452,7 +1452,7 @@
         border: 0 !important;
         border-bottom: .65pt solid #222 !important;
         background: #fff !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       .pdf-print-heading h1,
       .pdf-print-heading p { display: none !important; }
@@ -1463,26 +1463,31 @@
         min-height: 0 !important;
         padding: 0 !important;
         background: #fff !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       #preview, html[data-theme="dark"] #preview {
         min-height: 0 !important;
         overflow: visible !important;
-        color: #111 !important;
+        color: #000 !important;
         background: #fff !important;
         font-size: 10.5pt !important;
         line-height: 1.7 !important;
         overflow-wrap: break-word !important;
       }
       #preview, #preview * {
-        color: #111 !important;
+        color: #000 !important;
+        -webkit-text-fill-color: #000 !important;
+      }
+      #preview svg, #preview svg * {
+        fill: #000 !important;
+        stroke: #000 !important;
       }
       #preview.markdown-rendered { white-space: normal !important; }
       #preview p { orphans: 3; widows: 3; }
       #preview h1, #preview h2, #preview h3, #preview h4 {
         break-after: avoid-page;
         page-break-after: avoid;
-        color: #111 !important;
+        color: #000 !important;
       }
       #preview .math-display-wrapper,
       #preview .katex-display,
@@ -1495,20 +1500,20 @@
       #preview .katex-display {
         max-width: 100% !important;
         overflow: visible !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       #preview .katex,
-      #preview .katex * { color: #111 !important; }
-      #preview a { color: #111 !important; text-decoration: underline; }
+      #preview .katex * { color: #000 !important; }
+      #preview a { color: #000 !important; text-decoration: underline; }
       #preview blockquote { border-left-color: #777 !important; }
       #preview pre, #preview code {
         background: #f5f6f8 !important;
-        color: #111 !important;
+        color: #000 !important;
         border-color: #d8dce3 !important;
       }
       #preview th {
         background: #f0f2f5 !important;
-        color: #111 !important;
+        color: #000 !important;
       }
       #preview th, #preview td { border-color: #c8cdd5 !important; }
       #preview hr { border-top-color: #999 !important; }
@@ -1729,6 +1734,17 @@
             <option value="22mm">広い（22 mm）</option>
           </select>
         </label>
+        <label class="pdf-dialog-field">
+          <span>文字サイズ</span>
+          <select id="pdf-export-font-size">
+            <option value="9pt">小さめ（9 pt）</option>
+            <option value="10pt">やや小さめ（10 pt）</option>
+            <option value="10.5pt" selected>標準（10.5 pt）</option>
+            <option value="11pt">やや大きめ（11 pt）</option>
+            <option value="12pt">大きめ（12 pt）</option>
+            <option value="14pt">特大（14 pt）</option>
+          </select>
+        </label>
       </div>
       <div class="pdf-dialog-note">数式はプレビューと同じKaTeX表示で印刷します。ブラウザの印刷設定で「ヘッダーとフッター」をOFFにすると、日時・サイト名・URLも消せます。</div>
       <div class="pdf-dialog-actions">
@@ -1831,6 +1847,7 @@
       const pdfExportTitleInput = document.getElementById("pdf-export-title");
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
+      const pdfExportFontSize = document.getElementById("pdf-export-font-size");
       const pdfPrintTitle = document.getElementById("pdf-print-title");
       const pdfPrintDate = document.getElementById("pdf-print-date");
       let originalDocumentTitle = null;
@@ -3174,9 +3191,19 @@
         const orientation = pdfExportOrientation.value === "landscape" ? "landscape" : "portrait";
         const marginValues = ["10mm", "16mm", "22mm"];
         const margin = marginValues.includes(pdfExportMargin.value) ? pdfExportMargin.value : "16mm";
+        const fontSizeValues = ["9pt", "10pt", "10.5pt", "11pt", "12pt", "14pt"];
+        const fontSize = fontSizeValues.includes(pdfExportFontSize.value)
+          ? pdfExportFontSize.value
+          : "10.5pt";
         pdfPrintTitle.textContent = title;
         pdfPrintDate.textContent = "作成日時：" + new Date().toLocaleString("ja-JP");
-        pdfPageStyle.textContent = "@page { size: A4 " + orientation + "; margin: " + margin + "; }";
+        pdfPageStyle.textContent =
+          "@page { size: A4 " + orientation + "; margin: " + margin + "; }" +
+          "@media print {" +
+            "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; }" +
+            "#preview, #preview * { color: #000 !important; -webkit-text-fill-color: #000 !important; }" +
+            "#preview svg, #preview svg * { fill: #000 !important; stroke: #000 !important; }" +
+          "}";
 
         if (originalDocumentTitle === null) originalDocumentTitle = document.title;
         document.title = title.replace(/[\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
