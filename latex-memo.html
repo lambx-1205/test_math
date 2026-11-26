@@ -1443,19 +1443,25 @@
       }
       .output-panel > .panel-heading { display: none !important; }
 
-      /* Campus Note-style header: one thin rule, without title or timestamp. */
+      /* Minimal PDF header: a single hairline, then clear space before the text. */
       .pdf-print-heading {
         display: block !important;
         height: 0 !important;
         margin: 0 0 8mm !important;
         padding: 0 !important;
         border: 0 !important;
-        border-bottom: .65pt solid #222 !important;
-        background: #fff !important;
-        color: #000 !important;
+        border-bottom: .5pt solid #000 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+        outline: 0 !important;
       }
-      .pdf-print-heading h1,
-      .pdf-print-heading p { display: none !important; }
+      .pdf-print-heading::before,
+      .pdf-print-heading::after {
+        content: none !important;
+        display: none !important;
+      }
 
       .output-panel > .preview-wrap {
         display: block !important;
@@ -1592,10 +1598,7 @@
             <button id="pdf-export-open" class="primary-button pdf-export-button" type="button">PDF出力</button>
           </div>
         </div>
-        <div class="pdf-print-heading" aria-hidden="true">
-          <h1 id="pdf-print-title">LaTeXメモ</h1>
-          <p id="pdf-print-date"></p>
-        </div>
+        <div class="pdf-print-heading" aria-hidden="true"></div>
         <div class="preview-wrap">
           <div id="preview" aria-label="数式のプレビュー"></div>
         </div>
@@ -1848,8 +1851,6 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
-      const pdfPrintTitle = document.getElementById("pdf-print-title");
-      const pdfPrintDate = document.getElementById("pdf-print-date");
       let originalDocumentTitle = null;
       const pdfPageStyle = document.createElement("style");
       pdfPageStyle.id = "pdf-page-style";
@@ -3195,8 +3196,6 @@
         const fontSize = fontSizeValues.includes(pdfExportFontSize.value)
           ? pdfExportFontSize.value
           : "10.5pt";
-        pdfPrintTitle.textContent = title;
-        pdfPrintDate.textContent = "作成日時：" + new Date().toLocaleString("ja-JP");
         pdfPageStyle.textContent =
           "@page { size: A4 " + orientation + "; margin: " + margin + "; }" +
           "@media print {" +
