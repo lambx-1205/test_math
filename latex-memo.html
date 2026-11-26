@@ -1341,7 +1341,7 @@
       gap: 10px;
     }
     .pdf-export-button { white-space: nowrap; }
-    .pdf-print-heading { display: none; }
+    .pdf-print-rule { display: none; }
     .pdf-export-dialog {
       width: min(460px, calc(100vw - 28px));
       max-width: none;
@@ -1403,9 +1403,12 @@
         background: #fff !important;
         color: #000 !important;
       }
-      html, body, body * {
+      html, body, body *, body *::before, body *::after {
         print-color-adjust: exact !important;
         -webkit-print-color-adjust: exact !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        filter: none !important;
       }
       body.memo-drawer-open { overflow: visible !important; }
       .app-shell {
@@ -1443,24 +1446,19 @@
       }
       .output-panel > .panel-heading { display: none !important; }
 
-      /* Minimal PDF header: a single hairline, then clear space before the text. */
-      .pdf-print-heading {
+      /* A single rule at the top of the text area. */
+      .pdf-print-rule {
         display: block !important;
+        width: 100% !important;
         height: 0 !important;
-        margin: 0 0 8mm !important;
+        margin: 0 0 9mm !important;
         padding: 0 !important;
         border: 0 !important;
-        border-bottom: .5pt solid #000 !important;
-        background: transparent !important;
+        border-top: .5pt solid #000 !important;
+        background: none !important;
         box-shadow: none !important;
         text-shadow: none !important;
         filter: none !important;
-        outline: 0 !important;
-      }
-      .pdf-print-heading::before,
-      .pdf-print-heading::after {
-        content: none !important;
-        display: none !important;
       }
 
       .output-panel > .preview-wrap {
@@ -1598,7 +1596,7 @@
             <button id="pdf-export-open" class="primary-button pdf-export-button" type="button">PDF出力</button>
           </div>
         </div>
-        <div class="pdf-print-heading" aria-hidden="true"></div>
+        <div class="pdf-print-rule" aria-hidden="true"></div>
         <div class="preview-wrap">
           <div id="preview" aria-label="数式のプレビュー"></div>
         </div>
