@@ -1414,8 +1414,12 @@
         text-decoration-style: solid !important;
       }
       html, body, .app-shell, .workbench, .output-panel,
-      .preview-wrap, #preview, #preview * {
+      .preview-wrap, #preview {
         background-color: #fff !important;
+      }
+      #preview .katex,
+      #preview .katex * {
+        background-color: transparent !important;
       }
       body.memo-drawer-open { overflow: visible !important; }
       .app-shell {
@@ -1453,21 +1457,23 @@
       }
       .output-panel > .panel-heading { display: none !important; }
 
-      /* One physically thin rule, followed by generous whitespace. */
+      /* A vector hairline, separated from the text by 9 mm. */
       .pdf-print-rule {
         display: block !important;
         width: 100% !important;
-        height: .25pt !important;
-        min-height: .25pt !important;
+        height: 1px !important;
         margin: 0 0 9mm !important;
         padding: 0 !important;
+        overflow: visible !important;
         border: 0 !important;
-        background-color: #222 !important;
-        background-image: none !important;
+        background: transparent !important;
         box-shadow: none !important;
-        text-shadow: none !important;
         filter: none !important;
-        opacity: 1 !important;
+      }
+      .pdf-print-rule line {
+        stroke: #222 !important;
+        stroke-width: .18 !important;
+        vector-effect: non-scaling-stroke;
       }
 
       .output-panel > .preview-wrap {
@@ -1605,7 +1611,7 @@
             <button id="pdf-export-open" class="primary-button pdf-export-button" type="button">PDF出力</button>
           </div>
         </div>
-        <div class="pdf-print-rule" aria-hidden="true"></div>
+        <svg class="pdf-print-rule" aria-hidden="true" viewBox="0 0 1000 1" preserveAspectRatio="none"><line x1="0" y1="0.5" x2="1000" y2="0.5"></line></svg>
         <div class="preview-wrap">
           <div id="preview" aria-label="数式のプレビュー"></div>
         </div>
@@ -1859,6 +1865,7 @@
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
       let originalDocumentTitle = null;
+      let renderingLibrariesReady = null;
       const pdfPageStyle = document.createElement("style");
       pdfPageStyle.id = "pdf-page-style";
       document.head.appendChild(pdfPageStyle);
@@ -3175,6 +3182,48 @@
         }
       });
 
+      async function waitForKatexAssets() {
+        const cssLink = document.getElementById("katex-css");
+        if (cssLink && !cssLink.sheet) {
+          await new Promise(function (resolve, reject) {
+            const started = Date.now();
+            function check() {
+              if (cssLink.sheet) {
+                resolve();
+              } else if (Date.now() - started > 12000) {
+                reject(new Error("KaTeXのスタイルシートを読み込めませんでした。通信状態を確認してください。"));
+              } else {
+                window.requestAnimationFrame(check);
+              }
+            }
+            check();
+          });
+        }
+
+        if (!window.katex || typeof window.katex.render !== "function") {
+          throw new Error("KaTeXがまだ読み込まれていません。");
+        }
+
+        if (document.fonts && typeof document.fonts.load === "function") {
+          const katexFamilies = [
+            "KaTeX_Main", "KaTeX_Math", "KaTeX_AMS", "KaTeX_Size1",
+            "KaTeX_Size2", "KaTeX_Size3", "KaTeX_Size4",
+            "KaTeX_Caligraphic", "KaTeX_Fraktur", "KaTeX_SansSerif",
+            "KaTeX_Script", "KaTeX_Typewriter"
+          ];
+          await Promise.all(katexFamilies.map(function (family) {
+            return document.fonts.load('12pt "' + family + '"');
+          }));
+          await document.fonts.ready;
+        }
+
+        await new Promise(function (resolve) {
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(resolve);
+          });
+        });
+      }
+
       function openPdfExportDialog() {
         if (!source.value.trim()) {
           setStatus("PDF化する内容がありません", true);
@@ -3194,7 +3243,7 @@
         }
       }
 
-      function startPdfPrint() {
+      async function startPdfPrint() {
         const title = pdfExportTitleInput.value.trim() || "LaTeXメモ";
         const orientation = pdfExportOrientation.value === "landscape" ? "landscape" : "portrait";
         const marginValues = ["10mm", "16mm", "22mm"];
@@ -3203,31 +3252,31 @@
         const fontSize = fontSizeValues.includes(pdfExportFontSize.value)
           ? pdfExportFontSize.value
           : "10.5pt";
-        pdfPageStyle.textContent =
-          "@page { size: A4 " + orientation + "; margin: " + margin + "; }" +
-          "@media print {" +
-            "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; }" +
-            "#preview, #preview * { color: #000 !important; -webkit-text-fill-color: #000 !important; }" +
-            "#preview svg, #preview svg * { fill: #000 !important; stroke: #000 !important; }" +
-          "}";
 
-        if (originalDocumentTitle === null) originalDocumentTitle = document.title;
-        document.title = title.replace(/[\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
+        try {
+          setStatus("数式とフォントを準備中…", false);
+          if (renderingLibrariesReady) await renderingLibrariesReady;
+          await waitForKatexAssets();
 
-        const printAfterFonts = function () {
-          window.setTimeout(function () {
-            try {
-              window.print();
-            } catch (error) {
-              setStatus("印刷画面を開けませんでした: " + (error.message || error), true);
-              restorePdfDocumentTitle();
-            }
-          }, 100);
-        };
-        if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(printAfterFonts, printAfterFonts);
-        } else {
-          printAfterFonts();
+          // Re-render from the source only after KaTeX and its stylesheet are ready.
+          renderPreview();
+          pdfPageStyle.textContent =
+            "@page { size: A4 " + orientation + "; margin: " + margin + "; }" +
+            "@media print {" +
+              "#preview, html[data-theme='dark'] #preview { font-size: " + fontSize + " !important; color: #000 !important; }" +
+              "#preview, #preview * { color: #000 !important; -webkit-text-fill-color: #000 !important; }" +
+              "#preview .katex, #preview .katex * { background-color: transparent !important; }" +
+            "}";
+
+          if (originalDocumentTitle === null) originalDocumentTitle = document.title;
+          document.title = title.replace(/[\\\\/:*?"<>|]/g, " ").slice(0, 80) || "LaTeXメモ";
+
+          await waitForKatexAssets();
+          setStatus("印刷画面を開きます", false);
+          window.print();
+        } catch (error) {
+          setStatus(error && error.message ? error.message : "PDF出力の準備に失敗しました", true);
+          restorePdfDocumentTitle();
         }
       }
 
@@ -3279,7 +3328,8 @@
       setStatus("KaTeXを読み込み中…", false);
 
       const codeMirrorReady = initializeCodeMirror();
-      Promise.all([loadKatex(), loadMarkdownLibraries(), codeMirrorReady])
+      renderingLibrariesReady = Promise.all([loadKatex(), loadMarkdownLibraries()]);
+      Promise.all([renderingLibrariesReady, codeMirrorReady])
         .then(function () {
           renderPreview();
           renderSavedNotes();
