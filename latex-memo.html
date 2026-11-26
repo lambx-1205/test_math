@@ -1394,25 +1394,28 @@
 
     @page { size: A4 portrait; margin: 16mm; }
     @media print {
+      @page { background: #101722; }
       html, body {
         min-width: 0 !important;
-        min-height: 0 !important;
+        min-height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #fff !important;
-        color: #111 !important;
+        background: #101722 !important;
+        color: #f4f7fb !important;
       }
-      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-      html[data-theme="dark"] body {
-        background: #fff !important;
-        color: #111 !important;
+      html, body, body * {
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
       }
       body.memo-drawer-open { overflow: visible !important; }
       .app-shell {
         width: auto !important;
         max-width: none !important;
+        min-height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        background: #101722 !important;
+        color: #f4f7fb !important;
       }
       .topbar, .intro, .editor-panel, .character-count-panel,
       .library-section, .memo-drawer, .memo-drawer-backdrop,
@@ -1423,6 +1426,7 @@
         display: block !important;
         margin: 0 !important;
         padding: 0 !important;
+        background: #101722 !important;
       }
       .workbench > .output-panel {
         display: block !important;
@@ -1433,58 +1437,55 @@
         overflow: visible !important;
         border: 0 !important;
         border-radius: 0 !important;
-        background: #fff !important;
+        background: #101722 !important;
         box-shadow: none !important;
-        color: #111 !important;
+        color: #f4f7fb !important;
       }
       .output-panel > .panel-heading { display: none !important; }
       .pdf-print-heading {
         display: block !important;
-        margin: 0 0 10mm !important;
-        padding: 0 0 5mm !important;
-        border-bottom: .5pt solid #c8cdd5 !important;
-        color: #111 !important;
+        margin: 0 0 6mm !important;
+        padding: 0 0 3mm !important;
+        border-bottom: .5pt solid #526176 !important;
+        background: #101722 !important;
+        color: #f4f7fb !important;
       }
       .pdf-print-heading h1 {
-        margin: 0 0 3mm !important;
-        color: #111 !important;
-        font-size: 19pt !important;
+        margin: 0 !important;
+        color: #f4f7fb !important;
+        font-size: 14pt !important;
+        font-weight: 650 !important;
         line-height: 1.25 !important;
         letter-spacing: 0 !important;
         overflow-wrap: anywhere;
       }
-      .pdf-print-heading p {
-        margin: 0 !important;
-        color: #666 !important;
-        font-size: 8.5pt !important;
-      }
+      .pdf-print-heading p { display: none !important; }
       .output-panel > .preview-wrap {
         display: block !important;
         overflow: visible !important;
         min-height: 0 !important;
         padding: 0 !important;
-        background: #fff !important;
+        background: #101722 !important;
+        color: #f4f7fb !important;
       }
       #preview, html[data-theme="dark"] #preview {
         min-height: 0 !important;
         overflow: visible !important;
-        color: #111 !important;
-        background: #fff !important;
+        color: #f4f7fb !important;
+        background: #101722 !important;
         font-size: 10.5pt !important;
         line-height: 1.7 !important;
         overflow-wrap: break-word !important;
       }
-      html[data-theme="dark"] #preview :is(h1,h2,h3,h4,p,li,span,td,th,blockquote,code),
-      html[data-theme="dark"] #preview .katex,
-      html[data-theme="dark"] #preview .katex * {
-        color: #111 !important;
+      #preview, #preview * {
+        color: #f4f7fb !important;
       }
       #preview.markdown-rendered { white-space: normal !important; }
       #preview p { orphans: 3; widows: 3; }
       #preview h1, #preview h2, #preview h3, #preview h4 {
         break-after: avoid-page;
         page-break-after: avoid;
-        color: #111 !important;
+        color: #ffffff !important;
       }
       #preview .math-display-wrapper,
       #preview .katex-display,
@@ -1497,20 +1498,30 @@
       #preview .katex-display {
         max-width: 100% !important;
         overflow: visible !important;
-        color: #111 !important;
+        color: #ffffff !important;
       }
       #preview .katex,
-      #preview .katex * { color: #111 !important; }
-      #preview a { color: #111 !important; text-decoration: underline; }
-      #preview pre, #preview code {
-        background: #f5f6f8 !important;
-        color: #111 !important;
-        border-color: #d8dce3 !important;
+      #preview .katex * { color: #ffffff !important; }
+      #preview a { color: #c5d1ff !important; text-decoration: underline; }
+      #preview blockquote {
+        border-left-color: #66758a !important;
       }
-      #preview th { background: #f0f2f5 !important; }
+      #preview pre, #preview code {
+        background: #1a2637 !important;
+        color: #f4f7fb !important;
+        border-color: #526176 !important;
+      }
+      #preview th {
+        background: #1a2637 !important;
+        color: #ffffff !important;
+      }
+      #preview th, #preview td {
+        border-color: #526176 !important;
+      }
+      #preview hr { border-top-color: #526176 !important; }
     }
 
-  </style>
+</style>
   <link rel="stylesheet" href="theme.css?v=20261122-contrastfix3">
   <script src="theme.js"></script>
 </head>
