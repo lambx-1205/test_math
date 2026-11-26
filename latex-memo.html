@@ -1394,14 +1394,14 @@
 
     @page { size: A4 portrait; margin: 16mm; }
     @media print {
-      @page { background: #101722; }
+      @page { background: #fff; }
       html, body {
         min-width: 0 !important;
         min-height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #101722 !important;
-        color: #f4f7fb !important;
+        background: #fff !important;
+        color: #111 !important;
       }
       html, body, body * {
         print-color-adjust: exact !important;
@@ -1414,8 +1414,8 @@
         min-height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #101722 !important;
-        color: #f4f7fb !important;
+        background: #fff !important;
+        color: #111 !important;
       }
       .topbar, .intro, .editor-panel, .character-count-panel,
       .library-section, .memo-drawer, .memo-drawer-backdrop,
@@ -1426,7 +1426,7 @@
         display: block !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #101722 !important;
+        background: #fff !important;
       }
       .workbench > .output-panel {
         display: block !important;
@@ -1437,55 +1437,52 @@
         overflow: visible !important;
         border: 0 !important;
         border-radius: 0 !important;
-        background: #101722 !important;
+        background: #fff !important;
         box-shadow: none !important;
-        color: #f4f7fb !important;
+        color: #111 !important;
       }
       .output-panel > .panel-heading { display: none !important; }
+
+      /* Campus Note-style header: one thin rule, without title or timestamp. */
       .pdf-print-heading {
         display: block !important;
-        margin: 0 0 6mm !important;
-        padding: 0 0 3mm !important;
-        border-bottom: .5pt solid #526176 !important;
-        background: #101722 !important;
-        color: #f4f7fb !important;
+        height: 0 !important;
+        margin: 0 0 8mm !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-bottom: .65pt solid #222 !important;
+        background: #fff !important;
+        color: #111 !important;
       }
-      .pdf-print-heading h1 {
-        margin: 0 !important;
-        color: #f4f7fb !important;
-        font-size: 14pt !important;
-        font-weight: 650 !important;
-        line-height: 1.25 !important;
-        letter-spacing: 0 !important;
-        overflow-wrap: anywhere;
-      }
+      .pdf-print-heading h1,
       .pdf-print-heading p { display: none !important; }
+
       .output-panel > .preview-wrap {
         display: block !important;
         overflow: visible !important;
         min-height: 0 !important;
         padding: 0 !important;
-        background: #101722 !important;
-        color: #f4f7fb !important;
+        background: #fff !important;
+        color: #111 !important;
       }
       #preview, html[data-theme="dark"] #preview {
         min-height: 0 !important;
         overflow: visible !important;
-        color: #f4f7fb !important;
-        background: #101722 !important;
+        color: #111 !important;
+        background: #fff !important;
         font-size: 10.5pt !important;
         line-height: 1.7 !important;
         overflow-wrap: break-word !important;
       }
       #preview, #preview * {
-        color: #f4f7fb !important;
+        color: #111 !important;
       }
       #preview.markdown-rendered { white-space: normal !important; }
       #preview p { orphans: 3; widows: 3; }
       #preview h1, #preview h2, #preview h3, #preview h4 {
         break-after: avoid-page;
         page-break-after: avoid;
-        color: #ffffff !important;
+        color: #111 !important;
       }
       #preview .math-display-wrapper,
       #preview .katex-display,
@@ -1498,30 +1495,24 @@
       #preview .katex-display {
         max-width: 100% !important;
         overflow: visible !important;
-        color: #ffffff !important;
+        color: #111 !important;
       }
       #preview .katex,
-      #preview .katex * { color: #ffffff !important; }
-      #preview a { color: #c5d1ff !important; text-decoration: underline; }
-      #preview blockquote {
-        border-left-color: #66758a !important;
-      }
+      #preview .katex * { color: #111 !important; }
+      #preview a { color: #111 !important; text-decoration: underline; }
+      #preview blockquote { border-left-color: #777 !important; }
       #preview pre, #preview code {
-        background: #1a2637 !important;
-        color: #f4f7fb !important;
-        border-color: #526176 !important;
+        background: #f5f6f8 !important;
+        color: #111 !important;
+        border-color: #d8dce3 !important;
       }
       #preview th {
-        background: #1a2637 !important;
-        color: #ffffff !important;
+        background: #f0f2f5 !important;
+        color: #111 !important;
       }
-      #preview th, #preview td {
-        border-color: #526176 !important;
-      }
-      #preview hr { border-top-color: #526176 !important; }
-    }
-
-</style>
+      #preview th, #preview td { border-color: #c8cdd5 !important; }
+      #preview hr { border-top-color: #999 !important; }
+    }</style>
   <link rel="stylesheet" href="theme.css?v=20261122-contrastfix3">
   <script src="theme.js"></script>
 </head>
@@ -1739,7 +1730,7 @@
           </select>
         </label>
       </div>
-      <div class="pdf-dialog-note">数式はプレビューと同じKaTeX表示で印刷します。ページ数は内容に応じて自動調整されます。</div>
+      <div class="pdf-dialog-note">数式はプレビューと同じKaTeX表示で印刷します。ブラウザの印刷設定で「ヘッダーとフッター」をOFFにすると、日時・サイト名・URLも消せます。</div>
       <div class="pdf-dialog-actions">
         <button id="pdf-export-cancel" type="button">キャンセル</button>
         <button class="primary-button" type="submit">印刷画面へ進む</button>
