@@ -1515,11 +1515,91 @@
       font-weight: 500;
       line-height: 1;
     }
-    .latex-tool-symbol:hover {
+    .latex-tool-symbol:hover,
+    .latex-tool-symbol:focus-visible {
       border-color: var(--accent) !important;
       background: var(--accent-soft) !important;
       color: var(--accent) !important;
     }
+    .font-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .font-symbol { font-size: 22px; }
+    .latex-tool-vector-icon {
+      display: grid;
+      width: 32px;
+      height: 30px;
+      grid-template-rows: 15px 13px;
+      place-items: center;
+      line-height: 1;
+    }
+    .latex-tool-vector-arrow {
+      display: block;
+      width: 100%;
+      overflow: visible;
+      font-family: "Arial Unicode MS", "Noto Sans Symbols 2", sans-serif;
+      font-size: 29px;
+      font-weight: 500;
+      line-height: 13px;
+      transform: scaleX(1.12);
+    }
+    .latex-tool-vector-letters {
+      display: block;
+      margin-top: -1px;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      line-height: 12px;
+    }
+    .latex-tool-integral-icon {
+      position: relative;
+      display: inline-block;
+      width: 31px;
+      height: 31px;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1;
+    }
+    .latex-tool-integral-icon .integral-main {
+      position: absolute;
+      left: 1px;
+      top: 0;
+      font-size: 31px;
+      line-height: 31px;
+    }
+    .latex-tool-integral-icon .integral-dx {
+      position: absolute;
+      right: 0;
+      bottom: 2px;
+      font-size: 8px;
+      font-style: italic;
+      font-weight: 700;
+    }
+    .latex-tool-integral-icon .integral-upper,
+    .latex-tool-integral-icon .integral-lower {
+      position: absolute;
+      right: 0;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .latex-tool-integral-icon .integral-upper { top: 0; }
+    .latex-tool-integral-icon .integral-lower { bottom: 1px; }
+    .latex-toolbar-tooltip {
+      position: fixed;
+      z-index: 1300;
+      max-width: min(300px, calc(100vw - 20px));
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: #202b3d;
+      color: #fff;
+      box-shadow: 0 5px 20px rgba(10,18,32,.25);
+      font-size: 11px;
+      font-weight: 550;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      pointer-events: none;
+    }
+    .latex-toolbar-tooltip[hidden] { display: none !important; }
     .latex-tool-rows {
       display: grid;
       gap: 5px;
@@ -2014,8 +2094,23 @@
                     <button id="latex-insert-abs" class="latex-tool-symbol" type="button" title="絶対値" aria-label="絶対値"><span aria-hidden="true">|x|</span></button>
                     <button id="latex-insert-brace" class="latex-tool-symbol" type="button" title="波括弧" aria-label="波括弧"><span aria-hidden="true">{ }</span></button>
                     <button id="latex-insert-overline" class="latex-tool-symbol" type="button" title="上線" aria-label="上線"><span aria-hidden="true">x̄</span></button>
-                    <button id="latex-insert-vec" class="latex-tool-symbol" type="button" title="ベクトル" aria-label="ベクトル"><span aria-hidden="true">v⃗</span></button>
+                    <button id="latex-insert-vec" class="latex-tool-symbol vector-symbol" type="button" title="ベクトル" aria-label="ベクトル"><span class="latex-tool-vector-icon" aria-hidden="true"><span class="latex-tool-vector-arrow">⟶</span><span class="latex-tool-vector-letters">AB</span></span></button>
                     <button id="latex-insert-binom" class="latex-tool-symbol" type="button" title="二項係数" aria-label="二項係数"><span aria-hidden="true">Cₖⁿ</span></button>
+                  </div>
+                </section>
+                <section class="latex-tool-group" aria-label="書体">
+                  <h3 class="latex-tool-group-title">書体</h3>
+                  <div class="latex-tool-grid font-grid">
+                    <button id="latex-insert-font-bold" class="latex-tool-symbol font-symbol" type="button" title="太字" aria-label="太字"><span aria-hidden="true">𝐀</span></button>
+                    <button id="latex-insert-font-boldsymbol" class="latex-tool-symbol font-symbol" type="button" title="太字記号" aria-label="太字記号"><span aria-hidden="true">𝛂</span></button>
+                    <button id="latex-insert-font-blackboard" class="latex-tool-symbol font-symbol" type="button" title="黒板太字" aria-label="黒板太字"><span aria-hidden="true">ℝ</span></button>
+                    <button id="latex-insert-font-fraktur" class="latex-tool-symbol font-symbol" type="button" title="フラクトゥール" aria-label="フラクトゥール"><span aria-hidden="true">𝔄</span></button>
+                    <button id="latex-insert-font-calligraphic" class="latex-tool-symbol font-symbol" type="button" title="花文字" aria-label="花文字"><span aria-hidden="true">𝒜</span></button>
+                    <button id="latex-insert-font-script" class="latex-tool-symbol font-symbol" type="button" title="筆記体" aria-label="筆記体"><span aria-hidden="true">𝓐</span></button>
+                    <button id="latex-insert-font-italic" class="latex-tool-symbol font-symbol" type="button" title="イタリック" aria-label="イタリック"><span aria-hidden="true">𝐴</span></button>
+                    <button id="latex-insert-font-roman" class="latex-tool-symbol font-symbol" type="button" title="ローマン体" aria-label="ローマン体"><span aria-hidden="true">A</span></button>
+                    <button id="latex-insert-font-sans" class="latex-tool-symbol font-symbol" type="button" title="サンセリフ" aria-label="サンセリフ"><span aria-hidden="true">𝖠</span></button>
+                    <button id="latex-insert-font-mono" class="latex-tool-symbol font-symbol" type="button" title="等幅" aria-label="等幅"><span aria-hidden="true">𝙰</span></button>
                   </div>
                 </section>
                 <section class="latex-tool-group" aria-label="演算">
@@ -2023,8 +2118,8 @@
                   <div class="latex-tool-grid">
             <button id="latex-insert-sum" class="latex-tool-symbol" type="button" title="総和" aria-label="総和"><span aria-hidden="true">∑</span></button>
             <button id="latex-insert-prod" class="latex-tool-symbol" type="button" title="総積" aria-label="総積"><span aria-hidden="true">∏</span></button>
-            <button id="latex-insert-int" class="latex-tool-symbol" type="button" title="不定積分" aria-label="不定積分"><span aria-hidden="true">∫</span></button>
-            <button id="latex-insert-defint" class="latex-tool-symbol" type="button" title="定積分" aria-label="定積分"><span aria-hidden="true">∫</span></button>
+            <button id="latex-insert-int" class="latex-tool-symbol" type="button" title="不定積分" aria-label="不定積分"><span class="latex-tool-integral-icon indefinite" aria-hidden="true"><span class="integral-main">∫</span><span class="integral-dx">dx</span></span></button>
+            <button id="latex-insert-defint" class="latex-tool-symbol" type="button" title="定積分" aria-label="定積分"><span class="latex-tool-integral-icon definite" aria-hidden="true"><span class="integral-main">∫</span><span class="integral-upper">b</span><span class="integral-lower">a</span></span></button>
             <button id="latex-insert-cdot" class="latex-tool-symbol" type="button" title="中点" aria-label="中点"><span aria-hidden="true">·</span></button>
             <button id="latex-insert-times" class="latex-tool-symbol" type="button" title="乗算" aria-label="乗算"><span aria-hidden="true">×</span></button>
             <button id="latex-insert-pm" class="latex-tool-symbol" type="button" title="プラスマイナス" aria-label="プラスマイナス"><span aria-hidden="true">±</span></button>
@@ -2138,6 +2233,8 @@
     <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
       aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
       title="数式ツールを開く">∑</button>
+  
+    <div id="latex-toolbar-tooltip" class="latex-toolbar-tooltip" role="tooltip" hidden></div>
   </aside>
 
 
@@ -2290,6 +2387,7 @@
       const latexToolbar = document.getElementById("latex-floating-toolbar");
       const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
       const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
+      const latexToolbarTooltip = document.getElementById("latex-toolbar-tooltip");
       const latexInsertInlineButton = document.getElementById("latex-insert-inline");
       const latexInsertDisplayButton = document.getElementById("latex-insert-display");
       const latexInsertSumButton = document.getElementById("latex-insert-sum");
@@ -2384,6 +2482,16 @@
       const latexInsertOverlineButton = document.getElementById("latex-insert-overline");
       const latexInsertVecButton = document.getElementById("latex-insert-vec");
       const latexInsertBinomButton = document.getElementById("latex-insert-binom");
+      const latexInsertFontBoldButton = document.getElementById("latex-insert-font-bold");
+      const latexInsertFontBoldsymbolButton = document.getElementById("latex-insert-font-boldsymbol");
+      const latexInsertFontBlackboardButton = document.getElementById("latex-insert-font-blackboard");
+      const latexInsertFontFrakturButton = document.getElementById("latex-insert-font-fraktur");
+      const latexInsertFontCalligraphicButton = document.getElementById("latex-insert-font-calligraphic");
+      const latexInsertFontScriptButton = document.getElementById("latex-insert-font-script");
+      const latexInsertFontItalicButton = document.getElementById("latex-insert-font-italic");
+      const latexInsertFontRomanButton = document.getElementById("latex-insert-font-roman");
+      const latexInsertFontSansButton = document.getElementById("latex-insert-font-sans");
+      const latexInsertFontMonoButton = document.getElementById("latex-insert-font-mono");
       let EditorSelection = null;
       let originalDocumentTitle = null;
       let renderingLibrariesReady = null;
@@ -2577,12 +2685,86 @@
           "aria-label",
           open ? "ツールバーを閉じる" : "数式ツールを開く"
         );
-        latexToolbarToggle.setAttribute(
-          "title",
-          open ? "ツールバーを閉じる" : "数式ツールを開く"
-        );
+        latexToolbarToggle.dataset.tooltip = open
+          ? "ツールバーを閉じます。"
+          : "数式ツールを開きます。";
         latexToolbarToggle.textContent = open ? "‹ ツールバーを閉じる" : "∑";
       }
+
+      const latexTooltipDetails = {
+        "latex-insert-vec": "ベクトル：\\overrightarrow{AB} を挿入します。ABの部分に文字を入力してください。",
+        "latex-insert-int": "不定積分：上下限を指定しない積分です。\\int f(x)\\,dx を挿入します。",
+        "latex-insert-defint": "定積分：下限 a・上限 b を指定する積分です。\\int_a^b f(x)\\,dx を挿入します。",
+        "latex-insert-font-bold": "太字：\\mathbf{}。英字・数字を太字にします。",
+        "latex-insert-font-boldsymbol": "太字記号：\\boldsymbol{}。ギリシャ文字などの数学記号にも使えます。",
+        "latex-insert-font-blackboard": "黒板太字：\\mathbb{}。実数・整数・有理数などの集合記号によく使います。",
+        "latex-insert-font-fraktur": "フラクトゥール：\\mathfrak{}。",
+        "latex-insert-font-calligraphic": "花文字：\\mathcal{}。",
+        "latex-insert-font-script": "筆記体：\\mathscr{}。",
+        "latex-insert-font-italic": "イタリック：\\mathit{}。",
+        "latex-insert-font-roman": "ローマン体：\\mathrm{}。",
+        "latex-insert-font-sans": "サンセリフ：\\mathsf{}。",
+        "latex-insert-font-mono": "等幅：\\mathtt{}。"
+      };
+      Object.keys(latexTooltipDetails).forEach(function (id) {
+        const button = document.getElementById(id);
+        if (button) button.dataset.tooltip = latexTooltipDetails[id];
+      });
+      latexToolbar.querySelectorAll("button[title]").forEach(function (button) {
+        if (!button.dataset.tooltip) button.dataset.tooltip = button.getAttribute("title");
+        button.removeAttribute("title");
+      });
+
+      let activeLatexTooltipTarget = null;
+      function hideLatexToolbarTooltip() {
+        activeLatexTooltipTarget = null;
+        latexToolbarTooltip.hidden = true;
+      }
+      function showLatexToolbarTooltip(button) {
+        const description = button.dataset.tooltip || button.getAttribute("aria-label");
+        if (!description) return;
+        activeLatexTooltipTarget = button;
+        latexToolbarTooltip.textContent = description;
+        latexToolbarTooltip.hidden = false;
+        window.requestAnimationFrame(function () {
+          if (activeLatexTooltipTarget !== button || latexToolbarTooltip.hidden) return;
+          const rect = button.getBoundingClientRect();
+          const tip = latexToolbarTooltip.getBoundingClientRect();
+          let left = rect.right + 10;
+          if (left + tip.width > window.innerWidth - 8) {
+            left = Math.max(8, rect.left - tip.width - 10);
+          }
+          const top = Math.max(8, Math.min(
+            rect.top + (rect.height - tip.height) / 2,
+            window.innerHeight - tip.height - 8
+          ));
+          latexToolbarTooltip.style.left = left + "px";
+          latexToolbarTooltip.style.top = top + "px";
+        });
+      }
+      latexToolbar.addEventListener("pointerover", function (event) {
+        const button = event.target && event.target.closest
+          ? event.target.closest("button[data-tooltip]") : null;
+        if (button && latexToolbar.contains(button)) showLatexToolbarTooltip(button);
+      });
+      latexToolbar.addEventListener("pointerout", function (event) {
+        const fromButton = event.target && event.target.closest
+          ? event.target.closest("button[data-tooltip]") : null;
+        const toButton = event.relatedTarget && event.relatedTarget.closest
+          ? event.relatedTarget.closest("button[data-tooltip]") : null;
+        if (fromButton && fromButton !== toButton) hideLatexToolbarTooltip();
+      });
+      latexToolbar.addEventListener("focusin", function (event) {
+        const button = event.target && event.target.closest
+          ? event.target.closest("button[data-tooltip]") : null;
+        if (button) showLatexToolbarTooltip(button);
+      });
+      latexToolbar.addEventListener("focusout", function (event) {
+        if (!latexToolbar.contains(event.relatedTarget)) hideLatexToolbarTooltip();
+      });
+      latexToolbar.addEventListener("scroll", hideLatexToolbarTooltip, true);
+      window.addEventListener("resize", hideLatexToolbarTooltip);
+      window.addEventListener("scroll", hideLatexToolbarTooltip, true);
 
       function setEditingNote(note) {
         const existingNote = note && savedNotes.find(function (item) {
@@ -4101,12 +4283,52 @@
         insertLatexSnippet(snippet, snippet.length - 1);
       });
       latexInsertVecButton.addEventListener("click", function () {
-        const snippet = "\\vec{}";
+        const snippet = "\\overrightarrow{}";
         insertLatexSnippet(snippet, snippet.length - 1);
       });
       latexInsertBinomButton.addEventListener("click", function () {
         const snippet = "\\binom{}{}";
         insertLatexSnippet(snippet, snippet.indexOf("{}") + 1);
+      });
+      latexInsertFontBoldButton.addEventListener("click", function () {
+        const snippet = "\\mathbf{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontBoldsymbolButton.addEventListener("click", function () {
+        const snippet = "\\boldsymbol{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontBlackboardButton.addEventListener("click", function () {
+        const snippet = "\\mathbb{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontFrakturButton.addEventListener("click", function () {
+        const snippet = "\\mathfrak{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontCalligraphicButton.addEventListener("click", function () {
+        const snippet = "\\mathcal{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontScriptButton.addEventListener("click", function () {
+        const snippet = "\\mathscr{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontItalicButton.addEventListener("click", function () {
+        const snippet = "\\mathit{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontRomanButton.addEventListener("click", function () {
+        const snippet = "\\mathrm{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontSansButton.addEventListener("click", function () {
+        const snippet = "\\mathsf{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertFontMonoButton.addEventListener("click", function () {
+        const snippet = "\\mathtt{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
       });
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && !latexToolbarPanel.hidden) {
