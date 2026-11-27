@@ -1482,10 +1482,20 @@
       font-weight: 800;
       letter-spacing: .04em;
     }
+    .latex-tool-subgroup {
+      display: grid;
+      gap: 5px;
+    }
+    .latex-tool-subtitle {
+      margin: 1px 0 0;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+    }
     .latex-tool-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 5px;
     }
     .latex-tool-symbol {
       display: grid;
@@ -2014,7 +2024,7 @@
             <button id="latex-insert-sum" class="latex-tool-symbol" type="button" title="総和" aria-label="総和"><span aria-hidden="true">∑</span></button>
             <button id="latex-insert-prod" class="latex-tool-symbol" type="button" title="総積" aria-label="総積"><span aria-hidden="true">∏</span></button>
             <button id="latex-insert-int" class="latex-tool-symbol" type="button" title="不定積分" aria-label="不定積分"><span aria-hidden="true">∫</span></button>
-            <button id="latex-insert-defint" class="latex-tool-symbol" type="button" title="定積分" aria-label="定積分"><span aria-hidden="true">∫ᵇₐ</span></button>
+            <button id="latex-insert-defint" class="latex-tool-symbol" type="button" title="定積分" aria-label="定積分"><span aria-hidden="true">∫</span></button>
             <button id="latex-insert-cdot" class="latex-tool-symbol" type="button" title="中点" aria-label="中点"><span aria-hidden="true">·</span></button>
             <button id="latex-insert-times" class="latex-tool-symbol" type="button" title="乗算" aria-label="乗算"><span aria-hidden="true">×</span></button>
             <button id="latex-insert-pm" class="latex-tool-symbol" type="button" title="プラスマイナス" aria-label="プラスマイナス"><span aria-hidden="true">±</span></button>
@@ -2047,14 +2057,79 @@
             <button id="latex-insert-approx" class="latex-tool-symbol" type="button" title="近似" aria-label="近似"><span aria-hidden="true">≈</span></button>
                   </div>
                 </section>
-                <section class="latex-tool-group" aria-label="ギリシャ文字">
+                                <section class="latex-tool-group" aria-label="ギリシャ文字">
                   <h3 class="latex-tool-group-title">ギリシャ文字</h3>
-                  <div class="latex-tool-grid">
-            <button id="latex-insert-alpha" class="latex-tool-symbol" type="button" title="アルファ" aria-label="アルファ"><span aria-hidden="true">α</span></button>
-            <button id="latex-insert-beta" class="latex-tool-symbol" type="button" title="ベータ" aria-label="ベータ"><span aria-hidden="true">β</span></button>
-            <button id="latex-insert-gamma" class="latex-tool-symbol" type="button" title="ガンマ" aria-label="ガンマ"><span aria-hidden="true">γ</span></button>
-            <button id="latex-insert-theta" class="latex-tool-symbol" type="button" title="シータ" aria-label="シータ"><span aria-hidden="true">θ</span></button>
-            <button id="latex-insert-pi" class="latex-tool-symbol" type="button" title="パイ" aria-label="パイ"><span aria-hidden="true">π</span></button>
+
+                  <div class="latex-tool-subgroup" aria-label="小文字">
+                    <p class="latex-tool-subtitle">小文字</p>
+                    <div class="latex-tool-grid">
+                      <button id="latex-insert-alpha" class="latex-tool-symbol" type="button" title="小文字alpha" aria-label="小文字alpha"><span aria-hidden="true">α</span></button>
+                      <button id="latex-insert-beta" class="latex-tool-symbol" type="button" title="小文字beta" aria-label="小文字beta"><span aria-hidden="true">β</span></button>
+                      <button id="latex-insert-gamma" class="latex-tool-symbol" type="button" title="小文字gamma" aria-label="小文字gamma"><span aria-hidden="true">γ</span></button>
+                      <button id="latex-insert-greek-lower-delta" class="latex-tool-symbol" type="button" title="小文字delta" aria-label="小文字delta"><span aria-hidden="true">δ</span></button>
+                      <button id="latex-insert-greek-lower-epsilon" class="latex-tool-symbol" type="button" title="小文字epsilon" aria-label="小文字epsilon"><span aria-hidden="true">ε</span></button>
+                      <button id="latex-insert-greek-lower-zeta" class="latex-tool-symbol" type="button" title="小文字zeta" aria-label="小文字zeta"><span aria-hidden="true">ζ</span></button>
+                      <button id="latex-insert-greek-lower-eta" class="latex-tool-symbol" type="button" title="小文字eta" aria-label="小文字eta"><span aria-hidden="true">η</span></button>
+                      <button id="latex-insert-theta" class="latex-tool-symbol" type="button" title="小文字theta" aria-label="小文字theta"><span aria-hidden="true">θ</span></button>
+                      <button id="latex-insert-greek-lower-iota" class="latex-tool-symbol" type="button" title="小文字iota" aria-label="小文字iota"><span aria-hidden="true">ι</span></button>
+                      <button id="latex-insert-greek-lower-kappa" class="latex-tool-symbol" type="button" title="小文字kappa" aria-label="小文字kappa"><span aria-hidden="true">κ</span></button>
+                      <button id="latex-insert-greek-lower-lambda" class="latex-tool-symbol" type="button" title="小文字lambda" aria-label="小文字lambda"><span aria-hidden="true">λ</span></button>
+                      <button id="latex-insert-greek-lower-mu" class="latex-tool-symbol" type="button" title="小文字mu" aria-label="小文字mu"><span aria-hidden="true">μ</span></button>
+                      <button id="latex-insert-greek-lower-nu" class="latex-tool-symbol" type="button" title="小文字nu" aria-label="小文字nu"><span aria-hidden="true">ν</span></button>
+                      <button id="latex-insert-greek-lower-xi" class="latex-tool-symbol" type="button" title="小文字xi" aria-label="小文字xi"><span aria-hidden="true">ξ</span></button>
+                      <button id="latex-insert-greek-lower-omicron" class="latex-tool-symbol" type="button" title="小文字omicron" aria-label="小文字omicron"><span aria-hidden="true">ο</span></button>
+                      <button id="latex-insert-pi" class="latex-tool-symbol" type="button" title="小文字pi" aria-label="小文字pi"><span aria-hidden="true">π</span></button>
+                      <button id="latex-insert-greek-lower-rho" class="latex-tool-symbol" type="button" title="小文字rho" aria-label="小文字rho"><span aria-hidden="true">ρ</span></button>
+                      <button id="latex-insert-greek-lower-sigma" class="latex-tool-symbol" type="button" title="小文字sigma" aria-label="小文字sigma"><span aria-hidden="true">σ</span></button>
+                      <button id="latex-insert-greek-lower-tau" class="latex-tool-symbol" type="button" title="小文字tau" aria-label="小文字tau"><span aria-hidden="true">τ</span></button>
+                      <button id="latex-insert-greek-lower-upsilon" class="latex-tool-symbol" type="button" title="小文字upsilon" aria-label="小文字upsilon"><span aria-hidden="true">υ</span></button>
+                      <button id="latex-insert-greek-lower-phi" class="latex-tool-symbol" type="button" title="小文字phi" aria-label="小文字phi"><span aria-hidden="true">φ</span></button>
+                      <button id="latex-insert-greek-lower-chi" class="latex-tool-symbol" type="button" title="小文字chi" aria-label="小文字chi"><span aria-hidden="true">χ</span></button>
+                      <button id="latex-insert-greek-lower-psi" class="latex-tool-symbol" type="button" title="小文字psi" aria-label="小文字psi"><span aria-hidden="true">ψ</span></button>
+                      <button id="latex-insert-greek-lower-omega" class="latex-tool-symbol" type="button" title="小文字omega" aria-label="小文字omega"><span aria-hidden="true">ω</span></button>
+                    </div>
+                  </div>
+
+                  <div class="latex-tool-subgroup" aria-label="大文字">
+                    <p class="latex-tool-subtitle">大文字</p>
+                    <div class="latex-tool-grid">
+                      <button id="latex-insert-greek-upper-alpha" class="latex-tool-symbol" type="button" title="大文字alpha" aria-label="大文字alpha"><span aria-hidden="true">Α</span></button>
+                      <button id="latex-insert-greek-upper-beta" class="latex-tool-symbol" type="button" title="大文字beta" aria-label="大文字beta"><span aria-hidden="true">Β</span></button>
+                      <button id="latex-insert-greek-upper-gamma" class="latex-tool-symbol" type="button" title="大文字gamma" aria-label="大文字gamma"><span aria-hidden="true">Γ</span></button>
+                      <button id="latex-insert-greek-upper-delta" class="latex-tool-symbol" type="button" title="大文字delta" aria-label="大文字delta"><span aria-hidden="true">Δ</span></button>
+                      <button id="latex-insert-greek-upper-epsilon" class="latex-tool-symbol" type="button" title="大文字epsilon" aria-label="大文字epsilon"><span aria-hidden="true">Ε</span></button>
+                      <button id="latex-insert-greek-upper-zeta" class="latex-tool-symbol" type="button" title="大文字zeta" aria-label="大文字zeta"><span aria-hidden="true">Ζ</span></button>
+                      <button id="latex-insert-greek-upper-eta" class="latex-tool-symbol" type="button" title="大文字eta" aria-label="大文字eta"><span aria-hidden="true">Η</span></button>
+                      <button id="latex-insert-greek-upper-theta" class="latex-tool-symbol" type="button" title="大文字theta" aria-label="大文字theta"><span aria-hidden="true">Θ</span></button>
+                      <button id="latex-insert-greek-upper-iota" class="latex-tool-symbol" type="button" title="大文字iota" aria-label="大文字iota"><span aria-hidden="true">Ι</span></button>
+                      <button id="latex-insert-greek-upper-kappa" class="latex-tool-symbol" type="button" title="大文字kappa" aria-label="大文字kappa"><span aria-hidden="true">Κ</span></button>
+                      <button id="latex-insert-greek-upper-lambda" class="latex-tool-symbol" type="button" title="大文字lambda" aria-label="大文字lambda"><span aria-hidden="true">Λ</span></button>
+                      <button id="latex-insert-greek-upper-mu" class="latex-tool-symbol" type="button" title="大文字mu" aria-label="大文字mu"><span aria-hidden="true">Μ</span></button>
+                      <button id="latex-insert-greek-upper-nu" class="latex-tool-symbol" type="button" title="大文字nu" aria-label="大文字nu"><span aria-hidden="true">Ν</span></button>
+                      <button id="latex-insert-greek-upper-xi" class="latex-tool-symbol" type="button" title="大文字xi" aria-label="大文字xi"><span aria-hidden="true">Ξ</span></button>
+                      <button id="latex-insert-greek-upper-omicron" class="latex-tool-symbol" type="button" title="大文字omicron" aria-label="大文字omicron"><span aria-hidden="true">Ο</span></button>
+                      <button id="latex-insert-greek-upper-pi" class="latex-tool-symbol" type="button" title="大文字pi" aria-label="大文字pi"><span aria-hidden="true">Π</span></button>
+                      <button id="latex-insert-greek-upper-rho" class="latex-tool-symbol" type="button" title="大文字rho" aria-label="大文字rho"><span aria-hidden="true">Ρ</span></button>
+                      <button id="latex-insert-greek-upper-sigma" class="latex-tool-symbol" type="button" title="大文字sigma" aria-label="大文字sigma"><span aria-hidden="true">Σ</span></button>
+                      <button id="latex-insert-greek-upper-tau" class="latex-tool-symbol" type="button" title="大文字tau" aria-label="大文字tau"><span aria-hidden="true">Τ</span></button>
+                      <button id="latex-insert-greek-upper-upsilon" class="latex-tool-symbol" type="button" title="大文字upsilon" aria-label="大文字upsilon"><span aria-hidden="true">Υ</span></button>
+                      <button id="latex-insert-greek-upper-phi" class="latex-tool-symbol" type="button" title="大文字phi" aria-label="大文字phi"><span aria-hidden="true">Φ</span></button>
+                      <button id="latex-insert-greek-upper-chi" class="latex-tool-symbol" type="button" title="大文字chi" aria-label="大文字chi"><span aria-hidden="true">Χ</span></button>
+                      <button id="latex-insert-greek-upper-psi" class="latex-tool-symbol" type="button" title="大文字psi" aria-label="大文字psi"><span aria-hidden="true">Ψ</span></button>
+                      <button id="latex-insert-greek-upper-omega" class="latex-tool-symbol" type="button" title="大文字omega" aria-label="大文字omega"><span aria-hidden="true">Ω</span></button>
+                    </div>
+                  </div>
+
+                  <div class="latex-tool-subgroup" aria-label="異体字">
+                    <p class="latex-tool-subtitle">異体字</p>
+                    <div class="latex-tool-grid">
+                      <button id="latex-insert-greek-variant-varepsilon" class="latex-tool-symbol" type="button" title="異体字varepsilon" aria-label="異体字varepsilon"><span aria-hidden="true">ϵ</span></button>
+                      <button id="latex-insert-greek-variant-vartheta" class="latex-tool-symbol" type="button" title="異体字vartheta" aria-label="異体字vartheta"><span aria-hidden="true">ϑ</span></button>
+                      <button id="latex-insert-greek-variant-varpi" class="latex-tool-symbol" type="button" title="異体字varpi" aria-label="異体字varpi"><span aria-hidden="true">ϖ</span></button>
+                      <button id="latex-insert-greek-variant-varrho" class="latex-tool-symbol" type="button" title="異体字varrho" aria-label="異体字varrho"><span aria-hidden="true">ϱ</span></button>
+                      <button id="latex-insert-greek-variant-varsigma" class="latex-tool-symbol" type="button" title="異体字varsigma" aria-label="異体字varsigma"><span aria-hidden="true">ς</span></button>
+                      <button id="latex-insert-greek-variant-varphi" class="latex-tool-symbol" type="button" title="異体字varphi" aria-label="異体字varphi"><span aria-hidden="true">ϕ</span></button>
+                    </div>
                   </div>
                 </section>
 
@@ -2252,6 +2327,55 @@
       const latexInsertGammaButton = document.getElementById("latex-insert-gamma");
       const latexInsertThetaButton = document.getElementById("latex-insert-theta");
       const latexInsertPiButton = document.getElementById("latex-insert-pi");
+      const latexInsertGreekLowerDeltaButton = document.getElementById("latex-insert-greek-lower-delta");
+      const latexInsertGreekLowerEpsilonButton = document.getElementById("latex-insert-greek-lower-epsilon");
+      const latexInsertGreekLowerZetaButton = document.getElementById("latex-insert-greek-lower-zeta");
+      const latexInsertGreekLowerEtaButton = document.getElementById("latex-insert-greek-lower-eta");
+      const latexInsertGreekLowerIotaButton = document.getElementById("latex-insert-greek-lower-iota");
+      const latexInsertGreekLowerKappaButton = document.getElementById("latex-insert-greek-lower-kappa");
+      const latexInsertGreekLowerLambdaButton = document.getElementById("latex-insert-greek-lower-lambda");
+      const latexInsertGreekLowerMuButton = document.getElementById("latex-insert-greek-lower-mu");
+      const latexInsertGreekLowerNuButton = document.getElementById("latex-insert-greek-lower-nu");
+      const latexInsertGreekLowerXiButton = document.getElementById("latex-insert-greek-lower-xi");
+      const latexInsertGreekLowerOmicronButton = document.getElementById("latex-insert-greek-lower-omicron");
+      const latexInsertGreekLowerRhoButton = document.getElementById("latex-insert-greek-lower-rho");
+      const latexInsertGreekLowerSigmaButton = document.getElementById("latex-insert-greek-lower-sigma");
+      const latexInsertGreekLowerTauButton = document.getElementById("latex-insert-greek-lower-tau");
+      const latexInsertGreekLowerUpsilonButton = document.getElementById("latex-insert-greek-lower-upsilon");
+      const latexInsertGreekLowerPhiButton = document.getElementById("latex-insert-greek-lower-phi");
+      const latexInsertGreekLowerChiButton = document.getElementById("latex-insert-greek-lower-chi");
+      const latexInsertGreekLowerPsiButton = document.getElementById("latex-insert-greek-lower-psi");
+      const latexInsertGreekLowerOmegaButton = document.getElementById("latex-insert-greek-lower-omega");
+      const latexInsertGreekUpperAlphaButton = document.getElementById("latex-insert-greek-upper-alpha");
+      const latexInsertGreekUpperBetaButton = document.getElementById("latex-insert-greek-upper-beta");
+      const latexInsertGreekUpperGammaButton = document.getElementById("latex-insert-greek-upper-gamma");
+      const latexInsertGreekUpperDeltaButton = document.getElementById("latex-insert-greek-upper-delta");
+      const latexInsertGreekUpperEpsilonButton = document.getElementById("latex-insert-greek-upper-epsilon");
+      const latexInsertGreekUpperZetaButton = document.getElementById("latex-insert-greek-upper-zeta");
+      const latexInsertGreekUpperEtaButton = document.getElementById("latex-insert-greek-upper-eta");
+      const latexInsertGreekUpperThetaButton = document.getElementById("latex-insert-greek-upper-theta");
+      const latexInsertGreekUpperIotaButton = document.getElementById("latex-insert-greek-upper-iota");
+      const latexInsertGreekUpperKappaButton = document.getElementById("latex-insert-greek-upper-kappa");
+      const latexInsertGreekUpperLambdaButton = document.getElementById("latex-insert-greek-upper-lambda");
+      const latexInsertGreekUpperMuButton = document.getElementById("latex-insert-greek-upper-mu");
+      const latexInsertGreekUpperNuButton = document.getElementById("latex-insert-greek-upper-nu");
+      const latexInsertGreekUpperXiButton = document.getElementById("latex-insert-greek-upper-xi");
+      const latexInsertGreekUpperOmicronButton = document.getElementById("latex-insert-greek-upper-omicron");
+      const latexInsertGreekUpperPiButton = document.getElementById("latex-insert-greek-upper-pi");
+      const latexInsertGreekUpperRhoButton = document.getElementById("latex-insert-greek-upper-rho");
+      const latexInsertGreekUpperSigmaButton = document.getElementById("latex-insert-greek-upper-sigma");
+      const latexInsertGreekUpperTauButton = document.getElementById("latex-insert-greek-upper-tau");
+      const latexInsertGreekUpperUpsilonButton = document.getElementById("latex-insert-greek-upper-upsilon");
+      const latexInsertGreekUpperPhiButton = document.getElementById("latex-insert-greek-upper-phi");
+      const latexInsertGreekUpperChiButton = document.getElementById("latex-insert-greek-upper-chi");
+      const latexInsertGreekUpperPsiButton = document.getElementById("latex-insert-greek-upper-psi");
+      const latexInsertGreekUpperOmegaButton = document.getElementById("latex-insert-greek-upper-omega");
+      const latexInsertGreekVariantVarepsilonButton = document.getElementById("latex-insert-greek-variant-varepsilon");
+      const latexInsertGreekVariantVarthetaButton = document.getElementById("latex-insert-greek-variant-vartheta");
+      const latexInsertGreekVariantVarpiButton = document.getElementById("latex-insert-greek-variant-varpi");
+      const latexInsertGreekVariantVarrhoButton = document.getElementById("latex-insert-greek-variant-varrho");
+      const latexInsertGreekVariantVarsigmaButton = document.getElementById("latex-insert-greek-variant-varsigma");
+      const latexInsertGreekVariantVarphiButton = document.getElementById("latex-insert-greek-variant-varphi");
       const latexInsertPmatrixButton = document.getElementById("latex-insert-pmatrix");
       const latexInsertParenButton = document.getElementById("latex-insert-paren");
       const latexInsertSquareButton = document.getElementById("latex-insert-square");
@@ -3491,7 +3615,7 @@
           .replace(/\x60{3}[\s\S]*?\x60{3}/g, " ")
           .replace(/\x60[^\x60]*\x60/g, " ")
           .replace(mathPattern, " ");
-        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom|rightarrow|leftarrow|Leftrightarrow|to|lambda|mu|omega|subseteq|approx|vec)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
+        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom|rightarrow|leftarrow|Leftrightarrow|to|lambda|mu|omega|subseteq|approx|vec|epsilon|zeta|iota|kappa|delta|xi|upsilon|chi|psi|varsigma|varepsilon|vartheta|varpi|varrho|varphi|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|Omega)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
       }
 
       function renderPreview() {
@@ -3754,6 +3878,202 @@
       });
       latexInsertPiButton.addEventListener("click", function () {
         const snippet = "\\pi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerDeltaButton.addEventListener("click", function () {
+        const snippet = "\\delta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerEpsilonButton.addEventListener("click", function () {
+        const snippet = "\\epsilon ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerZetaButton.addEventListener("click", function () {
+        const snippet = "\\zeta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerEtaButton.addEventListener("click", function () {
+        const snippet = "\\eta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerIotaButton.addEventListener("click", function () {
+        const snippet = "\\iota ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerKappaButton.addEventListener("click", function () {
+        const snippet = "\\kappa ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerLambdaButton.addEventListener("click", function () {
+        const snippet = "\\lambda ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerMuButton.addEventListener("click", function () {
+        const snippet = "\\mu ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerNuButton.addEventListener("click", function () {
+        const snippet = "\\nu ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerXiButton.addEventListener("click", function () {
+        const snippet = "\\xi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerOmicronButton.addEventListener("click", function () {
+        const snippet = "o ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerRhoButton.addEventListener("click", function () {
+        const snippet = "\\rho ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerSigmaButton.addEventListener("click", function () {
+        const snippet = "\\sigma ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerTauButton.addEventListener("click", function () {
+        const snippet = "\\tau ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerUpsilonButton.addEventListener("click", function () {
+        const snippet = "\\upsilon ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerPhiButton.addEventListener("click", function () {
+        const snippet = "\\phi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerChiButton.addEventListener("click", function () {
+        const snippet = "\\chi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerPsiButton.addEventListener("click", function () {
+        const snippet = "\\psi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekLowerOmegaButton.addEventListener("click", function () {
+        const snippet = "\\omega ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperAlphaButton.addEventListener("click", function () {
+        const snippet = "A ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperBetaButton.addEventListener("click", function () {
+        const snippet = "B ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperGammaButton.addEventListener("click", function () {
+        const snippet = "\\Gamma ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperDeltaButton.addEventListener("click", function () {
+        const snippet = "\\Delta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperEpsilonButton.addEventListener("click", function () {
+        const snippet = "E ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperZetaButton.addEventListener("click", function () {
+        const snippet = "Z ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperEtaButton.addEventListener("click", function () {
+        const snippet = "H ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperThetaButton.addEventListener("click", function () {
+        const snippet = "\\Theta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperIotaButton.addEventListener("click", function () {
+        const snippet = "I ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperKappaButton.addEventListener("click", function () {
+        const snippet = "K ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperLambdaButton.addEventListener("click", function () {
+        const snippet = "\\Lambda ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperMuButton.addEventListener("click", function () {
+        const snippet = "M ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperNuButton.addEventListener("click", function () {
+        const snippet = "N ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperXiButton.addEventListener("click", function () {
+        const snippet = "\\Xi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperOmicronButton.addEventListener("click", function () {
+        const snippet = "O ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperPiButton.addEventListener("click", function () {
+        const snippet = "\\Pi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperRhoButton.addEventListener("click", function () {
+        const snippet = "P ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperSigmaButton.addEventListener("click", function () {
+        const snippet = "\\Sigma ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperTauButton.addEventListener("click", function () {
+        const snippet = "T ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperUpsilonButton.addEventListener("click", function () {
+        const snippet = "\\Upsilon ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperPhiButton.addEventListener("click", function () {
+        const snippet = "\\Phi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperChiButton.addEventListener("click", function () {
+        const snippet = "X ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperPsiButton.addEventListener("click", function () {
+        const snippet = "\\Psi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekUpperOmegaButton.addEventListener("click", function () {
+        const snippet = "\\Omega ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarepsilonButton.addEventListener("click", function () {
+        const snippet = "\\varepsilon ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarthetaButton.addEventListener("click", function () {
+        const snippet = "\\vartheta ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarpiButton.addEventListener("click", function () {
+        const snippet = "\\varpi ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarrhoButton.addEventListener("click", function () {
+        const snippet = "\\varrho ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarsigmaButton.addEventListener("click", function () {
+        const snippet = "\\varsigma ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertGreekVariantVarphiButton.addEventListener("click", function () {
+        const snippet = "\\varphi ";
         insertLatexSnippet(snippet, snippet.length);
       });
       latexInsertPmatrixButton.addEventListener("click", function () {
