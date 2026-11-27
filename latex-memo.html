@@ -1670,6 +1670,7 @@
         background: #fff !important;
         color: #000 !important;
       }
+      body { --latex-toolbar-reserve: 0px !important; }
       .topbar, .intro, .editor-panel, .character-count-panel,
       .library-section, .memo-drawer, .memo-drawer-backdrop,
       .latex-floating-toolbar, .pdf-export-dialog {
@@ -1981,6 +1982,32 @@
             <button id="latex-insert-subscript" class="latex-tool-symbol" type="button" title="下付き" aria-label="下付き"><span aria-hidden="true">xᵢ</span></button>
                   </div>
                 </section>
+                <section class="latex-tool-group" aria-label="数式環境">
+                  <h3 class="latex-tool-group-title">数式環境</h3>
+                  <div class="latex-tool-rows">
+                    <button id="latex-insert-aligned" class="latex-tool-row" type="button" title="aligned環境を挿入">
+                      <span class="latex-tool-row-symbol" aria-hidden="true">↔</span><span>aligned</span>
+                    </button>
+                    <button id="latex-insert-cases" class="latex-tool-row" type="button" title="cases環境を挿入">
+                      <span class="latex-tool-row-symbol" aria-hidden="true">{</span><span>cases</span>
+                    </button>
+                    <button id="latex-insert-pmatrix" class="latex-tool-row" type="button" title="pmatrix環境を挿入">
+                      <span class="latex-tool-row-symbol" aria-hidden="true">▦</span><span>pmatrix</span>
+                    </button>
+                  </div>
+                </section>
+                <section class="latex-tool-group" aria-label="括弧・表記">
+                  <h3 class="latex-tool-group-title">括弧・表記</h3>
+                  <div class="latex-tool-grid">
+                    <button id="latex-insert-paren" class="latex-tool-symbol" type="button" title="括弧" aria-label="括弧"><span aria-hidden="true">( )</span></button>
+                    <button id="latex-insert-square" class="latex-tool-symbol" type="button" title="角括弧" aria-label="角括弧"><span aria-hidden="true">[ ]</span></button>
+                    <button id="latex-insert-abs" class="latex-tool-symbol" type="button" title="絶対値" aria-label="絶対値"><span aria-hidden="true">|x|</span></button>
+                    <button id="latex-insert-brace" class="latex-tool-symbol" type="button" title="波括弧" aria-label="波括弧"><span aria-hidden="true">{ }</span></button>
+                    <button id="latex-insert-overline" class="latex-tool-symbol" type="button" title="上線" aria-label="上線"><span aria-hidden="true">x̄</span></button>
+                    <button id="latex-insert-vec" class="latex-tool-symbol" type="button" title="ベクトル" aria-label="ベクトル"><span aria-hidden="true">v⃗</span></button>
+                    <button id="latex-insert-binom" class="latex-tool-symbol" type="button" title="二項係数" aria-label="二項係数"><span aria-hidden="true">Cₖⁿ</span></button>
+                  </div>
+                </section>
                 <section class="latex-tool-group" aria-label="演算">
                   <h3 class="latex-tool-group-title">演算</h3>
                   <div class="latex-tool-grid">
@@ -2030,20 +2057,7 @@
             <button id="latex-insert-pi" class="latex-tool-symbol" type="button" title="パイ" aria-label="パイ"><span aria-hidden="true">π</span></button>
                   </div>
                 </section>
-                <section class="latex-tool-group" aria-label="数式環境">
-                  <h3 class="latex-tool-group-title">数式環境</h3>
-                  <div class="latex-tool-rows">
-                    <button id="latex-insert-aligned" class="latex-tool-row" type="button" title="aligned環境を挿入">
-                      <span class="latex-tool-row-symbol" aria-hidden="true">↔</span><span>aligned</span>
-                    </button>
-                    <button id="latex-insert-cases" class="latex-tool-row" type="button" title="cases環境を挿入">
-                      <span class="latex-tool-row-symbol" aria-hidden="true">{</span><span>cases</span>
-                    </button>
-                    <button id="latex-insert-pmatrix" class="latex-tool-row" type="button" title="pmatrix環境を挿入">
-                      <span class="latex-tool-row-symbol" aria-hidden="true">▦</span><span>pmatrix</span>
-                    </button>
-                  </div>
-                </section>
+
       </div>
     </section>
     <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
@@ -2239,6 +2253,13 @@
       const latexInsertThetaButton = document.getElementById("latex-insert-theta");
       const latexInsertPiButton = document.getElementById("latex-insert-pi");
       const latexInsertPmatrixButton = document.getElementById("latex-insert-pmatrix");
+      const latexInsertParenButton = document.getElementById("latex-insert-paren");
+      const latexInsertSquareButton = document.getElementById("latex-insert-square");
+      const latexInsertAbsButton = document.getElementById("latex-insert-abs");
+      const latexInsertBraceButton = document.getElementById("latex-insert-brace");
+      const latexInsertOverlineButton = document.getElementById("latex-insert-overline");
+      const latexInsertVecButton = document.getElementById("latex-insert-vec");
+      const latexInsertBinomButton = document.getElementById("latex-insert-binom");
       let EditorSelection = null;
       let originalDocumentTitle = null;
       let renderingLibrariesReady = null;
@@ -3470,7 +3491,7 @@
           .replace(/\x60{3}[\s\S]*?\x60{3}/g, " ")
           .replace(/\x60[^\x60]*\x60/g, " ")
           .replace(mathPattern, " ");
-        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom|rightarrow|leftarrow|Leftrightarrow|to|lambda|mu|omega|subseteq|approx|cdot|times)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
+        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom|rightarrow|leftarrow|Leftrightarrow|to|lambda|mu|omega|subseteq|approx|vec)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
       }
 
       function renderPreview() {
@@ -3738,6 +3759,34 @@
       latexInsertPmatrixButton.addEventListener("click", function () {
         const snippet = "\\begin{pmatrix}\n  a & b \\\\\n  c & d\n\\end{pmatrix}";
         insertLatexSnippet(snippet, snippet.indexOf("a &"));
+      });
+      latexInsertParenButton.addEventListener("click", function () {
+        const snippet = "\\left(  \\right)";
+        insertLatexSnippet(snippet, snippet.indexOf("  ") + 1);
+      });
+      latexInsertSquareButton.addEventListener("click", function () {
+        const snippet = "\\left[  \\right]";
+        insertLatexSnippet(snippet, snippet.indexOf("  ") + 1);
+      });
+      latexInsertAbsButton.addEventListener("click", function () {
+        const snippet = "\\left|  \\right|";
+        insertLatexSnippet(snippet, snippet.indexOf("  ") + 1);
+      });
+      latexInsertBraceButton.addEventListener("click", function () {
+        const snippet = "\\left\\{  \\right\\}";
+        insertLatexSnippet(snippet, snippet.indexOf("  ") + 1);
+      });
+      latexInsertOverlineButton.addEventListener("click", function () {
+        const snippet = "\\overline{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertVecButton.addEventListener("click", function () {
+        const snippet = "\\vec{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertBinomButton.addEventListener("click", function () {
+        const snippet = "\\binom{}{}";
+        insertLatexSnippet(snippet, snippet.indexOf("{}") + 1);
       });
       document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && !latexToolbarPanel.hidden) {
