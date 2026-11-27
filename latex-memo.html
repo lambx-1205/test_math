@@ -1339,40 +1339,35 @@
       .preview-wrap { padding: 19px 15px; }
     }
 
-    /* Dedicated sidebar alongside the entire Input panel. */
-    .editor-panel {
-      flex-direction: row;
+    /* Floating LaTeX toolbar: reserved rail to the far left of the input field. */
+    .editor-area {
+      position: relative;
+      padding: 14px 14px 14px 62px;
+      transition: padding-left .16s ease;
     }
-    .editor-panel-main {
-      display: flex;
-      flex: 1 1 auto;
-      min-width: 0;
-      min-height: 0;
-      flex-direction: column;
+    .editor-area.latex-toolbar-open {
+      padding-left: 202px;
     }
     .latex-floating-toolbar {
-      position: relative;
+      position: absolute;
       z-index: 20;
+      left: 14px;
+      top: 50%;
       display: flex;
-      flex: 0 0 56px;
-      width: 56px;
-      min-height: 0;
+      width: 40px;
+      height: 40px;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      align-items: stretch;
       gap: 8px;
-      padding: 12px 7px;
-      border-right: 1px solid var(--line);
-      background: var(--panel);
+      transform: translateY(-50%);
       pointer-events: none;
-      transition: flex-basis .16s ease, width .16s ease, padding .16s ease;
     }
     .latex-floating-toolbar.is-open {
-      flex: 0 0 176px;
+      top: 14px;
+      bottom: 14px;
       width: 176px;
-      align-items: stretch;
-      justify-content: stretch;
-      padding: 12px;
+      height: auto;
+      transform: none;
     }
     .latex-toolbar-toggle {
       display: flex;
@@ -1495,8 +1490,10 @@
       overflow-wrap: anywhere;
     }
     @media (max-width: 820px) {
-      .latex-floating-toolbar { flex-basis: 50px; width: 50px; padding: 10px 6px; }
-      .latex-floating-toolbar.is-open { flex-basis: 148px; width: 148px; padding: 10px; }
+      .editor-area { padding-left: 54px; }
+      .editor-area.latex-toolbar-open { padding-left: 158px; }
+      .latex-floating-toolbar { left: 8px; }
+      .latex-floating-toolbar.is-open { width: 138px; }
       .latex-tool-action { gap: 6px; padding: 5px 6px; }
       .latex-tool-icon { width: 28px; height: 28px; flex-basis: 28px; }
       .latex-tool-name { font-size: 10px; }
@@ -1742,6 +1739,25 @@
 
     <section class="workbench" aria-label="数式エディタ">
       <section class="panel editor-panel" aria-labelledby="editor-title">
+
+        <div class="panel-heading">
+          <div class="panel-title-wrap">
+            <div class="panel-icon" aria-hidden="true">⌘</div>
+            <div>
+              <h2 id="editor-title">入力</h2>
+              <p class="panel-subtitle">LaTeX ソース</p>
+            </div>
+          </div>
+          <div class="panel-actions">
+            <button id="save-button" class="primary-button" type="button">保存</button>
+            <button id="overwrite-save-button" type="button">上書き保存</button>
+            <button id="rename-save-button" type="button" disabled>保存名変更</button>
+            <button id="copy-current-button" type="button">コピー</button>
+            <button id="sample-button" type="button">サンプル</button>
+            <button id="clear-button" type="button">クリア</button>
+          </div>
+        </div>
+        <div class="editor-area">
         <aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
                     <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
                       <div class="latex-toolbar-panel-head">
@@ -1778,32 +1794,12 @@
                       aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
                       title="数式ツールを開く">∑</button>
                   </aside>
-        <div class="editor-panel-main">
-        <div class="panel-heading">
-          <div class="panel-title-wrap">
-            <div class="panel-icon" aria-hidden="true">⌘</div>
-            <div>
-              <h2 id="editor-title">入力</h2>
-              <p class="panel-subtitle">LaTeX ソース</p>
-            </div>
-          </div>
-          <div class="panel-actions">
-            <button id="save-button" class="primary-button" type="button">保存</button>
-            <button id="overwrite-save-button" type="button">上書き保存</button>
-            <button id="rename-save-button" type="button" disabled>保存名変更</button>
-            <button id="copy-current-button" type="button">コピー</button>
-            <button id="sample-button" type="button">サンプル</button>
-            <button id="clear-button" type="button">クリア</button>
-          </div>
-        </div>
-        <div class="editor-area">
           <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
           <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
             <span>Option + クリック：カーソルを追加して複数箇所に同時入力</span>
             <span id="char-count">0 文字</span>
           </div>
-        </div>
         </div>
       </section>
 
@@ -2079,6 +2075,7 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
+      const editorArea = document.querySelector(".editor-area");
       const latexToolbar = document.getElementById("latex-floating-toolbar");
       const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
       const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
@@ -2275,6 +2272,7 @@
       function setLatexToolbarOpen(open) {
         latexToolbarPanel.hidden = !open;
         latexToolbar.classList.toggle("is-open", open);
+        editorArea.classList.toggle("latex-toolbar-open", open);
         latexToolbarToggle.setAttribute("aria-expanded", String(open));
         latexToolbarToggle.setAttribute(
           "aria-label",
