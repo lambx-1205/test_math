@@ -448,15 +448,11 @@
     }
 
     .editor-area {
-      position: relative;
       display: flex;
       flex: 1;
+      min-width: 0;
       flex-direction: column;
-      padding: 14px 14px 14px 62px;
-      transition: padding-left .16s ease;
-    }
-    .editor-area.latex-toolbar-open {
-      padding-left: 202px;
+      padding: 14px;
     }
 
     textarea {
@@ -1335,8 +1331,7 @@
       .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
       .saved-note-title { max-width: 100%; }
       .saved-note-excerpt { flex-basis: 100%; }
-      .editor-area { padding: 10px 10px 10px 54px; }
-      .editor-area.latex-toolbar-open { padding-left: 158px; }
+      .editor-area { padding: 10px; }
       textarea { padding: 12px; font-size: 12px; }
       .source-editor .cm-editor { font-size: 12px; }
       .source-editor .cm-content { padding: 12px 0; }
@@ -1344,27 +1339,40 @@
       .preview-wrap { padding: 19px 15px; }
     }
 
-    /* Floating LaTeX toolbar: a reserved side rail beside the input. */
-    .latex-floating-toolbar {
-      position: absolute;
-      z-index: 20;
-      left: 14px;
-      top: 50%;
+    /* Dedicated sidebar alongside the entire Input panel. */
+    .editor-panel {
+      flex-direction: row;
+    }
+    .editor-panel-main {
       display: flex;
-      width: 40px;
-      height: 40px;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
       flex-direction: column;
-      align-items: stretch;
+    }
+    .latex-floating-toolbar {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      flex: 0 0 56px;
+      width: 56px;
+      min-height: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       gap: 8px;
-      transform: translateY(-50%);
+      padding: 12px 7px;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
       pointer-events: none;
+      transition: flex-basis .16s ease, width .16s ease, padding .16s ease;
     }
     .latex-floating-toolbar.is-open {
-      top: 14px;
-      bottom: 14px;
+      flex: 0 0 176px;
       width: 176px;
-      height: auto;
-      transform: none;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 12px;
     }
     .latex-toolbar-toggle {
       display: flex;
@@ -1487,10 +1495,8 @@
       overflow-wrap: anywhere;
     }
     @media (max-width: 820px) {
-      .editor-area { padding-left: 54px; }
-      .editor-area.latex-toolbar-open { padding-left: 158px; }
-      .latex-floating-toolbar { left: 8px; }
-      .latex-floating-toolbar.is-open { width: 138px; }
+      .latex-floating-toolbar { flex-basis: 50px; width: 50px; padding: 10px 6px; }
+      .latex-floating-toolbar.is-open { flex-basis: 148px; width: 148px; padding: 10px; }
       .latex-tool-action { gap: 6px; padding: 5px 6px; }
       .latex-tool-icon { width: 28px; height: 28px; flex-basis: 28px; }
       .latex-tool-name { font-size: 10px; }
@@ -1736,6 +1742,43 @@
 
     <section class="workbench" aria-label="数式エディタ">
       <section class="panel editor-panel" aria-labelledby="editor-title">
+        <aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
+                    <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
+                      <div class="latex-toolbar-panel-head">
+                        <p class="latex-toolbar-panel-title">数式ツール</p>
+                      </div>
+                      <div class="latex-toolbar-actions">
+                        <button id="latex-insert-inline" class="latex-tool-action" type="button" title="インライン数式を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">𝑥</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">数式を挿入</span><span class="latex-tool-example">\(　\)</span></span>
+                        </button>
+                        <button id="latex-insert-display" class="latex-tool-action" type="button" title="別行立て数式を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">𝑥²</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">別行立て数式</span><span class="latex-tool-example">\[ … \]</span></span>
+                        </button>
+                        <button id="latex-insert-sum" class="latex-tool-action" type="button" title="総和のひな型を挿入">
+                          <span class="latex-tool-icon sum" aria-hidden="true">∑</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">総和</span><span class="latex-tool-example">\sum_{k=1}^{n}</span></span>
+                        </button>
+                        <button id="latex-insert-prod" class="latex-tool-action" type="button" title="総積のひな型を挿入">
+                          <span class="latex-tool-icon prod" aria-hidden="true">∏</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">総積</span><span class="latex-tool-example">\prod_{k=1}^{n}</span></span>
+                        </button>
+                        <button id="latex-insert-int" class="latex-tool-action" type="button" title="不定積分を挿入">
+                          <span class="latex-tool-icon integral" aria-hidden="true">∫</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">不定積分</span><span class="latex-tool-example">\int f(x)\,dx</span></span>
+                        </button>
+                        <button id="latex-insert-defint" class="latex-tool-action" type="button" title="定積分のひな型を挿入">
+                          <span class="latex-tool-icon integral" aria-hidden="true">∫ᵇₐ</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">定積分</span><span class="latex-tool-example">\int_{a}^{b} f(x)\,dx</span></span>
+                        </button>
+                      </div>
+                    </section>
+                    <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
+                      aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
+                      title="数式ツールを開く">∑</button>
+                  </aside>
+        <div class="editor-panel-main">
         <div class="panel-heading">
           <div class="panel-title-wrap">
             <div class="panel-icon" aria-hidden="true">⌘</div>
@@ -1754,49 +1797,13 @@
           </div>
         </div>
         <div class="editor-area">
-          
-                  <aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
-            <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
-              <div class="latex-toolbar-panel-head">
-                <p class="latex-toolbar-panel-title">数式ツール</p>
-              </div>
-              <div class="latex-toolbar-actions">
-                <button id="latex-insert-inline" class="latex-tool-action" type="button" title="インライン数式を挿入">
-                  <span class="latex-tool-icon" aria-hidden="true">𝑥</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">数式を挿入</span><span class="latex-tool-example">\(　\)</span></span>
-                </button>
-                <button id="latex-insert-display" class="latex-tool-action" type="button" title="別行立て数式を挿入">
-                  <span class="latex-tool-icon" aria-hidden="true">𝑥²</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">別行立て数式</span><span class="latex-tool-example">\[ … \]</span></span>
-                </button>
-                <button id="latex-insert-sum" class="latex-tool-action" type="button" title="総和のひな型を挿入">
-                  <span class="latex-tool-icon sum" aria-hidden="true">∑</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">総和</span><span class="latex-tool-example">\sum_{k=1}^{n}</span></span>
-                </button>
-                <button id="latex-insert-prod" class="latex-tool-action" type="button" title="総積のひな型を挿入">
-                  <span class="latex-tool-icon prod" aria-hidden="true">∏</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">総積</span><span class="latex-tool-example">\prod_{k=1}^{n}</span></span>
-                </button>
-                <button id="latex-insert-int" class="latex-tool-action" type="button" title="不定積分を挿入">
-                  <span class="latex-tool-icon integral" aria-hidden="true">∫</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">不定積分</span><span class="latex-tool-example">\int f(x)\,dx</span></span>
-                </button>
-                <button id="latex-insert-defint" class="latex-tool-action" type="button" title="定積分のひな型を挿入">
-                  <span class="latex-tool-icon integral" aria-hidden="true">∫ᵇₐ</span>
-                  <span class="latex-tool-copy"><span class="latex-tool-name">定積分</span><span class="latex-tool-example">\int_{a}^{b} f(x)\,dx</span></span>
-                </button>
-              </div>
-            </section>
-            <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
-              aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
-              title="数式ツールを開く">∑</button>
-          </aside>
           <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
           <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
             <span>Option + クリック：カーソルを追加して複数箇所に同時入力</span>
             <span id="char-count">0 文字</span>
           </div>
+        </div>
         </div>
       </section>
 
@@ -2072,7 +2079,6 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
-      const editorArea = document.querySelector(".editor-area");
       const latexToolbar = document.getElementById("latex-floating-toolbar");
       const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
       const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
@@ -2269,7 +2275,6 @@
       function setLatexToolbarOpen(open) {
         latexToolbarPanel.hidden = !open;
         latexToolbar.classList.toggle("is-open", open);
-        editorArea.classList.toggle("latex-toolbar-open", open);
         latexToolbarToggle.setAttribute("aria-expanded", String(open));
         latexToolbarToggle.setAttribute(
           "aria-label",
