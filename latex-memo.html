@@ -1339,45 +1339,33 @@
       .preview-wrap { padding: 19px 15px; }
     }
 
-    /* Floating LaTeX toolbar: reserved rail to the far left of the input field. */
-    .editor-area {
-      position: relative;
-      padding: 14px 14px 14px 62px;
-      transition: padding-left .16s ease;
-    }
-    .editor-area.latex-toolbar-open {
-      padding-left: 202px;
-    }
+    /* Page-fixed LaTeX toolbar, independent of the editor layout. */
     .latex-floating-toolbar {
-      position: absolute;
-      z-index: 20;
-      left: 14px;
+      position: fixed;
+      z-index: 1200;
+      left: 12px;
       top: 50%;
       display: flex;
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      max-height: calc(100vh - 28px);
       flex-direction: column;
-      align-items: stretch;
+      align-items: center;
       gap: 8px;
       transform: translateY(-50%);
       pointer-events: none;
     }
     .latex-floating-toolbar.is-open {
-      top: 14px;
-      bottom: 14px;
-      width: 176px;
-      height: auto;
-      transform: none;
+      width: 224px;
+      align-items: stretch;
     }
     .latex-toolbar-toggle {
       display: flex;
-      width: 40px;
-      height: 40px;
-      min-height: 40px;
-      flex: 0 0 40px;
+      width: 42px;
+      height: 42px;
+      min-height: 42px;
+      flex: 0 0 42px;
       align-items: center;
       justify-content: center;
-      gap: 7px;
       padding: 0;
       border: 1px solid var(--line) !important;
       border-radius: 50%;
@@ -1399,7 +1387,6 @@
       height: 38px;
       min-height: 38px;
       flex: 0 0 38px;
-      margin-top: auto;
       border-radius: 9px;
       font-size: 11px;
       font-weight: 750;
@@ -1408,9 +1395,12 @@
       display: flex;
       width: 100%;
       min-height: 0;
-      flex: 1 1 auto;
+      max-height: calc(100vh - 88px);
+      flex: 0 1 auto;
       flex-direction: column;
+      overflow-x: hidden;
       overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 10px;
       border: 1px solid var(--line);
       border-radius: 13px;
@@ -1423,6 +1413,7 @@
     .latex-toolbar-panel-head {
       display: flex;
       align-items: center;
+      flex: 0 0 auto;
       margin-bottom: 8px;
       padding: 1px 2px 8px;
       border-bottom: 1px solid var(--line);
@@ -1434,17 +1425,14 @@
       font-weight: 800;
       letter-spacing: .04em;
     }
-    .latex-toolbar-actions {
-      display: grid;
-      gap: 5px;
-    }
+    .latex-toolbar-actions { display: grid; gap: 5px; }
     .latex-tool-action {
       display: flex;
       width: 100%;
-      min-height: 46px;
+      min-height: 44px;
       align-items: center;
       gap: 9px;
-      padding: 6px 8px;
+      padding: 5px 8px;
       border: 1px solid var(--line) !important;
       border-radius: 9px;
       background: var(--panel) !important;
@@ -1457,31 +1445,21 @@
     }
     .latex-tool-icon {
       display: grid;
-      width: 32px;
-      height: 32px;
-      flex: 0 0 32px;
+      width: 31px;
+      height: 31px;
+      flex: 0 0 31px;
       place-items: center;
       border-radius: 8px;
       background: var(--accent-soft) !important;
       color: var(--accent) !important;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 19px;
+      font-size: 18px;
       font-style: italic;
       line-height: 1;
     }
-    .latex-tool-icon.sum,
-    .latex-tool-icon.prod,
-    .latex-tool-icon.integral { font-size: 24px; font-style: normal; }
-    .latex-tool-copy {
-      display: grid;
-      gap: 3px;
-      min-width: 0;
-    }
-    .latex-tool-name {
-      color: var(--ink);
-      font-size: 11px;
-      font-weight: 750;
-    }
+    .latex-tool-icon.sum, .latex-tool-icon.prod, .latex-tool-icon.integral { font-size: 23px; font-style: normal; }
+    .latex-tool-copy { display: grid; gap: 2px; min-width: 0; }
+    .latex-tool-name { color: var(--ink); font-size: 11px; font-weight: 750; }
     .latex-tool-example {
       color: var(--muted);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1490,16 +1468,14 @@
       overflow-wrap: anywhere;
     }
     @media (max-width: 820px) {
-      .editor-area { padding-left: 54px; }
-      .editor-area.latex-toolbar-open { padding-left: 158px; }
       .latex-floating-toolbar { left: 8px; }
-      .latex-floating-toolbar.is-open { width: 138px; }
+      .latex-floating-toolbar.is-open { width: min(216px, calc(100vw - 16px)); }
+      .latex-toolbar-panel { max-height: calc(100vh - 84px); }
       .latex-tool-action { gap: 6px; padding: 5px 6px; }
       .latex-tool-icon { width: 28px; height: 28px; flex-basis: 28px; }
       .latex-tool-name { font-size: 10px; }
       .latex-tool-example { font-size: 8px; }
     }
-
     /* PDF export dialog */
     .preview-header-tools {
       display: flex;
@@ -1758,42 +1734,7 @@
           </div>
         </div>
         <div class="editor-area">
-        <aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
-                    <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
-                      <div class="latex-toolbar-panel-head">
-                        <p class="latex-toolbar-panel-title">数式ツール</p>
-                      </div>
-                      <div class="latex-toolbar-actions">
-                        <button id="latex-insert-inline" class="latex-tool-action" type="button" title="インライン数式を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">𝑥</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">数式を挿入</span><span class="latex-tool-example">\(　\)</span></span>
-                        </button>
-                        <button id="latex-insert-display" class="latex-tool-action" type="button" title="別行立て数式を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">𝑥²</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">別行立て数式</span><span class="latex-tool-example">\[ … \]</span></span>
-                        </button>
-                        <button id="latex-insert-sum" class="latex-tool-action" type="button" title="総和のひな型を挿入">
-                          <span class="latex-tool-icon sum" aria-hidden="true">∑</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">総和</span><span class="latex-tool-example">\sum_{k=1}^{n}</span></span>
-                        </button>
-                        <button id="latex-insert-prod" class="latex-tool-action" type="button" title="総積のひな型を挿入">
-                          <span class="latex-tool-icon prod" aria-hidden="true">∏</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">総積</span><span class="latex-tool-example">\prod_{k=1}^{n}</span></span>
-                        </button>
-                        <button id="latex-insert-int" class="latex-tool-action" type="button" title="不定積分を挿入">
-                          <span class="latex-tool-icon integral" aria-hidden="true">∫</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">不定積分</span><span class="latex-tool-example">\int f(x)\,dx</span></span>
-                        </button>
-                        <button id="latex-insert-defint" class="latex-tool-action" type="button" title="定積分のひな型を挿入">
-                          <span class="latex-tool-icon integral" aria-hidden="true">∫ᵇₐ</span>
-                          <span class="latex-tool-copy"><span class="latex-tool-name">定積分</span><span class="latex-tool-example">\int_{a}^{b} f(x)\,dx</span></span>
-                        </button>
-                      </div>
-                    </section>
-                    <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
-                      aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
-                      title="数式ツールを開く">∑</button>
-                  </aside>
+
           <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
           <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
@@ -1927,6 +1868,71 @@
 
 
   </main>
+
+<aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
+                    <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
+                      <div class="latex-toolbar-panel-head">
+                        <p class="latex-toolbar-panel-title">数式ツール</p>
+                      </div>
+                      <div class="latex-toolbar-actions">
+                        <button id="latex-insert-inline" class="latex-tool-action" type="button" title="インライン数式を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">𝑥</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">数式を挿入</span><span class="latex-tool-example">\(　\)</span></span>
+                        </button>
+                        <button id="latex-insert-display" class="latex-tool-action" type="button" title="別行立て数式を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">𝑥²</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">別行立て数式</span><span class="latex-tool-example">\[ … \]</span></span>
+                        </button>
+                        <button id="latex-insert-sum" class="latex-tool-action" type="button" title="総和のひな型を挿入">
+                          <span class="latex-tool-icon sum" aria-hidden="true">∑</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">総和</span><span class="latex-tool-example">\sum_{k=1}^{n}</span></span>
+                        </button>
+                        <button id="latex-insert-prod" class="latex-tool-action" type="button" title="総積のひな型を挿入">
+                          <span class="latex-tool-icon prod" aria-hidden="true">∏</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">総積</span><span class="latex-tool-example">\prod_{k=1}^{n}</span></span>
+                        </button>
+                        <button id="latex-insert-int" class="latex-tool-action" type="button" title="不定積分を挿入">
+                          <span class="latex-tool-icon integral" aria-hidden="true">∫</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">不定積分</span><span class="latex-tool-example">\int f(x)\,dx</span></span>
+                        </button>
+                        <button id="latex-insert-defint" class="latex-tool-action" type="button" title="定積分のひな型を挿入">
+                          <span class="latex-tool-icon integral" aria-hidden="true">∫ᵇₐ</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">定積分</span><span class="latex-tool-example">\int_{a}^{b} f(x)\,dx</span></span>
+                        </button>
+                        <button id="latex-insert-aligned" class="latex-tool-action" type="button" title="aligned環境を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">≡</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">aligned環境</span><span class="latex-tool-example">\begin{aligned}…</span></span>
+                        </button>
+                        <button id="latex-insert-cases" class="latex-tool-action" type="button" title="場合分けのcases環境を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">{ }</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">cases環境</span><span class="latex-tool-example">\begin{cases}…</span></span>
+                        </button>
+                        <button id="latex-insert-root" class="latex-tool-action" type="button" title="平方根のひな型を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">√</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">ルート</span><span class="latex-tool-example">\sqrt{ }</span></span>
+                        </button>
+                        <button id="latex-insert-superscript" class="latex-tool-action" type="button" title="上付き文字を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">x²</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">累乗・上付き</span><span class="latex-tool-example">^{ }</span></span>
+                        </button>
+                        <button id="latex-insert-subscript" class="latex-tool-action" type="button" title="下付き文字を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">xᵢ</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">下付き</span><span class="latex-tool-example">_{ }</span></span>
+                        </button>
+                        <button id="latex-insert-lim" class="latex-tool-action" type="button" title="極限のひな型を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">lim</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">極限</span><span class="latex-tool-example">\lim_{x \to a}</span></span>
+                        </button>
+                        <button id="latex-insert-rightarrow" class="latex-tool-action" type="button" title="右向き矢印を挿入">
+                          <span class="latex-tool-icon" aria-hidden="true">→</span>
+                          <span class="latex-tool-copy"><span class="latex-tool-name">右向き矢印</span><span class="latex-tool-example">\rightarrow</span></span>
+                        </button>
+                      </div>
+                    </section>
+                    <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
+                      aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
+                      title="数式ツールを開く">∑</button>
+                  </aside>
 
 
   
@@ -2075,7 +2081,6 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
-      const editorArea = document.querySelector(".editor-area");
       const latexToolbar = document.getElementById("latex-floating-toolbar");
       const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
       const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
@@ -2085,6 +2090,13 @@
       const latexInsertProdButton = document.getElementById("latex-insert-prod");
       const latexInsertIntButton = document.getElementById("latex-insert-int");
       const latexInsertDefIntButton = document.getElementById("latex-insert-defint");
+      const latexInsertAlignedButton = document.getElementById("latex-insert-aligned");
+      const latexInsertCasesButton = document.getElementById("latex-insert-cases");
+      const latexInsertRootButton = document.getElementById("latex-insert-root");
+      const latexInsertSuperscriptButton = document.getElementById("latex-insert-superscript");
+      const latexInsertSubscriptButton = document.getElementById("latex-insert-subscript");
+      const latexInsertLimButton = document.getElementById("latex-insert-lim");
+      const latexInsertRightArrowButton = document.getElementById("latex-insert-rightarrow");
       let EditorSelection = null;
       let originalDocumentTitle = null;
       let renderingLibrariesReady = null;
@@ -2272,7 +2284,6 @@
       function setLatexToolbarOpen(open) {
         latexToolbarPanel.hidden = !open;
         latexToolbar.classList.toggle("is-open", open);
-        editorArea.classList.toggle("latex-toolbar-open", open);
         latexToolbarToggle.setAttribute("aria-expanded", String(open));
         latexToolbarToggle.setAttribute(
           "aria-label",
@@ -3316,7 +3327,7 @@
           .replace(/\x60{3}[\s\S]*?\x60{3}/g, " ")
           .replace(/\x60[^\x60]*\x60/g, " ")
           .replace(mathPattern, " ");
-        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
+        return /\\(?:sum|prod|int|frac|dfrac|tfrac|sqrt|lim|sin|cos|tan|log|ln|alpha|beta|gamma|theta|pi|infty|cdot|times|pm|leq|geq|neq|in|notin|subset|cup|cap|begin|end|left|right|mathbf|mathrm|text|partial|nabla|overline|underline|binom|rightarrow|to)\b|(?:\^\{[^}]+\}|_\{[^}]+\})/.test(withoutDelimitedMath);
       }
 
       function renderPreview() {
@@ -3455,6 +3466,34 @@
       });
       latexInsertDefIntButton.addEventListener("click", function () {
         const snippet = "\\int_{a}^{b} ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertAlignedButton.addEventListener("click", function () {
+        const snippet = "\\begin{aligned}\n  \n\\end{aligned}";
+        insertLatexSnippet(snippet, snippet.indexOf("\n") + 3);
+      });
+      latexInsertCasesButton.addEventListener("click", function () {
+        const snippet = "\\begin{cases}\n  & \n\\end{cases}";
+        insertLatexSnippet(snippet, snippet.indexOf("& ") + 2);
+      });
+      latexInsertRootButton.addEventListener("click", function () {
+        const snippet = "\\sqrt{}";
+        insertLatexSnippet(snippet, snippet.length - 1);
+      });
+      latexInsertSuperscriptButton.addEventListener("click", function () {
+        const snippet = "^{ }";
+        insertLatexSnippet(snippet, snippet.length - 2);
+      });
+      latexInsertSubscriptButton.addEventListener("click", function () {
+        const snippet = "_{ }";
+        insertLatexSnippet(snippet, snippet.length - 2);
+      });
+      latexInsertLimButton.addEventListener("click", function () {
+        const snippet = "\\lim_{x \\to a} ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertRightArrowButton.addEventListener("click", function () {
+        const snippet = "\\rightarrow ";
         insertLatexSnippet(snippet, snippet.length);
       });
       document.addEventListener("keydown", function (event) {
