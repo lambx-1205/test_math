@@ -642,8 +642,14 @@
 
     .math-display-wrapper {
       display: block;
-      margin: 0.35em 0;
+      margin: 0.25em 0;
       text-align: center;
+    }
+
+    #preview .math-display-wrapper > .katex-display,
+    .saved-note-rendered .math-display-wrapper > .katex-display {
+      margin: 0 !important;
+      padding: 0;
     }
 
     #preview.markdown-rendered .katex-display,
@@ -2933,7 +2939,8 @@
             expression = token.slice(1, -1);
           }
           mathTokens.push({ placeholder, expression, displayMode });
-          return placeholder;
+          // Display math is a block. Isolate it so Marked gives it its own paragraph.
+          return displayMode ? "\n\n" + placeholder + "\n\n" : placeholder;
         });
 
         const html = window.marked.parse(protectedText, { gfm: true, breaks: true });
@@ -2952,6 +2959,22 @@
           }
           nodes.forEach(function (textNode) {
             const value = textNode.nodeValue;
+            const standaloneDisplay = mathTokens.find(function (item) {
+              return item.displayMode && value.trim() === item.placeholder;
+            });
+
+            if (standaloneDisplay) {
+              const paragraph = textNode.parentElement;
+              if (paragraph && paragraph.tagName === "P" &&
+                  paragraph.textContent.trim() === standaloneDisplay.placeholder &&
+                  paragraph.children.length === 0) {
+                const block = document.createDocumentFragment();
+                appendFormula(block, standaloneDisplay.expression, true);
+                paragraph.replaceWith(block);
+                return;
+              }
+            }
+
             const fragment = document.createDocumentFragment();
             let cursor = 0;
             let found = false;
@@ -2996,12 +3019,17 @@
         }
 
         let cursor = 0;
+        let previousWasDisplay = false;
         matches.forEach(function (match) {
-          appendText(target, text.slice(cursor, match.index));
+          let before = text.slice(cursor, match.index);
+          if (previousWasDisplay) {
+            before = before.replace(/^[ \t]*(?:\r?\n)+/, "");
+          }
+
           const token = match[0];
           let expression = token;
           let displayMode = false;
-          if (token.startsWith("$$") && token.endsWith("$$")) {
+          if (token.startsWith("$") && token.endsWith("$")) {
             expression = token.slice(2, -2);
             displayMode = true;
           } else if (token.startsWith("\\[") && token.endsWith("\\]")) {
@@ -3012,10 +3040,20 @@
           } else {
             expression = token.slice(1, -1);
           }
+
+          if (displayMode) {
+            before = before.replace(/(?:[ \t]*\r?\n)+[ \t]*$/, "");
+          }
+          appendText(target, before);
           appendFormula(target, expression, displayMode);
           cursor = match.index + token.length;
+          previousWasDisplay = displayMode;
         });
-        appendText(target, text.slice(cursor));
+        let after = text.slice(cursor);
+        if (previousWasDisplay) {
+          after = after.replace(/^[ \t]*(?:\r?\n)+/, "");
+        }
+        appendText(target, after);
       }
 
       function containsUndelimitedLatex(text) {
