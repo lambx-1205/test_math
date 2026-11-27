@@ -1338,6 +1338,144 @@
       .preview-wrap { padding: 19px 15px; }
     }
 
+    /* Floating LaTeX toolbar */
+    .latex-floating-toolbar {
+      position: fixed;
+      z-index: 1200;
+      left: 12px;
+      top: 50%;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .latex-toolbar-toggle {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      min-height: 42px;
+      flex: 0 0 42px;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--line) !important;
+      border-radius: 50%;
+      background: var(--panel) !important;
+      color: var(--accent) !important;
+      box-shadow: 0 4px 16px rgba(20, 32, 58, .14);
+      font-size: 22px;
+      line-height: 1;
+      pointer-events: auto;
+    }
+    .latex-toolbar-toggle:hover {
+      border-color: var(--accent) !important;
+      background: var(--accent-soft) !important;
+    }
+    .latex-toolbar-panel {
+      width: 184px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel) !important;
+      color: var(--ink) !important;
+      box-shadow: 0 8px 26px rgba(20, 32, 58, .16);
+      pointer-events: auto;
+    }
+    .latex-toolbar-panel[hidden] { display: none !important; }
+    .latex-toolbar-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 1px 2px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .latex-toolbar-panel-title {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .latex-toolbar-close {
+      width: 25px;
+      min-width: 25px;
+      min-height: 25px;
+      padding: 0;
+      border: 0 !important;
+      background: transparent !important;
+      color: var(--muted) !important;
+      font-size: 17px;
+    }
+    .latex-toolbar-actions {
+      display: grid;
+      gap: 6px;
+    }
+    .latex-tool-action {
+      display: flex;
+      width: 100%;
+      min-height: 52px;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 9px;
+      border: 1px solid var(--line) !important;
+      border-radius: 9px;
+      background: var(--panel) !important;
+      color: var(--ink) !important;
+      text-align: left;
+    }
+    .latex-tool-action:hover {
+      border-color: var(--accent) !important;
+      background: var(--accent-soft) !important;
+    }
+    .latex-tool-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--accent-soft) !important;
+      color: var(--accent) !important;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 20px;
+      font-style: italic;
+      line-height: 1;
+    }
+    .latex-tool-icon.sum { font-size: 25px; font-style: normal; }
+    .latex-tool-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+    .latex-tool-name {
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .latex-tool-example {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    @media (max-width: 820px) {
+      .latex-floating-toolbar {
+        left: 8px;
+        top: auto;
+        bottom: 14px;
+        transform: none;
+      }
+      .latex-toolbar-toggle {
+        width: 40px;
+        height: 40px;
+        min-height: 40px;
+        flex-basis: 40px;
+      }
+      .latex-toolbar-panel { width: 174px; }
+    }
+
     /* PDF export dialog */
     .preview-header-tools {
       display: flex;
@@ -1731,6 +1869,37 @@
   </main>
 
 
+  <aside id="latex-floating-toolbar" class="latex-floating-toolbar" aria-label="LaTeXツール">
+    <button id="latex-toolbar-toggle" class="latex-toolbar-toggle" type="button"
+      aria-label="数式ツールを開く" aria-expanded="false" aria-controls="latex-toolbar-panel"
+      title="数式ツール">∑</button>
+    <section id="latex-toolbar-panel" class="latex-toolbar-panel" aria-label="数式の挿入" hidden>
+      <div class="latex-toolbar-panel-head">
+        <p class="latex-toolbar-panel-title">数式ツール</p>
+        <button id="latex-toolbar-close" class="latex-toolbar-close" type="button"
+          aria-label="数式ツールを閉じる">×</button>
+      </div>
+      <div class="latex-toolbar-actions">
+        <button id="latex-insert-inline" class="latex-tool-action" type="button"
+          title="インライン数式の区切りを挿入">
+          <span class="latex-tool-icon" aria-hidden="true">𝑥</span>
+          <span class="latex-tool-copy">
+            <span class="latex-tool-name">数式を挿入</span>
+            <span class="latex-tool-example">\(　\)</span>
+          </span>
+        </button>
+        <button id="latex-insert-sum" class="latex-tool-action" type="button"
+          title="総和のひな型を挿入">
+          <span class="latex-tool-icon sum" aria-hidden="true">∑</span>
+          <span class="latex-tool-copy">
+            <span class="latex-tool-name">総和記号</span>
+            <span class="latex-tool-example">\sum_{k=1}^{n}</span>
+          </span>
+        </button>
+      </div>
+    </section>
+  </aside>
+
   <dialog id="pdf-export-dialog" class="pdf-export-dialog" aria-labelledby="pdf-export-dialog-title">
     <form id="pdf-export-form">
       <div class="pdf-dialog-heading">
@@ -1875,6 +2044,13 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
+      const latexToolbar = document.getElementById("latex-floating-toolbar");
+      const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
+      const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
+      const latexToolbarClose = document.getElementById("latex-toolbar-close");
+      const latexInsertInlineButton = document.getElementById("latex-insert-inline");
+      const latexInsertSumButton = document.getElementById("latex-insert-sum");
+      let EditorSelection = null;
       let originalDocumentTitle = null;
       let renderingLibrariesReady = null;
       const pdfPageStyle = document.createElement("style");
@@ -2029,6 +2205,43 @@
       function focusEditor() {
         if (editorView) editorView.focus();
         else source.focus();
+      }
+
+      function insertLatexSnippet(snippet, caretOffset) {
+        if (editorView) {
+          const state = editorView.state;
+          const transaction = state.changeByRange(function (range) {
+            return {
+              changes: {
+                from: range.from,
+                to: range.to,
+                insert: snippet
+              },
+              range: EditorSelection.cursor(range.from + caretOffset)
+            };
+          });
+          editorView.dispatch(transaction);
+          editorView.focus();
+          return;
+        }
+
+        const start = source.selectionStart ?? source.value.length;
+        const end = source.selectionEnd ?? start;
+        source.setRangeText(snippet, start, end, "preserve");
+        const cursor = start + caretOffset;
+        source.setSelectionRange(cursor, cursor);
+        source.dispatchEvent(new Event("input", { bubbles: true }));
+        source.focus();
+      }
+
+      function setLatexToolbarOpen(open) {
+        latexToolbarPanel.hidden = !open;
+        latexToolbar.classList.toggle("is-open", open);
+        latexToolbarToggle.setAttribute("aria-expanded", String(open));
+        latexToolbarToggle.setAttribute(
+          "aria-label",
+          open ? "数式ツールを閉じる" : "数式ツールを開く"
+        );
       }
 
       function setEditingNote(note) {
@@ -3102,10 +3315,12 @@
             import("https://esm.sh/@codemirror/commands@6.11.0?deps=@codemirror/state@6.7.1,@codemirror/view@6.43.9")
           ]);
           const EditorState = stateModule.EditorState;
+          EditorSelection = stateModule.EditorSelection;
           const EditorView = viewModule.EditorView;
 
           const missingApis = [];
           if (!EditorState) missingApis.push("EditorState");
+          if (!EditorSelection) missingApis.push("EditorSelection");
           if (!EditorView) missingApis.push("EditorView");
           if (typeof viewModule.drawSelection !== "function") missingApis.push("drawSelection");
           if (!EditorView || !EditorView.clickAddsSelectionRange ||
@@ -3172,6 +3387,27 @@
           return false;
         }
       }
+
+      latexToolbarToggle.addEventListener("click", function () {
+        setLatexToolbarOpen(latexToolbarPanel.hidden);
+      });
+      latexToolbarClose.addEventListener("click", function () {
+        setLatexToolbarOpen(false);
+        latexToolbarToggle.focus();
+      });
+      latexInsertInlineButton.addEventListener("click", function () {
+        insertLatexSnippet("\\(\\)", 2);
+      });
+      latexInsertSumButton.addEventListener("click", function () {
+        const snippet = "\\sum_{k=1}^{n}";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !latexToolbarPanel.hidden) {
+          setLatexToolbarOpen(false);
+          latexToolbarToggle.focus();
+        }
+      });
 
       memoDrawerToggle.addEventListener("click", function () {
         if (memoDrawer.classList.contains("is-open")) closeMemoDrawer(false);
