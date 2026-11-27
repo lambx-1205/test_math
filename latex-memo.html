@@ -448,10 +448,15 @@
     }
 
     .editor-area {
+      position: relative;
       display: flex;
       flex: 1;
       flex-direction: column;
-      padding: 14px;
+      padding: 14px 14px 14px 62px;
+      transition: padding-left .16s ease;
+    }
+    .editor-area.latex-toolbar-open {
+      padding-left: 202px;
     }
 
     textarea {
@@ -1330,7 +1335,8 @@
       .saved-note-heading { flex-wrap: wrap; gap: 2px 7px; }
       .saved-note-title { max-width: 100%; }
       .saved-note-excerpt { flex-basis: 100%; }
-      .editor-area { padding: 10px; }
+      .editor-area { padding: 10px 10px 10px 54px; }
+      .editor-area.latex-toolbar-open { padding-left: 158px; }
       textarea { padding: 12px; font-size: 12px; }
       .source-editor .cm-editor { font-size: 12px; }
       .source-editor .cm-content { padding: 12px 0; }
@@ -1338,25 +1344,37 @@
       .preview-wrap { padding: 19px 15px; }
     }
 
-    /* Floating LaTeX toolbar */
+    /* Floating LaTeX toolbar: a reserved side rail beside the input. */
     .latex-floating-toolbar {
-      position: fixed;
-      z-index: 1200;
-      left: 12px;
+      position: absolute;
+      z-index: 20;
+      left: 14px;
       top: 50%;
       display: flex;
-      align-items: flex-start;
+      width: 40px;
+      height: 40px;
+      flex-direction: column;
+      align-items: stretch;
       gap: 8px;
       transform: translateY(-50%);
       pointer-events: none;
     }
+    .latex-floating-toolbar.is-open {
+      top: 14px;
+      bottom: 14px;
+      width: 176px;
+      height: auto;
+      transform: none;
+    }
     .latex-toolbar-toggle {
-      display: grid;
-      width: 42px;
-      height: 42px;
-      min-height: 42px;
-      flex: 0 0 42px;
-      place-items: center;
+      display: flex;
+      width: 40px;
+      height: 40px;
+      min-height: 40px;
+      flex: 0 0 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
       padding: 0;
       border: 1px solid var(--line) !important;
       border-radius: 50%;
@@ -1365,14 +1383,31 @@
       box-shadow: 0 4px 16px rgba(20, 32, 58, .14);
       font-size: 22px;
       line-height: 1;
+      white-space: nowrap;
       pointer-events: auto;
     }
     .latex-toolbar-toggle:hover {
       border-color: var(--accent) !important;
       background: var(--accent-soft) !important;
     }
+    .latex-floating-toolbar.is-open .latex-toolbar-toggle {
+      order: 2;
+      width: 100%;
+      height: 38px;
+      min-height: 38px;
+      flex: 0 0 38px;
+      margin-top: auto;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 750;
+    }
     .latex-toolbar-panel {
-      width: 184px;
+      display: flex;
+      width: 100%;
+      min-height: 0;
+      flex: 1 1 auto;
+      flex-direction: column;
+      overflow-y: auto;
       padding: 10px;
       border: 1px solid var(--line);
       border-radius: 13px;
@@ -1385,8 +1420,6 @@
     .latex-toolbar-panel-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
       margin-bottom: 8px;
       padding: 1px 2px 8px;
       border-bottom: 1px solid var(--line);
@@ -1398,27 +1431,17 @@
       font-weight: 800;
       letter-spacing: .04em;
     }
-    .latex-toolbar-close {
-      width: 25px;
-      min-width: 25px;
-      min-height: 25px;
-      padding: 0;
-      border: 0 !important;
-      background: transparent !important;
-      color: var(--muted) !important;
-      font-size: 17px;
-    }
     .latex-toolbar-actions {
       display: grid;
-      gap: 6px;
+      gap: 5px;
     }
     .latex-tool-action {
       display: flex;
       width: 100%;
-      min-height: 52px;
+      min-height: 46px;
       align-items: center;
-      gap: 10px;
-      padding: 7px 9px;
+      gap: 9px;
+      padding: 6px 8px;
       border: 1px solid var(--line) !important;
       border-radius: 9px;
       background: var(--panel) !important;
@@ -1431,19 +1454,21 @@
     }
     .latex-tool-icon {
       display: grid;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 34px;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
       place-items: center;
       border-radius: 8px;
       background: var(--accent-soft) !important;
       color: var(--accent) !important;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 20px;
+      font-size: 19px;
       font-style: italic;
       line-height: 1;
     }
-    .latex-tool-icon.sum { font-size: 25px; font-style: normal; }
+    .latex-tool-icon.sum,
+    .latex-tool-icon.prod,
+    .latex-tool-icon.integral { font-size: 24px; font-style: normal; }
     .latex-tool-copy {
       display: grid;
       gap: 3px;
@@ -1457,23 +1482,19 @@
     .latex-tool-example {
       color: var(--muted);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 500;
+      overflow-wrap: anywhere;
     }
     @media (max-width: 820px) {
-      .latex-floating-toolbar {
-        left: 8px;
-        top: auto;
-        bottom: 14px;
-        transform: none;
-      }
-      .latex-toolbar-toggle {
-        width: 40px;
-        height: 40px;
-        min-height: 40px;
-        flex-basis: 40px;
-      }
-      .latex-toolbar-panel { width: 174px; }
+      .editor-area { padding-left: 54px; }
+      .editor-area.latex-toolbar-open { padding-left: 158px; }
+      .latex-floating-toolbar { left: 8px; }
+      .latex-floating-toolbar.is-open { width: 138px; }
+      .latex-tool-action { gap: 6px; padding: 5px 6px; }
+      .latex-tool-icon { width: 28px; height: 28px; flex-basis: 28px; }
+      .latex-tool-name { font-size: 10px; }
+      .latex-tool-example { font-size: 8px; }
     }
 
     /* PDF export dialog */
@@ -1734,7 +1755,7 @@
         </div>
         <div class="editor-area">
           
-          <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
+                  <div id="source-editor" class="source-editor" aria-label="LaTeX 入力欄"></div>
           <textarea id="source" hidden spellcheck="false" aria-hidden="true" tabindex="-1" autocapitalize="off" autocomplete="off"></textarea>
           <div class="editor-hint">
             <span>Option + クリック：カーソルを追加して複数箇所に同時入力</span>
@@ -2044,12 +2065,16 @@
       const pdfExportOrientation = document.getElementById("pdf-export-orientation");
       const pdfExportMargin = document.getElementById("pdf-export-margin");
       const pdfExportFontSize = document.getElementById("pdf-export-font-size");
+      const editorArea = document.querySelector(".editor-area");
       const latexToolbar = document.getElementById("latex-floating-toolbar");
       const latexToolbarToggle = document.getElementById("latex-toolbar-toggle");
       const latexToolbarPanel = document.getElementById("latex-toolbar-panel");
-      const latexToolbarClose = document.getElementById("latex-toolbar-close");
       const latexInsertInlineButton = document.getElementById("latex-insert-inline");
+      const latexInsertDisplayButton = document.getElementById("latex-insert-display");
       const latexInsertSumButton = document.getElementById("latex-insert-sum");
+      const latexInsertProdButton = document.getElementById("latex-insert-prod");
+      const latexInsertIntButton = document.getElementById("latex-insert-int");
+      const latexInsertDefIntButton = document.getElementById("latex-insert-defint");
       let EditorSelection = null;
       let originalDocumentTitle = null;
       let renderingLibrariesReady = null;
@@ -2237,11 +2262,17 @@
       function setLatexToolbarOpen(open) {
         latexToolbarPanel.hidden = !open;
         latexToolbar.classList.toggle("is-open", open);
+        editorArea.classList.toggle("latex-toolbar-open", open);
         latexToolbarToggle.setAttribute("aria-expanded", String(open));
         latexToolbarToggle.setAttribute(
           "aria-label",
-          open ? "数式ツールを閉じる" : "数式ツールを開く"
+          open ? "ツールバーを閉じる" : "数式ツールを開く"
         );
+        latexToolbarToggle.setAttribute(
+          "title",
+          open ? "ツールバーを閉じる" : "数式ツールを開く"
+        );
+        latexToolbarToggle.textContent = open ? "‹ ツールバーを閉じる" : "∑";
       }
 
       function setEditingNote(note) {
@@ -3389,17 +3420,31 @@
       }
 
       latexToolbarToggle.addEventListener("click", function () {
-        setLatexToolbarOpen(latexToolbarPanel.hidden);
-      });
-      latexToolbarClose.addEventListener("click", function () {
-        setLatexToolbarOpen(false);
-        latexToolbarToggle.focus();
+        const willOpen = latexToolbarPanel.hidden;
+        setLatexToolbarOpen(willOpen);
+        if (!willOpen) latexToolbarToggle.focus();
       });
       latexInsertInlineButton.addEventListener("click", function () {
         insertLatexSnippet("\\(\\)", 2);
       });
+      latexInsertDisplayButton.addEventListener("click", function () {
+        const snippet = "\\[\n  \n\\]";
+        insertLatexSnippet(snippet, 4);
+      });
       latexInsertSumButton.addEventListener("click", function () {
-        const snippet = "\\sum_{k=1}^{n}";
+        const snippet = "\\sum_{k=1}^{n} ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertProdButton.addEventListener("click", function () {
+        const snippet = "\\prod_{k=1}^{n} ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertIntButton.addEventListener("click", function () {
+        const snippet = "\\int ";
+        insertLatexSnippet(snippet, snippet.length);
+      });
+      latexInsertDefIntButton.addEventListener("click", function () {
+        const snippet = "\\int_{a}^{b} ";
         insertLatexSnippet(snippet, snippet.length);
       });
       document.addEventListener("keydown", function (event) {
