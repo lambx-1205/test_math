@@ -39,9 +39,12 @@
     }
 
     .app-shell {
-      width: min(1440px, 100%);
-      margin: 0 auto;
+      width: min(1440px, calc(100% - var(--latex-toolbar-reserve, 40px)));
+      margin: 28px 0 24px calc(var(--latex-toolbar-reserve, 40px) + max(0px, (100vw - var(--latex-toolbar-reserve, 40px) - 1440px) / 2));
       padding: 28px 30px 24px;
+    }
+    body.latex-toolbar-expanded {
+      --latex-toolbar-reserve: 220px;
     }
 
     .topbar {
@@ -1297,7 +1300,11 @@
     }
 
     @media (max-width: 820px) {
-      .app-shell { padding: 22px 16px; }
+      .app-shell {
+        width: calc(100% - var(--latex-toolbar-reserve, 40px));
+        margin: 22px 0 24px var(--latex-toolbar-reserve, 40px);
+        padding: 22px 16px;
+      }
       .workbench { grid-template-columns: minmax(0, 1fr); }
       .panel { min-height: 480px; }
       textarea { min-height: 330px; }
@@ -1306,6 +1313,35 @@
       .preview-wrap { min-height: 350px; }
       .library-layout { grid-template-columns: minmax(0, 1fr); }
       .library-folder-list { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      body.latex-toolbar-expanded { --latex-toolbar-reserve: 40px; }
+      .app-shell {
+        width: calc(100% - 40px);
+        margin-left: 40px;
+        padding-right: 10px;
+        padding-left: 12px;
+      }
+      .latex-floating-toolbar.is-open {
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        transform: none;
+        justify-content: center;
+        padding: 14px;
+        background: rgba(18, 27, 45, .42);
+      }
+      .latex-floating-toolbar.is-open .latex-toolbar-panel {
+        width: min(360px, 100%);
+        max-height: calc(100dvh - 82px);
+        flex: 0 1 auto;
+      }
+      .latex-floating-toolbar.is-open .latex-toolbar-toggle {
+        width: min(360px, 100%);
+        flex: 0 0 38px;
+      }
     }
 
     @media (max-width: 430px) {
@@ -1900,11 +1936,11 @@
                           <span class="latex-tool-copy"><span class="latex-tool-name">定積分</span><span class="latex-tool-example">\int_{a}^{b} f(x)\,dx</span></span>
                         </button>
                         <button id="latex-insert-aligned" class="latex-tool-action" type="button" title="aligned環境を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">≡</span>
+                          <span class="latex-tool-icon" aria-hidden="true">↔</span>
                           <span class="latex-tool-copy"><span class="latex-tool-name">aligned環境</span><span class="latex-tool-example">\begin{aligned}…</span></span>
                         </button>
                         <button id="latex-insert-cases" class="latex-tool-action" type="button" title="場合分けのcases環境を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">{ }</span>
+                          <span class="latex-tool-icon" aria-hidden="true">{</span>
                           <span class="latex-tool-copy"><span class="latex-tool-name">cases環境</span><span class="latex-tool-example">\begin{cases}…</span></span>
                         </button>
                         <button id="latex-insert-root" class="latex-tool-action" type="button" title="平方根のひな型を挿入">
@@ -1912,15 +1948,15 @@
                           <span class="latex-tool-copy"><span class="latex-tool-name">ルート</span><span class="latex-tool-example">\sqrt{ }</span></span>
                         </button>
                         <button id="latex-insert-superscript" class="latex-tool-action" type="button" title="上付き文字を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">x²</span>
+                          <span class="latex-tool-icon" aria-hidden="true">²</span>
                           <span class="latex-tool-copy"><span class="latex-tool-name">累乗・上付き</span><span class="latex-tool-example">^{ }</span></span>
                         </button>
                         <button id="latex-insert-subscript" class="latex-tool-action" type="button" title="下付き文字を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">xᵢ</span>
+                          <span class="latex-tool-icon" aria-hidden="true">ᵢ</span>
                           <span class="latex-tool-copy"><span class="latex-tool-name">下付き</span><span class="latex-tool-example">_{ }</span></span>
                         </button>
                         <button id="latex-insert-lim" class="latex-tool-action" type="button" title="極限のひな型を挿入">
-                          <span class="latex-tool-icon" aria-hidden="true">lim</span>
+                          <span class="latex-tool-icon" aria-hidden="true">↓</span>
                           <span class="latex-tool-copy"><span class="latex-tool-name">極限</span><span class="latex-tool-example">\lim_{x \to a}</span></span>
                         </button>
                         <button id="latex-insert-rightarrow" class="latex-tool-action" type="button" title="右向き矢印を挿入">
@@ -2284,6 +2320,7 @@
       function setLatexToolbarOpen(open) {
         latexToolbarPanel.hidden = !open;
         latexToolbar.classList.toggle("is-open", open);
+        document.body.classList.toggle("latex-toolbar-expanded", open);
         latexToolbarToggle.setAttribute("aria-expanded", String(open));
         latexToolbarToggle.setAttribute(
           "aria-label",
